@@ -1,0 +1,310 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<TargetPlatform>
+  <TaskPriorityDirection>HigherNumberIsMoreImportant</TaskPriorityDirection>
+  <KernelServiceGroups>
+    <KernelServiceGroup name="Semaphore">
+      <KernelService name="RtCreateSemaphore">
+        <Parameter name="Max" format="{0}"/>
+        <ReturnValue name="Sema" format=" returned {0}"/>
+      </KernelService>
+      <KernelService name="RtOpenSemaphore"/>
+      <KernelService name="RtCloseHandle" distinctName="RtCloseHandle (Semaphore)"/>
+      <KernelService name="RtReleaseSemaphore" operation="IncreaseSemaphore" parameters="ObjectAndNumericParameter"/>
+      <KernelService name="RtWaitForSingleObject" operation="DecreaseSemaphore"  distinctName="RtWaitForSingleObject (Semaphore)"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="FastSemaphore">
+      <KernelService name="RtInitializeFastSemaphore"/>
+      <KernelService name="RtAcquireFastSemaphore" operation="DecreaseSemaphore"/>
+      <KernelService name="RtReleaseFastSemaphore" operation="IncreaseSemaphore"/>
+      <KernelService name="RtReleaseAllFastSemaphore" operation="IncreaseSemaphore"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="Mutex">
+      <KernelService name="RtCreateMutex" operation="Initialize">
+        <Parameter name="Name" format="{0}"/>
+        <Parameter name="InitiallyLocked" format="{0}"/>
+        <ReturnValue name="Mutex" format=" returned {0}"/>
+      </KernelService>
+      <KernelService name="RtOpenMutex"/>
+      <KernelService name="RtCloseHandle" distinctName="RtCloseHandle (Mutex)"/>
+      <KernelService name="RtReleaseMutex" operation="ReleaseMutex"/>
+      <KernelService name="RtWaitForSingleObject" operation="LockMutex" distinctName="RtWaitForSingleObject (Mutex)"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="CriticalSection">
+      <KernelService name="EnterCriticalSection" operation="LockMutex"/>
+      <KernelService name="InitializeCriticalSection"/>
+      <KernelService name="DeleteCriticalSection"/>
+      <KernelService name="LeaveCriticalSection" operation="ReleaseMutex"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="Event">
+      <KernelService name="RtCreateEvent">
+        <ReturnValue name="Event" format=" returned {0}"/>
+      </KernelService>
+      <KernelService name="RtOpenEvent"/>
+      <KernelService name="RtCloseHandle" distinctName="RtCloseHandle (Event)"/>
+      <KernelService name="RtResetEvent" operation="MinimizeSemaphoreNoLock"/>
+      <KernelService name="RtPulseEvent" operation="IncreaseSemaphore"/>
+      <KernelService name="RtSetEvent" operation="MaximizeSemaphore"/>
+      <KernelService name="RtWaitForSingleObject" operation="DecreaseSemaphore" distinctName="RtWaitForSingleObject (Event)"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="Heap">
+      <KernelService name="HeapAlloc" operation="AllocateMemory" parameters="NumericParameterOnly">
+        <Parameter name="MemoryPool" format="{0}"/>
+        <Parameter name="size" format="{0}"/>
+        <ReturnValue name="ptr" format=" returned 0x{0:X8}"/>
+      </KernelService>
+      <KernelService name="HeapCreate">
+        <Parameter name="InitialSize" format="{0}"/>
+        <Parameter name="MaxSize" format="{0}"/>
+        <ReturnValue name="MemoryPool" format=" returned {0}"/>
+      </KernelService>
+      <KernelService name="HeapDestroy"/>
+      <KernelService name="HeapFree" operation="FreeMemory" parameters="NumericParameterOnly">
+        <Parameter name="MemoryPool" format="{0}" hidden="true"/>
+        <Parameter name="ptr" format="0x{0:X8}"/>
+        <ReturnValue name="size" format=" released {0} bytes"/>
+      </KernelService>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="WindowsMemory">
+      <KernelService name="WindowsMemoryAlloc" operation="AllocateMemory" parameters="NumericParameterOnly">
+        <Parameter name="MemoryPool" format="{0}" hidden="true"/>
+        <Parameter name="size" format="{0}"/>
+        <ReturnValue name="ptr" format=" returned 0x{0:X8}"/>
+      </KernelService>
+      <KernelService name="WindowsMemoryFree" operation="FreeMemory" parameters="NumericParameterOnly">
+        <Parameter name="MemoryPool" format="{0}" hidden="true"/>
+        <Parameter name="ptr" format="0x{0:X8}"/>
+        <ReturnValue name="size" format=" released {0} bytes"/>
+      </KernelService>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="LocalMemory">
+      <KernelService name="RtAllocateLocalMemory" operation="AllocateMemory" parameters="NumericParameterOnly">
+        <Parameter name="MemoryPool" format="{0}" hidden="true"/>
+        <Parameter name="size" format="{0}"/>
+        <ReturnValue name="ptr" format=" returned 0x{0:X8}"/>
+      </KernelService>
+      <KernelService name="RtShrinkLocalMemory" parameters="NumericParameterOnly">
+        <Parameter name="MemoryPool" format="{0}" hidden="true"/>
+        <Parameter name="size" format="{0}"/>
+      </KernelService>
+      <KernelService name="RtExpandLocalMemory" parameters="NumericParameterOnly">
+        <Parameter name="MemoryPool" format="{0}" hidden="true"/>
+        <Parameter name="size" format="{0}"/>
+      </KernelService>
+      <KernelService name="RtFreeLocalMemory" operation="FreeMemory" parameters="NumericParameterOnly">
+        <Parameter name="MemoryPool" format="{0}" hidden="true"/>
+        <Parameter name="ptr" format="0x{0:X8}"/>
+        <ReturnValue name="size" format=" released {0} bytes"/>
+      </KernelService>
+    </KernelServiceGroup>
+    
+    
+    <KernelServiceGroup name="ContiguousMemory">
+      <KernelService name="RtAllocateContiguousMemory" operation="AllocateMemory" parameters="NumericParameterOnly">
+        <Parameter name="MemoryPool" format="{0}" hidden="true"/>
+        <Parameter name="size" format="{0}"/>
+        <ReturnValue name="ptr" format=" returned 0x{0:X8}"/>
+      </KernelService>
+      <KernelService name="RtAllocateContiguousMemorySpecifyCache" operation="AllocateMemory" parameters="NumericParameterOnly">
+        <Parameter name="MemoryPool" format="{0}" hidden="true"/>
+        <Parameter name="size" format="{0}"/>
+        <ReturnValue name="ptr" format=" returned 0x{0:X8}"/>
+      </KernelService>
+      <KernelService name="RtFreeContiguousMemory" operation="FreeMemory" parameters="NumericParameterOnly">
+        <Parameter name="MemoryPool" format="{0}" hidden="true"/>
+        <Parameter name="ptr" format="0x{0:X8}"/>
+        <ReturnValue name="size" format=" released {0} bytes"/>
+      </KernelService>
+    </KernelServiceGroup>
+
+    
+    <KernelServiceGroup name="Thread">
+      <KernelService name="CreateThread">
+        <Parameter name="Start" format="0x{0:X16}"/>
+        <ReturnValue name="Thread" format=" returned {0}"/>
+      </KernelService>
+      <KernelService name="ThreadDestroy"/>
+      <KernelService name="RtSetThreadPriority">
+        <Parameter name="Thread"/>
+        <Parameter name="new" format="new: {0}"/>
+        <Parameter name="old" format="old: {0}"/>
+      </KernelService>
+      <KernelService name="SetThreadAffinityMask">
+        <Parameter name="Thread"/>
+        <Parameter name="new" format="new: {0}"/>
+        <Parameter name="old" format="old: {0}"/>
+      </KernelService>
+      <KernelService name="SetThreadIdealProcessor">
+        <Parameter name="Thread"/>
+        <Parameter name="new" format="new: {0}"/>
+        <Parameter name="old" format="old: {0}"/>
+      </KernelService>
+      <KernelService name="RtSetThreadTimeQuantum">
+        <Parameter name="Thread"/>
+        <Parameter name="new" format="new: {0}"/>
+        <Parameter name="old" format="old: {0}"/>
+      </KernelService>
+      <KernelService name="ResumeThread" operation="StartInstance"/>
+      <KernelService name="RtSleepFt" operation="Delay" parameters="NumericParameterOnly"/>
+      <KernelService name="SuspendThread"/>
+      <KernelService name="RtWaitForSingleObject" distinctName="RtWaitForSingleObject (Thread)"/>
+      <KernelService name="RtCloseHandle" distinctName="RtCloseHandle (Thread)"/>
+      <KernelService name="ExitThread">
+        <Parameter name="Thread" hidden="true"/>
+        <Parameter name="Code" format="{0}"/>
+      </KernelService>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="Timer">
+      <KernelService name="RtCreateTimer" parameters="Variable">
+        <Parameter name="Period"/>
+        <ReturnValue name="object" format=" returned {0}"/>
+      </KernelService>
+      <KernelService name="RtDeleteTimer"/>
+      <KernelService name="RtCancelTimer"/>
+      <KernelService name="RtSetTimer">
+        <Parameter name="Timer"/>
+        <Parameter name="Expiration" format="{0}"/>
+        <Parameter name="Period" format="{0}"/>
+      </KernelService>
+      <KernelService name="RtSetTimerRelative">
+        <Parameter name="Timer"/>
+        <Parameter name="Expiration" format="{0}"/>
+        <Parameter name="Period" format="{0}"/>
+      </KernelService>
+      <KernelService name="RtCloseHandle"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="Process">
+      <KernelService name="RtCreateProcess" operation="StartInstance">
+        <Parameter name="Path"/>
+        <Parameter name="Command"/>
+        <ReturnValue name="object" format=" returned {0}"/>
+      </KernelService>
+      <KernelService name="ProcessDestroy"/>
+      <KernelService name="RtSetProcessAffinityMask">
+        <Parameter name="Process"/>
+        <Parameter name="new" format="new: {0}"/>
+        <Parameter name="old" format="old: {0}"/>
+      </KernelService>
+      <KernelService name="RtOpenProcess"/>
+      <KernelService name="RtWaitForSingleObject" distinctName="RtWaitForSingleObject (Process)"/>
+      <KernelService name="RtCloseHandle" distinctName="RtCloseHandle (Process)"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="Misc">
+      <KernelService name="RtWaitForMultipleObjects" operation="WaitForMultipleObjects" parameters="Variable">
+        <ReturnValue name="object" format=" returned {0}"/>
+      </KernelService>
+      <KernelService name="RtCloseHandle" distinctName="RtCloseHandle (Other)"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="TLS">
+      <KernelService name="TlsAlloc" >
+        <ReturnValue name="Index" format=" returned {0}"/>
+      </KernelService>
+      <KernelService name="TlsFree" parameters="NumericParameterOnly"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="Shared Memory">
+      <KernelService name="RtCreateSharedMemory" parameters="ObjectAndNumericParameter"/>
+      <KernelService name="RtOpenSharedMemory"/>
+      <KernelService name="SharedMemoryDestroy"/>
+      <KernelService name="RtCloseHandle" distinctName="RtCloseHandle (SHM)"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="Memory Map">
+      <KernelService name="RtMapMemory" parameters="NumericParameterOnly" format="0x{0:X16}">
+        <Parameter name="Physical" format="0x{0:X16}" />
+        <Parameter name="Size" format="{0}"/>
+        <ReturnValue name="virtual" format=" return 0x{0:X16}"/>
+      </KernelService>
+      <KernelService name="RtUnmapMemory" parameters="NumericParameterOnly" format="0x{0:X16}"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="Library">
+      <KernelService name="LoadLibrary" parameters="None">
+        <Parameter name="fileName" format="&quot;{0}&quot;"/>
+        <ReturnValue name="handle" format=" returned {0}"/>
+      </KernelService>
+      <KernelService name="ModuleUnload" parameters="None"/>
+      <KernelService name="FreeLibrary" parameters="Variable"/>
+    </KernelServiceGroup>
+    
+    
+    <KernelServiceGroup name="Interrupts">
+      <KernelService name="RtAttachInterrupt" parameters="None" format="0x{0:X16}"/>
+      <KernelService name="RtReleaseInterrupt" parameters="None" format="0x{0:X16}"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="Shutdown Handler">
+      <KernelService name="RtAttachShutdownHandler" parameters="None"/>
+      <KernelService name="RtReleaseShutdownHandler" parameters="None"/>
+      <KernelService name="RtCloseHandle" distinctName="RtCloseHandle (ShutdownHandler)"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="File">
+      <KernelService name="CreateFile">
+        <Parameter name="fileName" format="&quot;{0}&quot;"/>
+        <ReturnValue name="handle" format=" returned {0}"/>
+      </KernelService>
+      <KernelService name="FileDestroy"/>
+      <KernelService name="RtCloseHandle" distinctName="RtCloseHandle (File)"/>
+    </KernelServiceGroup>
+    
+      
+    <KernelServiceGroup name="Exceptions">
+      <KernelService name="SetUnhandledExceptionFilter" >
+        <Parameter name="new" format="new: 0x{0:X16}"/>
+        <Parameter name="old" format="old: 0x{0:X16}"/>
+      </KernelService>
+    </KernelServiceGroup>
+  
+  
+  </KernelServiceGroups>
+  <ObjectClasses>
+    <ObjectClass name="FastSemaphore" type="Semaphore"/>
+    <ObjectClass name="Semaphore" type="Semaphore"/>
+    <ObjectClass name="Timer"/>
+    <ObjectClass name="Mutex" type="Mutex"/>
+    <ObjectClass name="Thread" type="Actor"/>
+    <ObjectClass name="Process" type="ActorGroup"/>
+    <ObjectClass name="Event" type="Semaphore"/>
+    <ObjectClass name="Heap" type="Heap" options="NoIpcGraph"/>
+    <ObjectClass name="CriticalSection" type="Mutex"/>
+    <ObjectClass name="SHM"/>
+    <ObjectClass name="File"/>
+    <ObjectClass name="Interrupt"/>
+    <ObjectClass name="Shutdown"/>
+    <ObjectClass name="Attachment"/>
+    <ObjectClass name="PciSlot"/>
+    <ObjectClass name="NMIHandler"/>
+    <ObjectClass name="Library"/>
+    <ObjectClass name="ProcessLibrary"/>
+    <ObjectClass name="Unknown"/>
+    
+  </ObjectClasses>
+</TargetPlatform>

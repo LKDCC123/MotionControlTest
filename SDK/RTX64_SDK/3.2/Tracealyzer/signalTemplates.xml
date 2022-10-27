@@ -1,0 +1,34 @@
+<SignalTemplates>
+  <Template>
+    <Name>First integer value after channel ID</Name>
+    <Description>Matches the first integer value following the initial "[channel]" part.</Description>
+    <Regex>^\[.*?\].*?(-?[0-9]+)</Regex>
+    <ResultIndex>1</ResultIndex>
+    <ParseAs>DecimalInteger</ParseAs>
+    <ExampleData>[V1] 234 volts</ExampleData>
+  </Template>
+  <Template>
+    <Name>Last integer value</Name>
+    <Description>Matches a decimal integer in the end of the string.</Description>
+    <Regex>(-?[0-9]+)$</Regex>
+    <ResultIndex>1</ResultIndex>
+    <ParseAs>DecimalInteger</ParseAs>
+    <ExampleData>[0001] MyVal: -42</ExampleData>
+  </Template>
+  <Template>
+    <Name>Labeled integer value</Name>
+    <Description>Matches the first decimal integer following the label "MyVal:" and any spaces in between.</Description>
+    <Regex>MyVal\:[ ]*(-?[0-9]+)</Regex>
+    <ResultIndex>1</ResultIndex>
+    <ParseAs>DecimalInteger</ParseAs>
+    <ExampleData>[0001] MyVal: 39 MyVal2: 82</ExampleData>
+  </Template>
+  <Template>
+    <Name>First Double value after channel ID</Name>
+    <Description>Matches the first Double value following the initial "[channel]" part. (e.g. 3,14 or -2,343E-12). Comma is used as decimal separator.</Description>
+    <Regex>^\[.*?\].*?(-?[0-9]+(,[0-9]+([eE][-+]?[0-9]+)?)?)</Regex>
+    <ResultIndex>1</ResultIndex>
+    <ParseAs>Double</ParseAs>
+    <ExampleData>[SimpleUserEvent] SimpleUserEvent, -2,449294E-16</ExampleData>
+  </Template>
+</SignalTemplates>

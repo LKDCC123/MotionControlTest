@@ -1,0 +1,10 @@
+<UserEventSignals>
+  <Signal>
+    <Name>SimpleUserEventPlot</Name>
+    <Color>-65536</Color>
+    <Regex>^\[.*?\].*?(-?[0-9]+(,[0-9]+([eE][-+]?[0-9]+)?)?)$</Regex>
+    <ResultIndex>1</ResultIndex>
+    <ParseAs>2</ParseAs>
+    <ExampleData>[SimpleUserEvent] SimpleUserEvent, -2,449294E-16</ExampleData>
+  </Signal>
+</UserEventSignals>

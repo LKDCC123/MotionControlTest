@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EventDefinitions>
+  <!-- These events use the full data block as hex or strings -->
+  <Event>
+    <Code>1</Code>
+    <Channel>Binary Data</Channel>
+    <BlobType>Hex</BlobType>
+  </Event>
+  <Event>
+    <Code>2</Code>
+    <Channel>ANSI strings</Channel>
+    <BlobType>ansi</BlobType>
+  </Event>
+  <Event>
+    <Code>3</Code>
+    <Channel>Unicode strings</Channel>
+    <BlobType>unicode</BlobType>
+  </Event>
+
+  <!-- 
+    These events completely ignore the data block and use a static string instead. Note that events can specify the same channel,
+    like below, which means they will appear under the same channel in the application.
+    -->
+  <Event>
+    <Code>4</Code>
+    <Channel>Static Events</Channel>
+    <Format>This is static event 4</Format>
+  </Event>
+  <Event>
+    <Code>5</Code>
+    <Channel>Static Events</Channel>
+    <Format>This is static event 5</Format>
+  </Event>
+
+  <!-- The following events demonstrate how to visualize C structs. -->
+
+  <!-- 
+    This event contains a point. The C struct may look something like this:
+  
+      struct Point
+      {
+        float x, y;
+      };
+  
+    This will be presented as a user event in Tracealyzer, and will show up as something like:
+  
+      [Points] (4.52 ; 3.23)
+      
+    The Format string can contain references to fields, as well as .NET format specifiers.
+    -->
+  <Event>
+    <Code>101</Code>
+    <Channel>Points</Channel>
+    <Format>({x:0.00} ; {y:0.00})</Format>
+    <Fields>
+      <Field>
+        <Type>float</Type>
+        <Offset>0</Offset>
+        <Name>x</Name>
+      </Field>
+      <Field>
+        <Type>float</Type>
+        <Offset>4</Offset>
+        <Name>y</Name>
+      </Field>
+    </Fields>
+  </Event>
+
+  <!-- 
+    This event represent some form of message with a sequence number, a sender and some raw data. The C struct may look like this:
+  
+      struct Message
+      {
+        uint32_t seqNo;
+        uint32_t senderId;
+        uint8_t data[32];
+      };
+    
+    This would show up in the application as something like:
+  
+      [Messages] seqNo = 53, senderId = 3, data = "0123ABCD(..)9876FEDC"
+    
+    Note that this event does not specify a format. When the Format tag is omitted, fields will simply be enumerated as above.
+    -->
+  <Event>
+    <Code>102</Code>
+    <Channel>Messages</Channel>
+    <Fields>
+      <Field>
+        <Type>u32</Type>
+        <Offset>0</Offset>
+        <Name>seqNo</Name>
+      </Field>
+      <Field>
+        <Type>u32</Type>
+        <Offset>4</Offset>
+        <Name>senderId</Name>
+      </Field>
+      <Field>
+        <Type>blob</Type>
+        <Offset>8</Offset>
+        <Name>data</Name>
+        <Size>32</Size>
+        <BlobType>hex</BlobType>
+      </Field>
+    </Fields>
+  </Event>
+
+</EventDefinitions>

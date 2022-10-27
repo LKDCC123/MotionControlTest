@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\L.B\GitHUB\MotionControlTest\Code\Tools\build\CMakeFiles\e17d95360d40c4eb343c633a295be89e\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{8CDE4B3E-614C-378C-AF3A-B872C84EE5C2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
