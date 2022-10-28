@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <iostream>
 
-#ifdef __USE_RTX
+#ifdef _USE_RTX
 #include <rtapi.h>
 #define ResetEvent              RtResetEvent  
 #define SetEvent                RtSetEvent    
@@ -18,6 +18,6 @@
 
 #define _D_WIN_RTX_TOOLS_BEGIN namespace Dcc { namespace WIN_RTX_TOOLS {
 #define _D_WIN_RTX_TOOLS_END }}
-#define _DWRT ::Dcc::WIN_RTX_TOOLS::
+#define _D_WRT ::Dcc::WIN_RTX_TOOLS::
 
 #endif

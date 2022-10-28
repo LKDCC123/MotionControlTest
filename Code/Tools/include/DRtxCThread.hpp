@@ -11,22 +11,24 @@
 
 _D_WIN_RTX_TOOLS_BEGIN
 
-DWORD WINAPI fnulCallBack(LPVOID lpt);
+template<typename tm_InputData>
+DWORD WINAPI ftmulCallBack(LPVOID lpt);
 
-class RtxCThread {
-    typedef void(*t_fptvCallBack)(double *);
+template<typename tm_InputData>
+class ctm_RtxCThread {
+    typedef void(*t_fptvCallBack)(tm_InputData *);
 private:
     t_fptvCallBack m_fptvCallBack;  // function pointer of the target funtion
-    double * m_dptDataIn;           // input data of the target function
+    tm_InputData * m_dptDataIn;           // input data of the target function
     HANDLE m_hThread;               // handle of the thread
     int m_nRunFlag;                 // if the thread is running
-    inline bool fnbInitIOPointer(t_fptvCallBack fptvCallBack = NULL, double * dptDataIn = NULL) { // point the target function pointer and the input data to the members
+    inline bool fnbInitIOPointer(t_fptvCallBack fptvCallBack = NULL, tm_InputData * dptDataIn = NULL) { // point the target function pointer and the input data to the members
         m_fptvCallBack = fptvCallBack, m_dptDataIn = dptDataIn;
         return TRUE;
     }
 public:
-    RtxCThread(t_fptvCallBack fptvCallBack, double * dptDataIn); 
-    ~RtxCThread();
+    ctm_RtxCThread(t_fptvCallBack fptvCallBack, tm_InputData * dptDataIn); 
+    ~ctm_RtxCThread();
     bool fnbCreateThread(); // create the thread and start it 
     bool fnbCreateThread(int nStartFlag); // create the thread
     bool fnbSetProcessPriority(); // set as the highest priority
@@ -42,28 +44,32 @@ public:
     }
 };
 
-RtxCThread::RtxCThread(t_fptvCallBack fptvCallBack = NULL, double * dptDataIn = NULL) {
+template<typename tm_InputData>
+ctm_RtxCThread<tm_InputData>::ctm_RtxCThread(t_fptvCallBack fptvCallBack, tm_InputData * dptDataIn) {
     this->fnbInitIOPointer(fptvCallBack, dptDataIn); // init the pointers in the members
     this->m_nRunFlag = FALSE;
     this->m_hThread = NULL;
 }
 
-RtxCThread::~RtxCThread() {
+template<typename tm_InputData>
+ctm_RtxCThread<tm_InputData>::~ctm_RtxCThread() {
     this->fnbCloseThread(); // close the thread
     Sleep(100);
     if(this->m_hThread != NULL) CloseHandle(this->m_hThread); // close the handle
 }
 
-bool RtxCThread::fnbCreateThread() {
+template<typename tm_InputData>
+bool ctm_RtxCThread<tm_InputData>::fnbCreateThread() {
     return (this->fnbCreateThread(TRUE));
 }
 
-bool RtxCThread::fnbCreateThread(int nStartFlag) {
+template<typename tm_InputData>
+bool ctm_RtxCThread<tm_InputData>::fnbCreateThread(int nStartFlag) {
     m_hThread = CreateThread( // create the thread
         NULL,
         0,
-        (LPTHREAD_START_ROUTINE)fnulCallBack,       // the callback function
-        LPVOID(this),       // input is the pointer of the class RtxCThread, but in the type of LPVOID
+        (LPTHREAD_START_ROUTINE)ftmulCallBack<tm_InputData>,       // the callback function
+        LPVOID(this),       // input is the pointer of the class ctm_RtxCThread, but in the type of LPVOID
         CREATE_SUSPENDED,   // does not start the thread the first time
         NULL                // thread id is negleted
     );
@@ -72,11 +78,13 @@ bool RtxCThread::fnbCreateThread(int nStartFlag) {
     return TRUE;
 }
 
-bool RtxCThread::fnbSetProcessPriority() {
+template<typename tm_InputData>
+bool ctm_RtxCThread<tm_InputData>::fnbSetProcessPriority() {
     return(this->fnbSetProcessPriority(REALTIME_PRIORITY_CLASS));
 }
 
-bool RtxCThread::fnbSetProcessPriority(DWORD dwPriorityClass) {
+template<typename tm_InputData>
+bool ctm_RtxCThread<tm_InputData>::fnbSetProcessPriority(DWORD dwPriorityClass) {
     HANDLE hCurrentProcess = GetCurrentProcess(); // get the handle of the current process
     SetPriorityClass(hCurrentProcess, dwPriorityClass); 
     SleepEx(10, FALSE); // not sleep when suspended
@@ -85,7 +93,8 @@ bool RtxCThread::fnbSetProcessPriority(DWORD dwPriorityClass) {
     return TRUE;
 }
 
-bool RtxCThread::fnbGetAvailableProcessor() {
+template<typename tm_InputData>
+bool ctm_RtxCThread<tm_InputData>::fnbGetAvailableProcessor() {
     _SYSTEM_INFO stInfo;
     GetSystemInfo(&stInfo);
     HANDLE hCurrentProcess = GetCurrentProcess(); // get the handle of the current process
@@ -96,36 +105,41 @@ bool RtxCThread::fnbGetAvailableProcessor() {
     return TRUE;
 }
 
-bool RtxCThread::fnbSetThreadProcessor(DWORD dwIdealProcessor) {
+template<typename tm_InputData>
+bool ctm_RtxCThread<tm_InputData>::fnbSetThreadProcessor(DWORD dwIdealProcessor) {
     if(SetThreadIdealProcessor(this->m_hThread, dwIdealProcessor) == -1) return FALSE;
     else return TRUE;
 }
 
-bool RtxCThread::fnbStartThread() {
+template<typename tm_InputData>
+bool ctm_RtxCThread<tm_InputData>::fnbStartThread() {
     this->m_nRunFlag = TRUE;
     ResumeThread(this->m_hThread);
     return TRUE;
 }
 
-bool RtxCThread::fnbPauseThread() {
+template<typename tm_InputData>
+bool ctm_RtxCThread<tm_InputData>::fnbPauseThread() {
     this->m_nRunFlag = FALSE;
     SuspendThread(this->m_hThread);
     return TRUE;
 }
 
-bool RtxCThread::fnbCloseThread() {
+template<typename tm_InputData>
+bool ctm_RtxCThread<tm_InputData>::fnbCloseThread() {
     this->m_nRunFlag = FALSE;
     CloseHandle(this->m_hThread);
     return TRUE;
 }
 
 // callback function
-DWORD WINAPI fnulCallBack(LPVOID lpt) { // input is a pointer to class RtxCThread
+template<typename tm_InputData>
+DWORD WINAPI ftmulCallBack(LPVOID lpt) { // input is a pointer to class ctm_RtxCThread
     if(lpt == NULL) {
         _STD cout << "DThread: Wrong callback function!" << _STD endl;
         return -1;
     }
-    auto cptCThread = (RtxCThread *)lpt; // translate the type of lpt to the class RtxCThread
+    auto cptCThread = (ctm_RtxCThread<tm_InputData> *)lpt; // translate the type of lpt to the class ctm_RtxCThread
     cptCThread->fnbRun(); // run the target function in the callback function
     _STD cout << "DThread: Quit!" << _STD endl;
     return 0;

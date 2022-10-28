@@ -13,23 +13,23 @@ int main() {
 }
 
 // ========================================== functions ====================================================
-void fnvFun1(double * dptDataIO) {
+void fnvFun1(int * dptDataIO) {
     while(1) {
         Sleep(1000);
         _STD cout << "Thread1: " << dptDataIO[0] << ", " << dptDataIO[1] << _STD endl;
 
-        dptDataIO[2] += 1.0, dptDataIO[3] += 2.0;
+        dptDataIO[2] += 1, dptDataIO[3] += 2;
     }
 }
 
 void fnvTestThread() {
-    double dptDataIO1[4];
-    void (*Fun1)(double *) = fnvFun1;
+    int dptDataIO1[4];
+    void (*Fun1)(int *) = fnvFun1;
 
-    dptDataIO1[0] = dptDataIO1[2] = 10.0;
-    dptDataIO1[1] = dptDataIO1[3] = 20.0;
+    dptDataIO1[0] = dptDataIO1[2] = 10;
+    dptDataIO1[1] = dptDataIO1[3] = 20;
 
-    _DWRT RtxCThread Thread1(Fun1, dptDataIO1);
+    _D_WRT ctm_RtxCThread<int> Thread1(Fun1, dptDataIO1);
     auto cptThread1 = &Thread1;
 
     cptThread1->fnbCreateThread(FALSE);
@@ -38,8 +38,8 @@ void fnvTestThread() {
 
     while(1) {
         Sleep(1000);
-        _STD cout << "Main: " << dptDataIO1[2] << "," <<  dptDataIO1[3] << _STD endl << _STD endl; 
+        _STD cout << "Main: " << dptDataIO1[2] << ", " <<  dptDataIO1[3] << _STD endl << _STD endl; 
 
-        dptDataIO1[0] += 1.0,dptDataIO1[1] += 2.0;
+        dptDataIO1[0] += 1, dptDataIO1[1] += 2;
     }
 }

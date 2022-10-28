@@ -29,7 +29,7 @@ target_compile_definitions(ToolsTest PUBLIC
     _UNICODE
     UNICODE
     _CRT_SECURE_NO_WARNINGS_
-    # __USE_RTX
+    # _USE_RTX
 )
 
 target_compile_options(ToolsTest PUBLIC
