@@ -1,20 +1,21 @@
-// based on Lee's RtxCThread.hpp
-// creat thread in Rtx bases on Rtx class: Thread
+// DRtxCThread.hpp
 // make a new thread into a new class
-// 20221027 Dcc <3120195094@bit.edu.cn>
+// bases on Rtx class: Thread
+// based on Lee's RtxCThread.hpp
+// 20221027 bit, Dcc <3120195094@bit.edu.cn>
 
 #pragma once
 #ifndef DRTXCTHREAD_HPP
 #define DRTXCTHREAD_HPP
-#include <RtxHeaders.h>
 #include <bitset>
+#include "RtxHeaders.h"
 
 _D_WIN_RTX_TOOLS_BEGIN
 
 template<typename tm_InputData>
 DWORD WINAPI ftmulCallBack(LPVOID lpt);
 
-template<typename tm_InputData>
+template<typename tm_InputData> // define typename: tm_InputData
 class ctm_RtxCThread {
     typedef void(*t_fptvCallBack)(tm_InputData *);
 private:

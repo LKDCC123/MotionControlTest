@@ -13,33 +13,51 @@ int main() {
 }
 
 // ========================================== functions ====================================================
-void fnvFun1(int * dptDataIO) {
-    while(1) {
-        Sleep(1000);
-        _STD cout << "Thread1: " << dptDataIO[0] << ", " << dptDataIO[1] << _STD endl;
+_D_WRT c_RtxCMutex MutexThread1(L"Cal1");
+_D_WRT c_RtxCMutex MutexMain(L"Cal1");
 
-        dptDataIO[2] += 1, dptDataIO[3] += 2;
+void fnvFunThread1(int * dptDataIO) {
+    MutexThread1.fnbGetMutex();
+    while(1) {
+        if(MutexThread1.fnbLock()) {
+            _STD cout << "Thread1: " << dptDataIO[0] << ", " << dptDataIO[1] << _STD endl;
+
+            dptDataIO[2] += 1, dptDataIO[3] += 2;
+        }
+        MutexThread1.fnbUnlock();
+    }
+}
+
+void fnvFunMain(int * dptDataIO) {
+    while(1) {
+        MutexMain.fnbUnlock();
+        MutexMain.fnbLock();
+        _STD cout << "Main: " << dptDataIO[2] << ", " <<  dptDataIO[3] << _STD endl << _STD endl; 
+
+        dptDataIO[0] += 1, dptDataIO[1] += 2;
+
+        Sleep(1000); // simulate the realtime control circle
     }
 }
 
 void fnvTestThread() {
-    int dptDataIO1[4];
-    void (*Fun1)(int *) = fnvFun1;
+    int dptDataIO[4];
+    void (*fptFunThread)(int *) = fnvFunThread1;
+    void (*fptFunMain)(int *) = fnvFunMain;
 
-    dptDataIO1[0] = dptDataIO1[2] = 10;
-    dptDataIO1[1] = dptDataIO1[3] = 20;
+    dptDataIO[0] = dptDataIO[2] = 10;
+    dptDataIO[1] = dptDataIO[3] = 20;
+    
+    MutexMain.fnbCreateMutex();
 
-    _D_WRT ctm_RtxCThread<int> Thread1(Fun1, dptDataIO1);
+    _D_WRT ctm_RtxCThread<int> Thread1(fnvFunThread1, dptDataIO);
     auto cptThread1 = &Thread1;
 
     cptThread1->fnbCreateThread(FALSE);
     cptThread1->fnbStartThread();
     cptThread1->fnbGetAvailableProcessor();
 
-    while(1) {
-        Sleep(1000);
-        _STD cout << "Main: " << dptDataIO1[2] << ", " <<  dptDataIO1[3] << _STD endl << _STD endl; 
+    fptFunMain(dptDataIO);
 
-        dptDataIO1[0] += 1, dptDataIO1[1] += 2;
-    }
+    getchar();
 }

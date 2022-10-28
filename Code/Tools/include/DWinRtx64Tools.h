@@ -3,5 +3,6 @@
 #define DWINRTXTOOLS_H
 
 #include <DRtxCThread.hpp>
+#include <DRtxCMutex.hpp>
 
 #endif

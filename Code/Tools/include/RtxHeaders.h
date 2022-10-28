@@ -8,12 +8,18 @@
 
 #ifdef _USE_RTX
 #include <rtapi.h>
+#define CreateEvent             RtCreateEvent
+#define OpenEvent               RtOpenEvent
 #define ResetEvent              RtResetEvent  
-#define SetEvent                RtSetEvent    
-#define WaitForSingleObject     RtWaitForSingleObject 
-#define CloseHandle             RtCloseHandle   
-#define ReleaseMutex            RtReleaseMutex      
+#define SetEvent                RtSetEvent      
 #define SetThreadPriority       RtSetThreadPriority 
+#define CreateMutex             RtCreateMutex
+#define OpenMutex               RtOpenMutex
+#define ReleaseMutex            RtReleaseMutex      
+#define WaitForSingleObject     RtWaitForSingleObject 
+#define CreateSemaphore         RtCreateSemaphore
+#define OpenSemaphore           RtOpenSemaphore 
+#define CloseHandle             RtCloseHandle   
 #endif
 
 #define _D_WIN_RTX_TOOLS_BEGIN namespace Dcc { namespace WIN_RTX_TOOLS {
