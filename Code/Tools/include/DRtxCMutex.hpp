@@ -16,14 +16,15 @@ private:
     _STD wstring m_wstrName;
     HANDLE m_hMutex;
 public:
-    inline c_RtxCMutex(const WCHAR * wstrName) {
-        this->m_wstrName = wstrName;
+    inline c_RtxCMutex(const WCHAR * wcptName) { // get the name of the handle
+        this->m_wstrName = wcptName;
+        this->m_hMutex = NULL;
     }
-    inline ~c_RtxCMutex() {
-        if(this->m_hMutex != NULL) CloseHandle(this->m_hMutex);
+    inline ~c_RtxCMutex() { // close the mutex
+        if(this->m_hMutex != NULL) RtCloseHandle(this->m_hMutex);
     }
-    inline bool fnbCreateMutex(){
-        this->m_hMutex = CreateMutex(NULL, FALSE, this->m_wstrName.c_str());
+    inline bool fnbCreate() { // create a mutex which not belongs to the process with directed name 
+        this->m_hMutex = RtCreateMutex(NULL, FALSE, this->m_wstrName.c_str());
         if(this->m_hMutex == NULL) {
             _STD cout << "DMutex: Error! Can't create mutex named <" << this->m_wstrName.c_str() << ">" << _STD endl;
             return FALSE; 
@@ -31,8 +32,8 @@ public:
         else _STD cout << "DMutex: Created! Mutex named <" << this->m_wstrName.c_str() << ">" << _STD endl;
         return TRUE;
     }
-    inline bool fnbGetMutex() {
-        this->m_hMutex = OpenMutex(SYNCHRONIZE, FALSE, this->m_wstrName.c_str());
+    inline bool fnbOpen() {
+        this->m_hMutex = RtOpenMutex(SYNCHRONIZE, FALSE, this->m_wstrName.c_str());
         if(this->m_hMutex == NULL) {
             _STD cout << "DMutex: Error! Can't get mutex named <" << this->m_wstrName.c_str() << ">" << _STD endl;
             return FALSE; 
@@ -41,12 +42,15 @@ public:
         return TRUE;
     }
     inline bool fnbLock() {
-        WaitForSingleObject(this->m_hMutex, INFINITE);
+        RtWaitForSingleObject(this->m_hMutex, INFINITE);
         return TRUE;
     }
     inline bool fnbUnlock() {
-        ReleaseMutex(this->m_hMutex);
+        RtReleaseMutex(this->m_hMutex);
         return TRUE;
+    }
+    inline bool fnbClose() {
+        if(this->m_hMutex != NULL) RtCloseHandle(this->m_hMutex);
     }
 };
 

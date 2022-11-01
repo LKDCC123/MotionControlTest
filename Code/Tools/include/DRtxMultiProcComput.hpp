@@ -5,4 +5,9 @@
 // 20221029 bit, Dcc <3120195094@bit.edu.cn>
 
 #pragma once
+#ifndef DRTXMULTIPROCCOMPUT_HPP
+#define DRTXMULTIPROCCOMPUT_HPP
+#include "RtxHeaders.h"
 
+
+#endif

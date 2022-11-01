@@ -8,20 +8,44 @@
 
 #ifdef _USE_RTX
 #include <rtapi.h>
-#define CreateEvent             RtCreateEvent
-#define OpenEvent               RtOpenEvent
-#define ResetEvent              RtResetEvent  
-#define SetEvent                RtSetEvent      
-#define SetThreadPriority       RtSetThreadPriority 
-#define CreateMutex             RtCreateMutex
-#define OpenMutex               RtOpenMutex
-#define ReleaseMutex            RtReleaseMutex      
-#define WaitForSingleObject     RtWaitForSingleObject 
-#define CreateSemaphore         RtCreateSemaphore
-#define OpenSemaphore           RtOpenSemaphore 
-#define CloseHandle             RtCloseHandle   
+#else
+#define RtCreateEvent               CreateEvent
+#define RtOpenEvent                 OpenEvent
+#define RtResetEvent                ResetEvent  
+#define RtSetEvent                  SetEvent      
+#define RtCreateThread              CreateThread
+#define RtResumeThread              ResumeThread
+#define RtSetThreadPriority         SetThreadPriority 
+#define RtGetProcessAffinityMask    GetProcessAffinityMask
+#define RtCreateMutex               CreateMutex
+#define RtOpenMutex                 OpenMutex
+#define RtReleaseMutex              ReleaseMutex      
+#define RtWaitForSingleObject       WaitForSingleObject 
+#define RtCreateSemaphore           CreateSemaphore
+#define RtOpenSemaphore             OpenSemaphore 
+#define RtCloseHandle               CloseHandle   
 #endif
 
+#define _D_Create                   433001
+#define _D_CantCreate               433002
+#define _D_Get                      433003
+#define _D_CantGet                  433004
+
+inline void fnvSendMsg(int nIssueIndex, const CHAR * wcptBelongs, const CHAR * wcptObject, const WCHAR * wcptName) {
+    printf_s("%s", wcptBelongs);
+    switch(nIssueIndex) {
+        case _D_Create: _STD cout << ": Created! "; break;
+        case _D_CantCreate: _STD cout << ": Error! Can't created "; break;
+        case _D_Get: _STD cout << ": Get! "; break;
+        case _D_CantGet: _STD cout << ": Error! Can't get "; break;
+    }
+    printf_s("%s ", wcptObject);
+    _STD cout << "Named <";
+    wprintf_s(L"%s", wcptName);
+    _STD cout << ">" << _STD endl;
+}
+
+#define _D_Msg(IssusIndex, Belongs, Object, Name) fnvSendMsg(IssusIndex, Belongs, Object, Name)
 #define _D_WIN_RTX_TOOLS_BEGIN namespace Dcc { namespace WIN_RTX_TOOLS {
 #define _D_WIN_RTX_TOOLS_END }}
 #define _D_WRT ::Dcc::WIN_RTX_TOOLS::

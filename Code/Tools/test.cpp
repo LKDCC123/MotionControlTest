@@ -13,51 +13,56 @@ int main() {
 }
 
 // ========================================== functions ====================================================
-_D_WRT c_RtxCMutex MutexThread1(L"Cal1");
-_D_WRT c_RtxCMutex MutexMain(L"Cal1");
+void fnvFunWin(int * dptDataIO) {
+    _D_WRT c_RtxCMutex MutexWin(L"Cal1"); // instantiate the mutex named "Cal1" in thread: win 
+    MutexWin.fnbOpen();
+    
 
-void fnvFunThread1(int * dptDataIO) {
-    MutexThread1.fnbGetMutex();
-    while(1) {
-        if(MutexThread1.fnbLock()) {
+    while(1) { // loop in win
+        if(MutexWin.fnbLock()) {
             _STD cout << "Thread1: " << dptDataIO[0] << ", " << dptDataIO[1] << _STD endl;
 
             dptDataIO[2] += 1, dptDataIO[3] += 2;
         }
-        MutexThread1.fnbUnlock();
+        MutexWin.fnbUnlock();
     }
 }
 
-void fnvFunMain(int * dptDataIO) {
-    while(1) {
-        MutexMain.fnbUnlock();
-        MutexMain.fnbLock();
-        _STD cout << "Main: " << dptDataIO[2] << ", " <<  dptDataIO[3] << _STD endl << _STD endl; 
+void fnvFunRtx(int * dptDataIO) {
+    _D_WRT c_RtxCMutex MutexRtx(L"Cal1"); // instantiate the mutex named "Cal1" in thread: rtx
+    MutexRtx.fnbCreate();
 
-        dptDataIO[0] += 1, dptDataIO[1] += 2;
+    while(1) { // loop in rtx
+        if(MutexRtx.fnbLock()) {
+            _STD cout << "Main: " << dptDataIO[2] << ", " <<  dptDataIO[3] << _STD endl << _STD endl; 
 
-        Sleep(1000); // simulate the realtime control circle
+            dptDataIO[0] += 1, dptDataIO[1] += 2;
+
+            Sleep(1000); // simulate the realtime control circle
+        }
+        MutexRtx.fnbUnlock();
     }
 }
 
 void fnvTestThread() {
-    int dptDataIO[4];
-    void (*fptFunThread)(int *) = fnvFunThread1;
-    void (*fptFunMain)(int *) = fnvFunMain;
-
-    dptDataIO[0] = dptDataIO[2] = 10;
-    dptDataIO[1] = dptDataIO[3] = 20;
+    void (*fptFunWin)(int *) = fnvFunWin; // obtain the function pointder for windows
+    void (*fptFunRtx)(int *) = fnvFunRtx; // obtain the function pointder for rtx
     
-    MutexMain.fnbCreateMutex();
-
-    _D_WRT ctm_RtxCThread<int> Thread1(fnvFunThread1, dptDataIO);
+    _D_WRT ctm_RtxCShm<int> Shm1(L"Shm1"); // instantiate the sharedmemory named "Cal1"
+    auto cptShm1 = &Shm1; // obtain the sharedmemory pointer
+    
+    cptShm1->fnbCreateShm(); // sharedmemory: create
+    *cptShm1->fntmptGetDataIOPointer() = *(cptShm1->fntmptGetDataIOPointer() + 2) = 10; // init the data
+    *(cptShm1->fntmptGetDataIOPointer() + 1) = *(cptShm1->fntmptGetDataIOPointer() + 3) = 20; // init the data
+    
+    _D_WRT ctm_RtxCThread<int> Thread1(cptShm1->fntmptGetDataIOPointer());
     auto cptThread1 = &Thread1;
 
-    cptThread1->fnbCreateThread(FALSE);
-    cptThread1->fnbStartThread();
+    cptThread1->fnbCreate(fptFunWin, FALSE);
     cptThread1->fnbGetAvailableProcessor();
+    cptThread1->fnbStart();
 
-    fptFunMain(dptDataIO);
+    fptFunRtx(cptShm1->fntmptGetDataIOPointer());
 
     getchar();
 }

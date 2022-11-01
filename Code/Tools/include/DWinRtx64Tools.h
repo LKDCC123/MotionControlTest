@@ -4,5 +4,7 @@
 
 #include <DRtxCThread.hpp>
 #include <DRtxCMutex.hpp>
+#include <DRtxCSharedMem.hpp>
+#include <DRtxCSemaphore.hpp>
 
 #endif
