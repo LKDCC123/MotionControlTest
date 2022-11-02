@@ -26,19 +26,19 @@ public:
     inline bool fnbCreate(int nMaxCounts) { // create a semaphore which not belongs to the process with directed name, and set the maximum count number
         this->m_hSem = RtCreateSemaphore(NULL, 0, nMaxCounts, this->m_wstrName.c_str());
         if(this->m_hSem == NULL) {
-            _STD cout << "DSema: Error! Can't create semaphore named <" << this->m_wstrName.c_str() << ">" << _STD endl;
+            _D_Msg(_D_CantCreate, "DSema", "Semaphore", this->m_wstrName.c_str());
             return FALSE; 
         }
-        else _STD cout << "DSema: Created! semaphore named <" << this->m_wstrName.c_str() << ">" << _STD endl;
+        else _D_Msg(_D_Create, "DSema", "Semaphore", this->m_wstrName.c_str());
         return TRUE;
     }
     inline bool fnbOpen() {
         this->m_hSem = RtOpenSemaphore(SYNCHRONIZE, FALSE, this->m_wstrName.c_str());
         if(this->m_hSem == NULL) {
-            _STD cout << "DSema: Error! Can't get semaphore named <" << this->m_wstrName.c_str() << ">" << _STD endl;
+            _D_Msg(_D_CantGet, "DSema", "Semaphore", this->m_wstrName.c_str());
             return FALSE; 
         }
-        else _STD cout << "DSema: Get! semaphore named <" << this->m_wstrName.c_str() << ">" << _STD endl;
+        else _D_Msg(_D_Get, "DSema", "Semaphore", this->m_wstrName.c_str());
         return TRUE;
     }
     inline bool fnbWait() { // wait for the semaphore and discount the counting number to ?

@@ -26,19 +26,19 @@ public:
     inline bool fnbCreate() { // create a mutex which not belongs to the process with directed name 
         this->m_hMutex = RtCreateMutex(NULL, FALSE, this->m_wstrName.c_str());
         if(this->m_hMutex == NULL) {
-            _STD cout << "DMutex: Error! Can't create mutex named <" << this->m_wstrName.c_str() << ">" << _STD endl;
+            _D_Msg(_D_CantCreate, "DMutex", "Mutex", this->m_wstrName.c_str());
             return FALSE; 
         }
-        else _STD cout << "DMutex: Created! Mutex named <" << this->m_wstrName.c_str() << ">" << _STD endl;
+        else _D_Msg(_D_Create, "DMutex", "Mutex", this->m_wstrName.c_str());
         return TRUE;
     }
     inline bool fnbOpen() {
         this->m_hMutex = RtOpenMutex(SYNCHRONIZE, FALSE, this->m_wstrName.c_str());
         if(this->m_hMutex == NULL) {
-            _STD cout << "DMutex: Error! Can't get mutex named <" << this->m_wstrName.c_str() << ">" << _STD endl;
+            _D_Msg(_D_CantGet, "DMutex", "Mutex", this->m_wstrName.c_str());
             return FALSE; 
         }
-        else _STD cout << "DMutex: Get! Mutex named <" << this->m_wstrName.c_str() << ">" << _STD endl;
+        else _D_Msg(_D_Get, "DMutex", "Mutex", this->m_wstrName.c_str());
         return TRUE;
     }
     inline bool fnbLock() {

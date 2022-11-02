@@ -8,7 +8,7 @@
 #ifndef DRTXCSHAREDMEM_HPP
 #define DRTXCSHAREDMEM_HPP
 #include "RtxHeaders.h"
-// #define _USE_RTX
+
 _D_WIN_RTX_TOOLS_BEGIN
 
 template<typename tm_DataIO>
@@ -35,7 +35,7 @@ public:
         #else
             this->m_hShm = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(tm_DataIO), this->m_wstrName.c_str());
         #endif
-        if(GetLastError() == ERROR_ALREADY_EXISTS) _STD cout << "DShm: Shared memory already exist!" << _STD endl;
+        if(GetLastError() == ERROR_ALREADY_EXISTS) _D_Msg(_D_Exist, "DShm", "SharedMemory", this->m_wstrName.c_str());
         if(this->m_hShm == NULL) {
             _D_Msg(_D_CantCreate, "DShm", "SharedMemory", this->m_wstrName.c_str());
             return FALSE;

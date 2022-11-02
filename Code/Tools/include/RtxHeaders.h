@@ -30,6 +30,7 @@
 #define _D_CantCreate               433002
 #define _D_Get                      433003
 #define _D_CantGet                  433004
+#define _D_Exist                    433005
 
 inline void fnvSendMsg(int nIssueIndex, const CHAR * wcptBelongs, const CHAR * wcptObject, const WCHAR * wcptName) {
     printf_s("%s", wcptBelongs);
@@ -38,6 +39,7 @@ inline void fnvSendMsg(int nIssueIndex, const CHAR * wcptBelongs, const CHAR * w
         case _D_CantCreate: _STD cout << ": Error! Can't created "; break;
         case _D_Get: _STD cout << ": Get! "; break;
         case _D_CantGet: _STD cout << ": Error! Can't get "; break;
+        case _D_Exist: _STD cout << ": Already exist! "; break; 
     }
     printf_s("%s ", wcptObject);
     _STD cout << "Named <";
