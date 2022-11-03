@@ -6,5 +6,7 @@
 #include <DRtxCMutex.hpp>
 #include <DRtxCSharedMem.hpp>
 #include <DRtxCSemaphore.hpp>
+#include <DRtxCEvent.hpp>
+#include <DRtxIPC.hpp>
 
 #endif
