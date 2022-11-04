@@ -17,7 +17,8 @@ DWORD WINAPI ftmulCallBack(LPVOID lpt);
 
 template<typename tm_DataIO> // define typename: tm_DataIO
 class ctm_RtxCThread {
-    typedef void(*t_fptvCallBack)(tm_DataIO *);
+    typedef void (*t_fptvCallBack)(tm_DataIO *);
+    typedef void (*t_fptUserCallback)();
 private:
     t_fptvCallBack m_fptvCallBack;  // function pointer of the target funtion
     tm_DataIO * m_tmptDataIO;           // input data of the target function
@@ -91,10 +92,10 @@ bool ctm_RtxCThread<tm_DataIO>::fnbSetProcessPriority() {
 
 template<typename tm_DataIO>
 bool ctm_RtxCThread<tm_DataIO>::fnbSetProcessPriority(DWORD dwPriorityClass) {
-    HANDLE hCurrentProcess = RtGetCurrentProcess(); // get the handle of the current process
-    RtSetPriorityClass(hCurrentProcess, dwPriorityClass); 
+    HANDLE hCurrentProcess = GetCurrentProcess(); // get the handle of the current process
+    SetPriorityClass(hCurrentProcess, dwPriorityClass); 
     SleepEx(10, FALSE); // not sleep when suspended
-    RtSetProcessPriorityBoost(hCurrentProcess, TRUE);
+    SetProcessPriorityBoost(hCurrentProcess, TRUE);
     SleepEx(10, FALSE);
     return TRUE;
 }

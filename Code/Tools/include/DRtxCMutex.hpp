@@ -17,7 +17,7 @@ private:
     HANDLE m_hMutex;
 public:
     inline c_RtxCMutex(const WCHAR * wcptName) { // get the name of the handle
-        WCHAR wcNameTemp[60];
+        WCHAR wcNameTemp[_MaxStrLen];
         wcscpy_s(wcNameTemp, wcptName);
         wcscat_s(wcNameTemp, L"_Mutex");
         this->m_wstrName = wcNameTemp;

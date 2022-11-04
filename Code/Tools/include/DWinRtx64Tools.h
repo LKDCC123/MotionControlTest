@@ -8,5 +8,6 @@
 #include <DRtxCSemaphore.hpp>
 #include <DRtxCEvent.hpp>
 #include <DRtxIPC.hpp>
+#include <DRtxMultiProcCompute.hpp>
 
 #endif

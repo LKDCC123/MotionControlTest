@@ -2,11 +2,13 @@
 
 // ========================================== tests ====================================================
 // #define _TEST_BASIC_THREAD
-#define _TEST_IPC
+// #define _TEST_IPC
+#define _TEST_MULTIPC
 // ========================================== tests ====================================================
 
 void fnvTestThread();
 void fnvTestIPC();
+void fnvTestMultiPC();
 
 int main() {
     #ifdef _TEST_BASIC_THREAD 
@@ -14,6 +16,9 @@ int main() {
     #endif
     #ifdef _TEST_IPC 
         fnvTestIPC();
+    #endif
+    #ifdef _TEST_MULTIPC
+        fnvTestMultiPC();
     #endif
 }
 
@@ -139,4 +144,29 @@ void fnvTestIPC() {
     Thread2.fnbCreate(fnvIPCWin, TRUE);
 
     fnvIPCRtx();
+}
+
+// ========================================== _TEST_IPC ====================================================
+typedef struct {
+    double dPos[4];
+}DataIO;
+
+void fnvComputingTask(DataIO * ptDataIO) {
+
+}
+
+void fnvMutiPCWin() {
+    _D_WRT ctm_RtxMultiPC<DataIO> ctmMultiPCWin(L"Com1");
+    DataIO DataIO;
+    ctmMultiPCWin.fnbInitEngine(fnvComputingTask, &DataIO);
+}
+
+void fnvMutiPCRtx() {
+    _D_WRT ctm_RtxMultiPC<DataIO> ctmMultiPCRtx(L"Com1");
+    DataIO DataIO;
+    ctmMultiPCRtx.fnbInitRequest(1, &DataIO);
+}
+
+void fnvTestMultiPC() {
+    fnvMutiPCRtx();
 }

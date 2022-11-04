@@ -26,6 +26,8 @@
 #define RtCloseHandle               CloseHandle   
 #endif
 
+#define _MaxStrLen                  60
+
 #define _D_Create                   433001
 #define _D_CantCreate               433002
 #define _D_Open                     433003

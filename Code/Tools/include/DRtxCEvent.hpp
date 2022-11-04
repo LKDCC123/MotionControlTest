@@ -19,7 +19,7 @@ private:
     int m_nMaxNum;
 public:
     inline c_RtxCEvent(const WCHAR * wcptName) {
-        WCHAR wcNameTemp[60];
+        WCHAR wcNameTemp[_MaxStrLen];
         wcscpy_s(wcNameTemp, wcptName);
         wcscat_s(wcNameTemp, L"_Event");
         this->m_wstrName = wcNameTemp;
@@ -70,7 +70,10 @@ public:
         return (RtResetEvent(this->m_hEvent));
     }
     inline bool fnbWait() {
-        RtWaitForSingleObject(this->m_hEvent, INFINITE);
+        return(fnbWait(INFINITE));
+    }
+    inline bool fnbWait(DWORD dwWaitTimeMs ) {
+        RtWaitForSingleObject(this->m_hEvent, dwWaitTimeMs);
         this->fnbReset();
         return TRUE;
     }

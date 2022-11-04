@@ -20,7 +20,7 @@ private:
     tmpt_DataIO m_tmptDataIO;
 public:
     inline ctm_RtxCShm(const WCHAR * wcptName) { // get the name of the handle
-        WCHAR wcNameTemp[60];
+        WCHAR wcNameTemp[_MaxStrLen];
         wcscpy_s(wcNameTemp, wcptName);
         wcscat_s(wcNameTemp, L"_Shm");
         this->m_wstrName = wcNameTemp;
@@ -34,7 +34,7 @@ public:
     }
     inline bool fnbCreate() {
         #ifdef _USE_RTX
-            RtCreateSharedMemory(PAGE_READWRITE, 0, sizeof(tm_DataIO), this->m_hShm, (LPVOID*)&m_tmptDataIO);
+            RtCreateSharedMemory(PAGE_READWRITE, 0, sizeof(tm_DataIO), this->m_wstrName.c_str(), (LPVOID*)&m_tmptDataIO);
         #else
             this->m_hShm = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(tm_DataIO), this->m_wstrName.c_str());
         #endif
@@ -51,7 +51,7 @@ public:
     }
     inline bool fnbOpen() {
         #ifdef _USE_RTX 
-            this->m_hShm = RtOpenSharedMemory(PAGE_READWRITE, FALSE, this->m_hShm, (LPVOID*)&m_tmptDataIO);
+            this->m_hShm = RtOpenSharedMemory(PAGE_READWRITE, FALSE, this->m_wstrName.c_str(), (LPVOID*)&m_tmptDataIO);
         #else
             this->m_hShm = OpenFileMapping(FILE_MAP_ALL_ACCESS, NULL, this->m_wstrName.c_str());
         #endif
