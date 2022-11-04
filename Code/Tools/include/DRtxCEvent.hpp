@@ -73,9 +73,11 @@ public:
         return(fnbWait(INFINITE));
     }
     inline bool fnbWait(DWORD dwWaitTimeMs ) {
-        RtWaitForSingleObject(this->m_hEvent, dwWaitTimeMs);
-        this->fnbReset();
-        return TRUE;
+        if(RtWaitForSingleObject(this->m_hEvent, dwWaitTimeMs)) {
+            this->fnbReset();
+            return TRUE;
+        };
+        return FALSE;
     }
     inline bool fnbClose() {
         if(this->m_hEvent != NULL) RtCloseHandle(this->m_hEvent);

@@ -34,6 +34,7 @@ private:
     c_RtxCEvent * m_cptComRequest;
     c_RtxCEvent * m_cptComFinished;
     DWORD m_wdWaitTimeMs;
+    int m_nComRunFlag;
 public:
     inline ctm_RtxMultiPC(const WCHAR * wcptName):ctm_RtxIPC<tm_DataIO>(wcptName) {
         this->m_wstrName = wcptName;
@@ -41,6 +42,7 @@ public:
         wcscpy_s(this->m_wcComRequestName, wcptName);       wcscat_s(this->m_wcComRequestName, L"_Event.Request");
         wcscpy_s(this->m_wcComFinishedName, wcptName);      wcscat_s(this->m_wcComFinishedName, L"_Event.Finished");
         this->m_hComEngineReady = this->m_hComRequest = this->m_hComFinished = this->m_hThread = NULL;
+        this->m_nComRunFlag = FALSE;
     }
     inline ~ctm_RtxMultiPC() {
         
@@ -80,11 +82,15 @@ public:
     }
     inline bool fnbSetWaitTime(DWORD wdWaitTimeMs) { // default: 1000 Ms
         this->m_wdWaitTimeMs = wdWaitTimeMs;
+        return TRUE;
     }
     inline bool fnbComputeRequest() {
-        if(this->m_cptComEngineReady->fnbWait(this->m_wdWaitTimeMs)) { // check the engine thread if be started
-
-        }
+        if(!this->m_nComRunFlag)
+        {
+            this->m_nComRunFlag = this->m_cptComEngineReady->fnbWait(this->m_wdWaitTimeMs);
+        }return FALSE; // check the engine thread if be started
+        
+        return TRUE;
     }
     // used in engine thread
     inline bool fnbInitEngine(t_fptvCallBack fptvCallBack, tmpt_DataIO tmptDataIO) { // used in Win to initiate the computing engine
@@ -105,11 +111,14 @@ public:
                 this->m_cptComFinished->fnbOpen()           &&  // open the event of compute finished
                 this->_IPC fnbOpen());                          // open the IPC interface for send & receive data
     }
+    inline bool fnbComputeEngineReady() {
+        return(this->m_cptComEngineReady->fnbSet());
+    }
     inline bool fnbRunCompute() {
         this->fptvCallBack(this->tmptDataIO);
     }
     inline bool fnbStart() {
-        RtResumeThread(this->m_hThread);
+        return(RtResumeThread(this->m_hThread));
     }
     
 };
@@ -121,8 +130,8 @@ DWORD WINAPI ftmulCallBackMultiCom(LPVOID lpt) { // input is a pointer to class 
         _STD cout << "DThread: Wrong callback function!" << _STD endl;
         return -1;
     }
-    auto cptCMultiPC = (ctm_RtxMultiPC<tm_DataIO> *)lpt; // translate the type of lpt to the class ctm_RtxCThread
-    cptCMultiPC->m_cptComEngineReady->fnbSet();
+    auto cptCMultiPC = (ctm_RtxMultiPC<tm_DataIO> *)lpt; // translate the type of lpt to the class ctm_RtxMultiPC
+    cptCMultiPC->fnbComputeEngineReady();
     _STD cout << "DThread: Quit!" << _STD endl;
     return 0;
 }
