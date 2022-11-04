@@ -1,6 +1,6 @@
 // DRtxIPC.hpp
 // inter-process communication in Rtx
-// based on Dcc class: SharedMemory, Mutex
+// based on Dcc Win Rtx64 Tool class: ctm_RtxCShm, c_RtxCMutex
 // refering to Lee's RtxCIPC.hpp
 // 20221103 bit, Dcc <3120195094@bit.edu.cn>
 
@@ -16,7 +16,8 @@ _D_WIN_RTX_TOOLS_BEGIN
 
 template<typename tm_DataIO>
 class ctm_RtxIPC:   protected ctm_RtxCShm<tm_DataIO>, 
-                    protected c_RtxCMutex{
+                    protected c_RtxCMutex {
+    typedef tm_DataIO * tmpt_DataIO;
 private:
     _STD wstring m_wstrName;
 public:
@@ -35,12 +36,12 @@ public:
         return(this->_Shm fnbOpen(5) && this->_Mutex fnbOpen(5)); // open sharememory and the mutex
     }
     // both required
-    inline bool fnbSendData(tm_DataIO * tmptDataIO) { // send data
+    inline bool fnbSendData(tmpt_DataIO tmptDataIO) { // send data
         if(this->_Mutex fnbLock()) *this->_Shm fntmptGetDataIOPointer() = *tmptDataIO; // lock and send data to sharedmemory
         this->_Mutex fnbUnlock(); // unlock
         return TRUE;
     }
-    inline bool fnbGetData(tm_DataIO * tmptDataIO) { // receive data
+    inline bool fnbGetData(tmpt_DataIO tmptDataIO) { // receive data
         if(this->_Mutex fnbLock()) *tmptDataIO = *this->_Shm fntmptGetDataIOPointer(); // lock and receive data from sharedmemory
         this->_Mutex fnbUnlock(); // unlock
         return TRUE;

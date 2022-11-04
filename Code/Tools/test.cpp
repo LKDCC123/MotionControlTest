@@ -105,7 +105,7 @@ void fnvIPCWin(int * nptNull) {
         cEventWin.fnbWait();
 
         ctmIPCWin.fnbGetData(&DataIO);
-        _STD cout << "Thread2: " << DataIO.dPos[2] << ", " << DataIO.dPos[3] << _STD endl; 
+        _STD cout << "Thread2: " << DataIO.dPos[0] << ", " << DataIO.dPos[1] << _STD endl; 
         DataIO.dPos[2] += 1.0, DataIO.dPos[3] += 2.0;
         ctmIPCWin.fnbSendData(&DataIO);
     }
@@ -126,10 +126,9 @@ void fnvIPCRtx() {
 
         DataIO.dPos[0] += 1.0, DataIO.dPos[1] += 2.0;
         ctmIPCRtx.fnbSendData(&DataIO);
-        Sleep(10);
-        _STD cout << "Main: " << DataIO.dPos[2] << ", " << DataIO.dPos[3] << _STD endl << _STD endl; 
-        Sleep(990);
+        Sleep(1000);
         ctmIPCRtx.fnbGetData(&DataIO);
+        _STD cout << "Main: " << DataIO.dPos[2] << ", " << DataIO.dPos[3] << _STD endl << _STD endl; 
     }
 }
 
