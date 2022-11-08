@@ -152,19 +152,21 @@ typedef struct {
 }DataIO;
 
 void fnvComputingTask(DataIO * ptDataIO) {
-
-}
-
-void fnvMutiPCWin() {
-    _D_WRT ctm_RtxMultiPC<DataIO> ctmMultiPCWin(L"Com1");
-    DataIO DataIO;
-    ctmMultiPCWin.fnbInitEngine(fnvComputingTask, &DataIO);
+    ptDataIO->dPos[2] += 1, ptDataIO->dPos[3] += 2;
 }
 
 void fnvMutiPCRtx() {
     _D_WRT ctm_RtxMultiPC<DataIO> ctmMultiPCRtx(L"Com1");
-    DataIO DataIO;
-    ctmMultiPCRtx.fnbInitRequest(1, &DataIO);
+    DataIO DataIO = { 10.0, 20.0, 10.0, 20.0 };
+    ctmMultiPCRtx.fnbInitRequest(&DataIO);
+    // ctmMultiPCRtx.fnbInitEngine(fnvComputingTask, &DataIO);
+    // ctmMultiPCRtx.fnbStart();
+    // start
+    while(1) {
+        ctmMultiPCRtx.fnbComputeEngine();
+        _STD cout << "Rtx: " << DataIO.dPos[2] << ", " << DataIO.dPos[3] << _STD endl;
+        DataIO.dPos[0] += 1, DataIO.dPos[1] += 2;
+    }
 }
 
 void fnvTestMultiPC() {

@@ -17,6 +17,7 @@ private:
     HANDLE m_hEvent;
     int m_nCountNum;
     int m_nMaxNum;
+    int m_nSwichOnFlag;
 public:
     inline c_RtxCEvent(const WCHAR * wcptName) {
         WCHAR wcNameTemp[_MaxStrLen];
@@ -25,11 +26,14 @@ public:
         this->m_wstrName = wcNameTemp;
         this->m_hEvent = NULL;
         this->m_nCountNum = 0;
+        this->m_nSwichOnFlag = FALSE;
+        _D_Msg(_D_CantCreate, "hehe", "hehe1", this->m_wstrName.c_str());
     }
     inline ~c_RtxCEvent() {
         this->fnbClose();
     }
     inline bool fnbCreate(int nMaxNum) {
+        _D_Msg(_D_CantCreate, "hehe", "hehe2", this->m_wstrName.c_str());
         this->m_hEvent = RtCreateEvent(NULL, NULL, NULL, this->m_wstrName.c_str());
         if(this->m_hEvent == NULL) {
             _D_Msg(_D_CantCreate, "DEvent", "Event", this->m_wstrName.c_str());       
@@ -65,19 +69,29 @@ public:
         }
         return FALSE;
     }
+    inline bool fnbWait() {
+        return(fnbWait(INFINITE));
+    }
     inline bool fnbReset() { // reset the event along with the counting
         this->m_nCountNum = 0;
         return (RtResetEvent(this->m_hEvent));
     }
-    inline bool fnbWait() {
-        return(fnbWait(INFINITE));
-    }
-    inline bool fnbWait(DWORD dwWaitTimeMs ) {
+    inline bool fnbWait(DWORD dwWaitTimeMs) {
         if(RtWaitForSingleObject(this->m_hEvent, dwWaitTimeMs)) {
             this->fnbReset();
             return TRUE;
         };
         return FALSE;
+    }
+    inline bool fnbSwichOn(DWORD dwWaitTimeMs) { // no blocked judgment
+        if(!m_nSwichOnFlag) {
+            m_nSwichOnFlag = this->fnbWait(dwWaitTimeMs);
+            return FALSE;
+        }
+        return TRUE;
+    }
+    inline bool fnbSwichOn() {
+        return(fnbSwichOn(INFINITE));
     }
     inline bool fnbClose() {
         if(this->m_hEvent != NULL) RtCloseHandle(this->m_hEvent);
