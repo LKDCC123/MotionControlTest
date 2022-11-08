@@ -30,9 +30,9 @@ private:
     WCHAR m_wcComEngineReadyName[_MaxStrLen];
     WCHAR m_wcComRequestName[_MaxStrLen];
     WCHAR m_wcComFinishedName[_MaxStrLen];
-    c_RtxCEvent * m_cptComEngineReady;
-    c_RtxCEvent * m_cptComRequest;
-    c_RtxCEvent * m_cptComFinished;
+    c_RtxCEvent m_cComEngineReady;
+    c_RtxCEvent m_cComRequest;
+    c_RtxCEvent m_cComFinished;
     DWORD m_wdWaitTimeMs;
     int m_nComRunFlag;
     int m_nAsynCyc;
@@ -40,9 +40,9 @@ private:
 public:
     inline ctm_RtxMultiPC(const WCHAR * wcptName):ctm_RtxIPC<tm_DataIO>(wcptName) {
         this->m_wstrName = wcptName;
-        wcscpy_s(this->m_wcComEngineReadyName, wcptName);   wcscat_s(this->m_wcComEngineReadyName, L"_Ready");
-        wcscpy_s(this->m_wcComRequestName, wcptName);       wcscat_s(this->m_wcComRequestName, L"_Request");
-        wcscpy_s(this->m_wcComFinishedName, wcptName);      wcscat_s(this->m_wcComFinishedName, L"_Finished");
+        wcscpy_s(this->m_wcComEngineReadyName, wcptName);   wcscat_s(this->m_wcComEngineReadyName, L"_Ready");  m_cComEngineReady.fnbSetName(this->m_wcComEngineReadyName);
+        wcscpy_s(this->m_wcComRequestName, wcptName);       wcscat_s(this->m_wcComRequestName, L"_Request");    m_cComRequest.fnbSetName(this->m_wcComRequestName);
+        wcscpy_s(this->m_wcComFinishedName, wcptName);      wcscat_s(this->m_wcComFinishedName, L"_Finished");  m_cComFinished.fnbSetName(this->m_wcComFinishedName);
         this->m_hComEngineReady = this->m_hComRequest = this->m_hComFinished = this->m_hThread = NULL;
         this->m_nComRunFlag = FALSE;
     }
@@ -57,15 +57,8 @@ public:
         this->m_fptvCallBack = fptvCallBack;
         return TRUE;
     }
-    inline bool fnbInitEvents() {
-        _D_Msg(_D_CantCreate, "hehe", "hehe", this->m_wcComEngineReadyName);
-        c_RtxCEvent cComEngineReady(this->m_wcComEngineReadyName);  this->m_cptComEngineReady = &cComEngineReady;   
-        // c_RtxCEvent cComRequest(this->m_wcComRequestName);          this->m_cptComRequest = &cComRequest;
-        // c_RtxCEvent cComFinished(this->m_wcComFinishedName);        this->m_cptComFinished = &cComFinished;
-        return TRUE;
-    }
     inline bool fnbSetRunFlag(bool bSetFlag) {
-        return bSetFlag;
+        return this->m_nComRunFlag = bSetFlag;
     }
     inline bool fnbGetRunFlag() {
         return this->m_nComRunFlag;
@@ -79,18 +72,17 @@ public:
     // used in request thread
     inline bool fnbInitRequest(tmpt_DataIO tmptDataIO) { // used in Rtx or Win to push a request for a synchronous or an asynchronous computation thread in Win, nAsynCyc is the asynchronous cycle
         this->fnbInitIOPointer(tmptDataIO);
-        this->fnbInitEvents();
-        this->fnbSetWaitTime(1000);
+        this->fnbSetWaitTime(1);
         this->fnbSetAsynCyc(1);
         this->m_nCurrentCyc = 0;
-this->m_cptComEngineReady->fnbCreate();
-getchar();
-
-return TRUE;
-        // return (this->m_cptComEngineReady->fnbCreate()      &&  // create the event of engine ready 
-        //         this->m_cptComRequest->fnbCreate()  &&  // create the event of compute request 
-        //         this->m_cptComFinished->fnbCreate()         &&  // create the event of compute finished
-        //         this->_IPC fnbCreate());                        // create the IPC interface for send & receive data
+        if (this->m_cComEngineReady.fnbCreate()     &&  // create the event of engine ready 
+            this->m_cComRequest.fnbCreate()         &&  // create the event of compute request 
+            this->m_cComFinished.fnbCreate()        &&  // create the event of compute finished
+            this->_IPC fnbCreate()) {                   // create the IPC interface for send & receive data
+            _D_Msg(_D_Create, "DMultiPC", "Computing Engine", this->m_wstrName.c_str());
+            return TRUE;
+        }
+        return FALSE;
     }
     inline bool fnbSetAsynCyc(int nAsynCyc) { // default: 1
         this->m_nAsynCyc = nAsynCyc;
@@ -101,10 +93,10 @@ return TRUE;
         return TRUE;
     }
     inline bool fnbComputeRequest() {
-        if(this->m_cptComEngineReady->fnbSwichOn(this->m_wdWaitTimeMs)) { // if the computing engine is ready
+        if(this->m_cComEngineReady.fnbSwichOn(this->m_wdWaitTimeMs)) { // if the computing engine is ready
             if(this->m_nCurrentCyc == 0) { // the first cycle
                 this->fnbSendComputeData(); // send data to the sharedmemory
-                this->m_cptComRequest->fnbSet(); // set event of computing request
+                this->m_cComRequest.fnbSet(); // set event of computing request
                 return TRUE;
             }
         }
@@ -112,12 +104,12 @@ return TRUE;
     }
     inline bool fnbComputeRecieve() {
         if(++this->m_nCurrentCyc >= this->m_nAsynCyc) { // the last cycle that need to recieve computing result
-            if(this->m_cptComFinished->fnbWait(this->m_wdWaitTimeMs)) { // if the computation is finished
+            this->m_nCurrentCyc = 0; // reset the cycle
+            if(this->m_cComFinished.fnbWait(this->m_wdWaitTimeMs)) { // if the computation is finished
                 this->fnbGetComputeData(); // get data from the sharedmemory
-                this->m_nCurrentCyc = 0; // reset the cycle
                 return TRUE;
             }
-            this->m_nCurrentCyc = 0; // reset the cycle even if failed to  recieve the result
+            _STD cout << "Fail to recieve result!" << _STD endl; 
         }
         return FALSE;
     }
@@ -129,7 +121,6 @@ return TRUE;
     inline bool fnbInitEngine(t_fptvCallBack fptvCallBack, tmpt_DataIO tmptDataIO) { // used in Win to initiate the computing engine
         this->fnbInitIOPointer(tmptDataIO);
         this->fnbInitFunPointer(fptvCallBack);
-        this->fnbInitEvents(); 
         m_hThread = RtCreateThread( // create the thread
             NULL,
             0,
@@ -139,10 +130,14 @@ return TRUE;
             NULL                                                        // thread id is negleted
         );
         fnbSetProcessPriority(REALTIME_PRIORITY_CLASS);
-        return (this->m_cptComEngineReady->fnbOpen()        &&  // open the event of engine ready 
-                this->m_cptComRequest->fnbOpen()            &&  // open the event of compute request 
-                this->m_cptComFinished->fnbOpen()           &&  // open the event of compute finished
-                this->_IPC fnbOpen());                          // open the IPC interface for send & receive data
+        if (this->m_cComEngineReady.fnbOpen(5)        &&  // open the event of engine ready 
+            this->m_cComRequest.fnbOpen(5)            &&  // open the event of compute request 
+            this->m_cComFinished.fnbOpen(5)           &&  // open the event of compute finished
+            this->_IPC fnbOpen()) {                      // open the IPC interface for send & receive data
+            _D_Msg(_D_Open, "DMultiPC", "Computing Engine", this->m_wstrName.c_str());
+            return TRUE;
+        }
+        return FALSE;
     }
     inline bool fnbSetProcessPriority(DWORD dwPriorityClass) { // default: real time priority
         HANDLE hCurrentProcess = GetCurrentProcess(); // get the handle of the current process
@@ -156,17 +151,17 @@ return TRUE;
         this->m_fptvCallBack(this->m_tmptDataIO);
         return TRUE;
     }
-    inline bool fnbStart() {
+    inline bool fnbStartEngine() {
         return (RtResumeThread(this->m_hThread));
     }
     inline bool fnbComputeEngineReady() {
-        return (this->m_cptComEngineReady->fnbSet());
+        return (this->m_cComEngineReady.fnbSet());
     }
     inline bool fnbWaitRequest() {
-        return (this->m_cptComRequest->fnbWait(this->m_wdWaitTimeMs));
+        return (this->m_cComRequest.fnbWait(this->m_wdWaitTimeMs));
     }
     inline bool fnbComputeFinished() {
-        return (this->m_cptComFinished->fnbSet());
+        return (this->m_cComFinished.fnbSet());
     }
 };
 
@@ -188,6 +183,7 @@ DWORD WINAPI ftmulCallBackMultiCom(LPVOID lpt) { // input is a pointer to class 
             cptCMultiPC->fnbComputeFinished(); // set event of computing finished
         }
     }
+    INFINITE;
     _STD cout << "DMultiPC: Quit!" << _STD endl;
     return 0; 
 }

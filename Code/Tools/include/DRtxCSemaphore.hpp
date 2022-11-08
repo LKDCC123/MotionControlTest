@@ -15,6 +15,7 @@ class c_RtxCSem {
 private:
     _STD wstring m_wstrName;
     HANDLE m_hSem;
+    int m_nNameFlag;
 public:
     inline c_RtxCSem(const WCHAR * wcptName) {
         WCHAR wcNameTemp[60];
@@ -22,11 +23,26 @@ public:
         wcscat_s(wcNameTemp, L"_Sem");
         this->m_wstrName = wcNameTemp;
         this->m_hSem = NULL;
+        this->m_nNameFlag = TRUE;
+    }
+    inline c_RtxCSem() {
+        this->m_wstrName = L"Default_Sem";
+        this->m_hSem = NULL;
+        this->m_nNameFlag = FALSE;
     }
     inline ~c_RtxCSem() {
         this->fnbClose();
     }
+    inline bool fnbSetName(const WCHAR * wcptName) {
+        WCHAR wcNameTemp[_MaxStrLen];
+        wcscpy_s(wcNameTemp, wcptName);
+        wcscat_s(wcNameTemp, L"_Sem");
+        this->m_wstrName = wcNameTemp;
+        this->m_nNameFlag = TRUE;
+        return TRUE;
+    }
     inline bool fnbCreate(int nMaxCounts) { // create a semaphore which not belongs to the process with directed name, and set the maximum count number
+        if(!this->m_nNameFlag) return FALSE;
         this->m_hSem = RtCreateSemaphore(NULL, nMaxCounts, nMaxCounts, this->m_wstrName.c_str());
         if(this->m_hSem == NULL) {
             _D_Msg(_D_CantCreate, "DSema", "Semaphore", this->m_wstrName.c_str());
@@ -51,8 +67,14 @@ public:
         return FALSE;
     }
     inline bool fnbWait() { // wait for the semaphore and discount the counting number to ?
-        RtWaitForSingleObject(this->m_hSem, INFINITE);
-        return TRUE;
+        switch(RtWaitForSingleObject(this->m_hSem, INFINITE)) {
+            case WAIT_OBJECT_0:
+                return TRUE;
+            case WAIT_TIMEOUT:
+                return FALSE;
+            case WAIT_ABANDONED:
+                return FALSE;
+        }
     }
     inline bool fnbRelease() { // rise the counting number of semaphore for 1
         ReleaseSemaphore(this->m_hSem, 1, NULL);

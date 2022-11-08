@@ -15,6 +15,7 @@ class c_RtxCMutex {
 private: 
     _STD wstring m_wstrName;
     HANDLE m_hMutex;
+    int m_nNameFlag;
 public:
     inline c_RtxCMutex(const WCHAR * wcptName) { // get the name of the handle
         WCHAR wcNameTemp[_MaxStrLen];
@@ -22,11 +23,26 @@ public:
         wcscat_s(wcNameTemp, L"_Mutex");
         this->m_wstrName = wcNameTemp;
         this->m_hMutex = NULL;
+        this->m_nNameFlag = TRUE;
+    }
+    inline c_RtxCMutex() { 
+        this->m_wstrName = L"Default_Mutex";
+        this->m_hMutex = NULL;
+        this->m_nNameFlag = FALSE;
     }
     inline ~c_RtxCMutex() { // close the mutex
         this->fnbClose();
     }
+    inline bool fnbSetName(const WCHAR * wcptName) {
+        WCHAR wcNameTemp[_MaxStrLen];
+        wcscpy_s(wcNameTemp, wcptName);
+        wcscat_s(wcNameTemp, L"_Mutex");
+        this->m_wstrName = wcNameTemp;
+        this->m_nNameFlag = TRUE;
+        return TRUE;
+    }
     inline bool fnbCreate() { // create a mutex which not belongs to the process with directed name 
+        if(!this->m_nNameFlag) return FALSE;
         this->m_hMutex = RtCreateMutex(NULL, FALSE, this->m_wstrName.c_str());
         if(this->m_hMutex == NULL) {
             _D_Msg(_D_CantCreate, "DMutex", "Mutex", this->m_wstrName.c_str());

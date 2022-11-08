@@ -148,24 +148,28 @@ void fnvTestIPC() {
 
 // ========================================== _TEST_IPC ====================================================
 typedef struct {
-    double dPos[4];
+    double dPos[2];
 }DataIO;
 
 void fnvComputingTask(DataIO * ptDataIO) {
-    ptDataIO->dPos[2] += 1, ptDataIO->dPos[3] += 2;
+    ptDataIO->dPos[1] += 1;
+    _STD cout << "Engine: " << ptDataIO->dPos[0] << _STD endl;
 }
 
 void fnvMutiPCRtx() {
     _D_WRT ctm_RtxMultiPC<DataIO> ctmMultiPCRtx(L"Com1");
-    DataIO DataIO = { 10.0, 20.0, 10.0, 20.0 };
+    DataIO DataIO = { 0.0, 0.0 };
     ctmMultiPCRtx.fnbInitRequest(&DataIO);
-    // ctmMultiPCRtx.fnbInitEngine(fnvComputingTask, &DataIO);
-    // ctmMultiPCRtx.fnbStart();
+    ctmMultiPCRtx.fnbInitEngine(fnvComputingTask, &DataIO);
+    ctmMultiPCRtx.fnbStartEngine();
+    int nSucceed = 0;
     // start
     while(1) {
-        ctmMultiPCRtx.fnbComputeEngine();
-        _STD cout << "Rtx: " << DataIO.dPos[2] << ", " << DataIO.dPos[3] << _STD endl;
-        DataIO.dPos[0] += 1, DataIO.dPos[1] += 2;
+        DataIO.dPos[0] += 1;
+        nSucceed = ctmMultiPCRtx.fnbComputeEngine();
+        Sleep(10);
+        _STD cout << "Rtx: " << DataIO.dPos[1] << ", " << nSucceed << _STD endl << _STD endl;
+        Sleep(240);
     }
 }
 

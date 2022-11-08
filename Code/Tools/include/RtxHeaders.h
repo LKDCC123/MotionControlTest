@@ -39,7 +39,7 @@ inline void fnvSendMsg(int nIssueIndex, const CHAR * wcptBelongs, const CHAR * w
     switch(nIssueIndex) {
         case _D_Create:     _STD cout << ": Created! "              ; break;
         case _D_CantCreate: _STD cout << ": Error! Can't created "  ; break;
-        case _D_Open:       _STD cout << ": opened! "               ; break;
+        case _D_Open:       _STD cout << ": Opened! "               ; break;
         case _D_CantOpen:   _STD cout << ": Error! Can't open "     ; break;
         case _D_Exist:      _STD cout << ": Already exist! "        ; break; 
     }

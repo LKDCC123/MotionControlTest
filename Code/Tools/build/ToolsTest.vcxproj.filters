@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\Code\Tools\test.cpp">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\Code\Tools\test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\GitHUB\MotionControlTest\Code\Tools\CMakeLists.txt" />
+    <CustomBuild Include="D:\L.B\GitHUB\MotionControlTest\Code\Tools\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{8D40D904-7637-3533-B523-9F5B7026AA5B}</UniqueIdentifier>
+      <UniqueIdentifier>{3AA2261C-6044-31BF-9B62-917D2CC14E8F}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

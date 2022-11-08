@@ -18,6 +18,7 @@ private:
     _STD wstring m_wstrName;
     HANDLE m_hShm;
     tmpt_DataIO m_tmptDataIO;
+    int m_nNameFlag;
 public:
     inline ctm_RtxCShm(const WCHAR * wcptName) { // get the name of the handle
         WCHAR wcNameTemp[_MaxStrLen];
@@ -25,14 +26,30 @@ public:
         wcscat_s(wcNameTemp, L"_Shm");
         this->m_wstrName = wcNameTemp;
         this->m_hShm = NULL;
+        this->m_nNameFlag = TRUE;
+    }
+    inline ctm_RtxCShm() { 
+        this->m_wstrName = L"Default_Shm";
+        this->m_hShm = NULL;
+        this->m_nNameFlag = FALSE;
     }
     inline ~ctm_RtxCShm() {
         this->fnbClose();
+    }
+    inline bool fnbSetName(const WCHAR * wcptName) {
+        WCHAR wcNameTemp[_MaxStrLen];
+        WCHAR wcNameTemp[_MaxStrLen];
+        wcscpy_s(wcNameTemp, wcptName);
+        wcscat_s(wcNameTemp, L"_Shm");
+        this->m_wstrName = wcNameTemp;
+        this->m_nNameFlag = TRUE;
+        return TRUE;
     }
     inline tmpt_DataIO fntmptGetDataIOPointer() {
         return this->m_tmptDataIO;
     }
     inline bool fnbCreate() {
+        if(!this->m_nNameFlag) return FALSE;
         #ifdef _USE_RTX
             RtCreateSharedMemory(PAGE_READWRITE, 0, sizeof(tm_DataIO), this->m_wstrName.c_str(), (LPVOID*)&m_tmptDataIO);
         #else
