@@ -104,7 +104,7 @@ public:
         return FALSE;
     }
     inline bool fnbSwichOn(DWORD dwWaitTimeMs) { // no blocked judgment
-        if(!m_nSwichOnFlag) return(m_nSwichOnFlag = this->fnbWait(dwWaitTimeMs));
+        if(!this->m_nSwichOnFlag) return(this->m_nSwichOnFlag = this->fnbWait(dwWaitTimeMs));
         return TRUE;
     }
     inline bool fnbSwichOn() {
