@@ -44,4 +44,3 @@ target_compile_options(MotConTest
 target_link_options(MotConTest
     \out: MotConTest.exe
 )
-

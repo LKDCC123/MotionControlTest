@@ -160,6 +160,7 @@ void fnvMutiPCRtx() {
     _D_WRT ctm_RtxMultiPC<DataIO> ctmMultiPCRtx(L"Com1");
     DataIO DataIO = { 0.0, 0.0 };
     ctmMultiPCRtx.fnbInitRequest(&DataIO);
+    ctmMultiPCRtx.fnbSetAsynCyc(2);
     ctmMultiPCRtx.fnbInitEngine(fnvComputingTask, &DataIO);
     ctmMultiPCRtx.fnbStartEngine();
     int nSucceed = 0;
@@ -169,7 +170,7 @@ void fnvMutiPCRtx() {
         nSucceed = ctmMultiPCRtx.fnbComputeEngine();
         Sleep(10);
         _STD cout << "Rtx: " << DataIO.dPos[1] << ", " << nSucceed << _STD endl << _STD endl;
-        Sleep(240);
+        Sleep(490);
     }
 }
 

@@ -1,0 +1,71 @@
+SD/FAST Information File: SDRobot.sd
+Generated 01-Jan-1999 11:47:59 by SD/FAST, Kane's formulation
+(sdfast B.2.8 #30123) on machine ID unknown
+
+ROADMAP (SDRobot.sd)
+
+Bodies        Inb
+No  Name      body Joint type  Coords q
+--- --------- ---- ----------- ----------------
+ -1 $ground                                    
+  0 midbody    -1  Bushing       0   1   2 
+                   ...           3   4   5     
+  1 uppbody     0  Pin           6             
+  2 larm        1  Pin           7             
+  3 rarm        1  Pin           8             
+  4 lthigh      0  Gimbal        9  10  11     
+  5 lshank      4  Pin          12             
+  6 lfoot       5  U-joint      13  14         
+  7 rthigh      0  Gimbal       15  16  17     
+  8 rshank      7  Pin          18             
+  9 rfoot       8  U-joint      19  20         
+
+
+STATE INDEX TO JOINT/AXIS MAP (SDRobot.sd)
+
+ Index
+  q|u   Joint  Axis   Joint type    Axis type    Joint Name
+ -----  -----  ----   -----------   ----------   ----------
+  0|21      0     0   Bushing       translate    
+  1|22      .     1   .             translate 
+  2|23      .     2   .             translate 
+  3|24      .     3   .             rotate    
+  4|25      .     4   .             rotate    
+  5|26      .     5   .             rotate    
+  6|27      1     0   Pin           rotate       
+  7|28      2     0   Pin           rotate       
+  8|29      3     0   Pin           rotate       
+  9|30      4     0   Gimbal        rotate       
+ 10|31      .     1   .             rotate    
+ 11|32      .     2   .             rotate    
+ 12|33      5     0   Pin           rotate       
+ 13|34      6     0   U-joint       rotate       
+ 14|35      .     1   .             rotate    
+ 15|36      7     0   Gimbal        rotate       
+ 16|37      .     1   .             rotate    
+ 17|38      .     2   .             rotate    
+ 18|39      8     0   Pin           rotate       
+ 19|40      9     0   U-joint       rotate       
+ 20|41      .     1   .             rotate    
+
+
+SYSTEM PARAMETERS (SDRobot.sd)
+
+Parameter  Value  Description
+
+nbod          10  no. bodies (also, no. of tree joints)
+njnt          10  total number of joints (tree+loop)
+ndof          21  no. degrees of freedom allowed by tree joints
+nloop          0  no. loop joints
+nldof          0  no. degrees of freedom allowed by loop joints
+
+nq            21  no. position coordinates in state (tree joints)
+nu            21  no. rate coordinates in state (tree joints)
+nlq            0  no. position coordinates describing loop joints
+nlu            0  no. rate coordinates describing loop joints
+
+nc             0  total no. constraints defined
+nlc            0  no. loop joint constraints
+npresc         0  no. prescribed motion constraints
+nuserc         0  no. user constraints
+

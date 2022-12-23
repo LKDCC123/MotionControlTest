@@ -1,0 +1,84 @@
+#command: sdfast -ge -lc bhr7pwaist.sd
+
+language = c
+gravity = 0 0 -9.8
+
+body = midbody  inb = $ground  joint = bushing  
+	mass = ?
+	inertia = ? ? ?
+	bodytojoint = ? ? ?
+	inbtojoint = ? ? ?
+	pin = 0 0 1
+	pin = 0 1 0
+	pin = 1 0 0
+
+body = uppbody  inb = midbody  joint = pin
+	mass = ?
+	inertia = ? ? ?
+	bodytojoint = ? ? ?
+	inbtojoint = ? ? ?
+	pin = 0 0 1
+	
+body = larm  inb = uppbody  joint = pin
+	mass = ?
+	inertia = ? ? ?
+	bodytojoint = ? ? ?
+	inbtojoint = ? ? ?
+	pin = 0 1 0
+	
+body = rarm  inb = uppbody  joint = pin
+	mass = ?
+	inertia = ? ? ?
+	bodytojoint = ? ? ?
+	inbtojoint = ? ? ?
+	pin = 0 1 0
+	
+body = lthigh  inb = midbody  joint = gimbal
+	mass = ?
+	inertia = ? ? ?
+	bodytojoint = ? ? ?
+	inbtojoint = ? ? ?
+	pin = 0 0 1
+	pin = 1 0 0
+	pin = 0 1 0
+	
+body = lshank  inb = lthigh  joint = pin
+	mass = ?
+	inertia = ? ? ?
+	bodytojoint = ? ? ?
+	inbtojoint = ? ? ?
+	pin = 0 1 0
+	
+body = lfoot  inb = lshank  joint = ujoint
+	mass = ?
+	inertia = ? ? ?
+	bodytojoint = ? ? ?
+	inbtojoint = ? ? ?
+	pin = 0 1 0
+	pin = 1 0 0
+	
+body = rthigh  inb = midbody  joint = gimbal
+	mass = ?
+	inertia = ? ? ?
+	bodytojoint = ? ? ?
+	inbtojoint = ? ? ?
+	pin = 0 0 1
+	pin = 1 0 0
+	pin = 0 1 0
+	
+body = rshank  inb = rthigh  joint = pin
+	mass = ?
+	inertia = ? ? ?
+	bodytojoint = ? ? ?
+	inbtojoint = ? ? ?
+	pin = 0 1 0
+	
+body = rfoot  inb = rshank  joint = ujoint
+	mass = ?
+	inertia = ? ? ?
+	bodytojoint = ? ? ?
+	inbtojoint = ? ? ?
+	pin = 0 1 0
+	pin = 1 0 0
+
+# End of file
