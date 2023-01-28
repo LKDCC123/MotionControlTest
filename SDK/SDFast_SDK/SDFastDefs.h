@@ -1,5 +1,6 @@
 // SDFastDefs.h
-#include "SDFastHeaders.h"
+#include <SDFastHeaders.h>
+#include <stdio.h>
 
 _D_SDFAST_BEGIN
 

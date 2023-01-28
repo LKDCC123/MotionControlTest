@@ -4,6 +4,18 @@
     <ClCompile Include="D:\GitHUB\MotionControlTest\Code\SDFast\Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFiles\SDRobot_d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFiles\SDRobot_s.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFiles\sdlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFastDefs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="D:\GitHUB\MotionControlTest\Code\SDFast\CMakeLists.txt" />

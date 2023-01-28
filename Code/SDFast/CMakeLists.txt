@@ -12,9 +12,9 @@ link_directories(
 
 )
 
-aux_source_directory(
-    ${ROOT_PATH}/src SRC_TEST
-)
+aux_source_directory(${ROOT_PATH}/src SRC_TEST)
+aux_source_directory(${ROOT_PATH}/../../SDK/SDFast_SDK/SDFiles SRC_TEST)
+aux_source_directory(${ROOT_PATH}/../../SDK/SDFast_SDK SRC_TEST)
 
 add_executable(SDFastTest
     Test.cpp
@@ -38,5 +38,5 @@ target_compile_options(SDFastTest PUBLIC
 )
 
 # target_link_options(SDFastTest PUBLIC
-#     /out: SDFastTest.exe
+#     /out:Test.exe
 # )

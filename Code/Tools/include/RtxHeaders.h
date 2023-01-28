@@ -3,6 +3,7 @@
 #pragma once
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 #include <windows.h>
 #include <string.h>
 #include <stdio.h>
@@ -55,5 +56,4 @@ inline void fnvSendMsg(int nIssueIndex, const CHAR * wcptBelongs, const CHAR * w
 #define _D_WIN_RTX_TOOLS_BEGIN namespace Dcc { namespace WIN_RTX_TOOLS {
 #define _D_WIN_RTX_TOOLS_END }}
 #define _D_WRT ::Dcc::WIN_RTX_TOOLS::
-
-#endif
+#define _D_USING_WRT using namespace Dcc::WIN_RTX_TOOLS;

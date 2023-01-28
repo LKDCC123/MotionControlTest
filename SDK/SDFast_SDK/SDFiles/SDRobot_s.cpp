@@ -13,7 +13,6 @@ FAR Supplement.  Symbolic Dynamics, Inc., Mountain View, CA 94041
 #include "..\SDFastDefs.h"
 
 _D_SDFAST_BEGIN
-
 /* These routines are passed to sdroot. */
 void sdposfunc(double vars[21],
     double param[1],

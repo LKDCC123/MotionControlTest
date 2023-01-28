@@ -1,5 +1,5 @@
 /*
-Generated 01-Jan-1999 11:47:59 by SD/FAST, Kane's formulation
+Generated 01-Jan-1999 18:58:22 by SD/FAST, Kane's formulation
 (sdfast B.2.8 #30123) on machine ID unknown
 Copyright (c) 1990-1997 Symbolic Dynamics, Inc.
 Copyright (c) 1990-1997 Parametric Technology Corp.
@@ -11,10 +11,9 @@ FAR Supplement.  Symbolic Dynamics, Inc., Mountain View, CA 94041
 */
 #include <math.h>
 #include <stdio.h>
-#include "..\SDFastDefs.h"
 
-_D_SDFAST_BEGIN
-
+namespace ChzSD
+{
 typedef struct {
     int lasterr_,lastrou_;
 } sdgerror_t;
@@ -975,7 +974,7 @@ void sdcalcerrs(double fval[],
     }
 }
 
-void sdadjvars(void (*func)(double[], double[], double[]),
+void sdadjvars(void(*func)(double[], double[], double[]),
     double vars[],
     double param[],
     int nfunc,
@@ -1355,7 +1354,7 @@ void sdroot(void (*func)(double[], double[], double[]),
 /* Utility routine for use with sdfinteg and sdvinteg.  Work is 2*neq. */
 
 
-void sdrk4m(void (*func)(double, double[], double*, double[], int*),
+void sdrk4m(void(*func)(double, double[], double*, double[], int*),
     double time,
     double st[],
     double dst0[],
@@ -1415,7 +1414,7 @@ void sdrk4m(void (*func)(double, double[], double*, double[], int*),
 /* A fixed-step integrator.  Work should be dimensioned 4*neq. */
 
 
-void sdfinteg(void (*func)(double, double[], double[], double[], int *),
+void sdfinteg(void(*func)(double, double[], double[], double[], int*),
     double *time,
     double st[],
     double dst[],
@@ -1450,7 +1449,7 @@ void sdfinteg(void (*func)(double, double[], double[], double[], int *),
 
 /* A variable-step integrator.  Work should be dimensioned 6*neq. */
 
-void sdvinteg(void (*func)(double, double[], double[], double[], int*),
+void sdvinteg(void(*func)(double, double[], double[], double[], int*),
     double *time,
     double st[],
     double dst[],
@@ -1858,4 +1857,6 @@ void sdserialno(int *serno)
     *serno = 30123;
 }
 
-_D_SDFAST_END
+#undef lasterr
+#undef lastrou
+}
