@@ -12,7 +12,8 @@ link_directories(
 
 )
 
-aux_source_directory(${ROOT_PATH}/src SRC_TEST)
+aux_source_directory(${ROOT_PATH}/TestWithChz/SDFAST SRC_TEST)
+aux_source_directory(${ROOT_PATH}/TestWithChz/QP_Moment_Control SRC_TEST)
 aux_source_directory(${ROOT_PATH}/../../SDK/SDFast_SDK/SDFiles SRC_TEST)
 aux_source_directory(${ROOT_PATH}/../../SDK/SDFast_SDK SRC_TEST)
 

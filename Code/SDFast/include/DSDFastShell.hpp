@@ -36,6 +36,7 @@ typedef struct { // input [ dQ & dU ], then update the others for kinematics & d
     double dMass;        // total mass of the robot
     double dMatA[6][__DoFNum]; // centroidal kinematics metrix
     double dMatdA[6][__DoFNum]; // rate of centroidal kinematics metrix
+    double dAnk[2][6]; // ankle position & rotation: [L, R][pos3, rot3]
 }tp_stSDState; 
 
 class c_SDCalcu {
@@ -58,7 +59,7 @@ public:
         this->fnbSetState(dptQInitIn, dptUInitIn);
         for(int i = 0; i < 3; i++) { // initiate the com, momentum, A
             this->m_stptRobotState->dCoM[i] = this->m_stptRobotState->dMom[i] = this->m_stptRobotState->dMom[i + 3] = 0.0;
-            for(int j = 0; j < this->m_stptRobotMech->nDoFNum; j++) this->m_stptRobotState->dMatA[i][j] = this->m_stptRobotState->dMatA[i + 3][j] = 0.0;
+            for(int j = 0; j < this->m_stptRobotMech->nDoFNum; j++) this->dMatAOld[i][j] = this->dMatAOld[i + 3][j] = this->m_stptRobotState->dMatA[i][j] = this->m_stptRobotState->dMatA[i + 3][j] = 0.0;
         }
         this->fnbUpdateFK();
         for(int i = 0; i < 3; i++) { // initiate the rate of com, momentum, A
@@ -68,16 +69,17 @@ public:
         return true;
     }
     inline bool fnbSetState(double * dptQIn, double * dptUIn) { // set the state of the robot
-        for(int i = 0; i < this->m_stptRobotMech->nDoFNum - 1; i++) {
+        for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) {
             this->m_stptRobotState->dQ[i] = dptQIn[i], this->m_stptRobotState->dU[i] = dptUIn[i];
         }
         sdstate(0, this->m_stptRobotState->dQ, this->m_stptRobotState->dU);
         return true;
     }
-    inline bool fnbUpdateFK() { // obtain: major -> [ com, momentum, A ] and their rate; minor -> [ inertia, energy, mass ]
+    inline bool fnbUpdateFK() { // obtain: major -> [ com, momentum, A, ank ] and their rate; minor -> [ inertia, energy, mass ]
         this->fnbUpdateCoM();
         this->fnbUpdateMom();
         this->fnbUpdateMatA();
+        this->fnbUpdateAnk();
         return true;
     }
 private:
@@ -85,7 +87,7 @@ private:
     tp_stSDMech * m_stptRobotMech;
     tp_stSDState * m_stptRobotState;
     inline bool fnbSetMechParas() {
-        for(int i = 0; i < this->m_stptRobotMech->nBodNum - 1; i++) {
+        for(int i = 0; i < this->m_stptRobotMech->nBodNum; i++) {
             sdmass(i, *((double *)m_stptRobotMech + i * __MechParasNum + 0)); // reset mass
             double dInerTemp[3][3] = {
                 { *((double *)m_stptRobotMech + i * __MechParasNum + 1), 0.0, 0.0 }, 
@@ -94,7 +96,7 @@ private:
             };
             sdiner(i, dInerTemp); // reset inertia
             sdbtj(i, (double *)m_stptRobotMech + i * __MechParasNum + 4); // reset bodytojoint
-            sditj(i, (double *)m_stptRobotMech + i * __MechParasNum + 4); // reset inbtojoint
+            sditj(i, (double *)m_stptRobotMech + i * __MechParasNum + 7); // reset inbtojoint
         }
         // notation: sdgrav() and sdpin() are required to be set in SDRobot.sd file
 		sdinit();
@@ -119,8 +121,8 @@ private:
     inline bool fnbUpdateMatA() {
         double dDeltaU = 1e-5;
         double dUTemp[__DoFNum], dMomTemp[6], dEngTemp;
-        for(int i = 0; i < this->m_stptRobotMech->nDoFNum - 1; i++) dUTemp[i] = this->m_stptRobotState->dU[i];
-        for(int i = 0; i < this->m_stptRobotMech->nDoFNum - 1; i++) { // obtain A by columns
+        for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) dUTemp[i] = this->m_stptRobotState->dU[i];
+        for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) { // obtain A by columns
             dUTemp[i] = this->m_stptRobotState->dU[i] + dDeltaU; // numerical calculate jacobian: +deltaU -> H(+)
             sdstate(0, this->m_stptRobotState->dQ, dUTemp);
             sdmom(dMomTemp, dMomTemp + 3, &dEngTemp);
@@ -136,6 +138,14 @@ private:
         }
         sdstate(0, this->m_stptRobotState->dQ, this->m_stptRobotState->dU); // return the sdfast to the current state
         return true; 
+    }
+    inline bool fnbUpdateAnk() {
+        double dPosAnkTemp[3] = { 0.010, 0.010, 0.050 }, dTRotTemp[3][3]; // nfy
+        sdpos(6, dPosAnkTemp, this->m_stptRobotState->dAnk[0]); // update the lfoot's position
+        sdpos(9, dPosAnkTemp, this->m_stptRobotState->dAnk[1]); // update the rfoot's position
+        sdorient(6, dTRotTemp); // nfy
+        sdorient(9, dTRotTemp); // nfy
+        return true;
     }
 
 };

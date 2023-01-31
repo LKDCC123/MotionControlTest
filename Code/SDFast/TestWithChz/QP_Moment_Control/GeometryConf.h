@@ -1,8 +1,8 @@
 #ifndef GEOMETRYCONF_H
 #define GEOMETRYCONF_H
-#include "..\\Chz_Control_lib\\Chz_Base.h"
-#include "..\\..\\ChzFramePlatformSelector.h"
-#include "..\\..\\SDFAST\\ChzSD_sdfastdefs.h"
+#include "Chz_Base.h"
+#include "ChzFramePlatformSelector.h"
+#include "..\\SDFAST\\ChzSD_sdfastdefs.h"
 
 #ifdef GEOMETRYCONF_CPP
 #define Extern

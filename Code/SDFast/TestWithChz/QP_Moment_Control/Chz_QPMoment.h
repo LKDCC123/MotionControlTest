@@ -1,8 +1,8 @@
 #pragma once
 #ifndef CHZ_QPMOMENT_H
 #define CHZ_QPMOMENT_H
-#include "../Chz_control_lib/Chz_Base.h"
-#include "../../SDFAST/ChzSD_sdfastdefs.h"
+#include "Chz_Base.h"
+#include "../SDFAST/ChzSD_sdfastdefs.h"
 #include <EigenQP\QuadProg.h>
 #ifdef CHZ_QPMOMENT_CPP
 #define Extern
@@ -32,7 +32,6 @@ namespace Chz
 	class QP_Moment_Controller
 	{
 		double T;
-		int ifinit;
 		char supleg;
 
 		//Joint
@@ -60,7 +59,6 @@ namespace Chz
 		Eigen::Vector6d D_mom;
 		Eigen::Vector3d CoM, CoM_last, dCoM;
 		Eigen::Vector6d Mom, Mom_last, dMom, dMomd;
-		Eigen::Matrix<double, 6, ndof> H, H_last, dH, D_mom_H;
 		void _GetQcAb_Momentum();
 		// QP
 		Eigen::Matrixnd Q;
@@ -76,10 +74,12 @@ namespace Chz
 		void _AddCons(char eq, Eigen::Matrix<double, 1, ndof>& Aeq1, double beq1, char c = '<');
 		void _GetQcAb();
 	public:
+		int ifinit;
 		QP_Moment_Controller();
 		void SetPeriod(double t1);
 		//Joint
 		void Resetq(Eigen::Vectornd& q1, Eigen::Vectornd& dq1);
+		void Setq(Eigen::Vectornd& q1, Eigen::Vectornd& dq1);
 		void Outputq(Eigen::Vectornd& q1, Eigen::Vectornd& dq1, Eigen::Vectornd& ddq_last1);
 		void OutputWaist(Eigen::Vector3d& Waist1, Eigen::Vector3d& dWaist1);
 		void SetD_joint(Eigen::Vectornd& D_joint1);
@@ -96,6 +96,7 @@ namespace Chz
 		void SetdMomd(Eigen::Vector6d& dMomd1);
 		//QP
 		int Update();
+		Eigen::Matrix<double, 6, ndof> H, H_last, dH, D_mom_H;
 	};
 
 	Extern QP_Moment_Controller QMC1;

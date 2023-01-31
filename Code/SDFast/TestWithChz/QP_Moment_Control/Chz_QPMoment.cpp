@@ -11,7 +11,7 @@ using namespace ChzSD;
 
 namespace Chz
 {
-	QuadProgDense QPDense1;
+	//QuadProgDense QPDense1;
 }
 // neq = 1 for 7p1, neq = 7 for 7p2 (fixed constraints)
 void Chz::QP_Moment_Controller::_GetQcAb_Joint()
@@ -75,7 +75,7 @@ void Chz::QP_Moment_Controller::_GetQcAb_Joint()
 void Chz::QP_Moment_Controller::_GetQcAb_Foot()
 {
 	double pos[3], posw[3], Rot[3][3], Eul[3];
-	pos[0] = 0.0; pos[1] = 0.0; pos[2] = RobotGeom.FindBody("lfoot").bodytojoint[2];
+	pos[0] = 0.01; pos[1] = 0.01; pos[2] = RobotGeom.FindBody("lfoot").bodytojoint[2];
 	if(!ifinit) ChzF(i, 0, 2) D_ank(i) = D_ank(i + 6) = 3000.0, D_ank(i + 3) = D_ank(i + 9) = 300.0;
 
 	if (ifinit) Ank[0] = Ank[1], Ank[1] = Ank[2];
@@ -352,12 +352,18 @@ void Chz::QP_Moment_Controller::SetPeriod(double t1)
 
 void Chz::QP_Moment_Controller::Resetq(Vectornd& q1, Vectornd& dq1)
 {
-	QPDense1.problem(ndof, neq, nieq);
+	//QPDense1.problem(ndof, neq, nieq);
 	ifinit = 0;
 	q = q1; dq = dq1; ddq.setZero();
 	supleg = 'D';
 	_GetQcAb();
 	ifinit = 1;
+}
+
+void Chz::QP_Moment_Controller::Setq(Vectornd& q1, Vectornd& dq1)
+{
+	//QPDense1.problem(ndof, neq, nieq);
+	q = q1; dq = dq1; ddq.setZero();
 }
 
 void Chz::QP_Moment_Controller::Outputq(Vectornd& q1, Vectornd& dq1, Vectornd& ddq_last1)
@@ -396,8 +402,8 @@ int Chz::QP_Moment_Controller::Update()
 {
 	_GetQcAb();
 	int qpflag = 1;
-	qpflag = QPDense1.solve(Q, c, Aeq, beq, A, b, 0);
-	ddq = QPDense1.result();
+	// qpflag = QPDense1.solve(Q, c, Aeq, beq, A, b, 0);
+	// ddq = QPDense1.result();
 	//ddq.setZero();
 	dq += ddq * T;
 	q += dq * T;
