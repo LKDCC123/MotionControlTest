@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "TestWithChz/QP_Moment_Control/Chz_QPMoment.h" // chz momcon
+#include "TestWithChz/SDFAST/ChzSD_sdfastdefs.h"
 
 // tests
 // #define __TEST_COM
@@ -13,11 +14,12 @@
 // #define __TEST_DMOM
 // #define __TEST_ANK
 // #define __TEST_MATA
-#define __TEST_MATDA
-
+// #define __TEST_MATDA
+#define __TEST_JACO
 
 _D_USING_SDT // dcc
 using namespace Chz; // chz
+using namespace ChzSD; // chz
 
 tp_stSDMech stptRobotMech = {
 //		      mass     inerx   inery   inerz    bodytojoint           inbtojoint
@@ -59,6 +61,8 @@ void main() {
     cSDCalcu7p2.fnbInitState(dQInit); // init state
     cSDCalcu7p2.fnbSetState(dQIn, dUIn); // set state
     cSDCalcu7p2.fnbUpdateFK(); // update state
+    double dJaco[6][__DoFNum] = { 0.0 }, dPosTemp[3] = { 0.01, 0.02, 0.03 };
+    cSDCalcu7p2.fnbGetPointJacobian(lfoot, dPosTemp, dJaco);
 
     // chz calcuprog
     Eigen::Vectornd q, dq;
@@ -90,6 +94,8 @@ void main() {
 	QMC1.OutputCoM(CoM, dCoM);
 	QMC1.OutputMom(Mom, dMom);
     QMC1.OutputAnk(Ank, dAnk);
+    
+    
 
     // plot 
     // _STD cout << "dMatdA from dcc:" << _STD endl;
@@ -201,4 +207,7 @@ void main() {
     _STD cout << "==================================================" << _STD endl;
 #endif
 
+#ifdef __TEST_JACO
+
+#endif
 }

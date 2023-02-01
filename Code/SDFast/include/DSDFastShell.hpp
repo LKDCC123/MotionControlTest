@@ -2,8 +2,8 @@
 // 20221223 Dcc <3120195094@bit.edu.cn>
 
 #pragma once
-#ifndef DSDFASTFUNS_HPP
-#define DSDFASTFUNS_HPP
+#ifndef DSDFASTFUNS_H
+#define DSDFASTFUNS_H
 #include <SDFastDefs.h>
 #include "SDMechDefs.h"
 
@@ -54,7 +54,7 @@ public:
         this->fnbSetMechParas();
         return true;
     }
-    inline bool fnbInitState(double * dptQInitIn) {
+    inline bool fnbInitState(double dptQInitIn[__DoFNum]) {
         double dptUInitIn[__DoFNum] = { 0.0 };
         this->fnbSetState(dptQInitIn, dptUInitIn);
         for(int i = 0; i < 3; i++) { // initiate the com, momentum, A
@@ -68,7 +68,7 @@ public:
         }
         return true;
     }
-    inline bool fnbSetState(double * dptQIn, double * dptUIn) { // set the state of the robot
+    inline bool fnbSetState(double dptQIn[__DoFNum], double dptUIn[__DoFNum]) { // set the state of the robot
         for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) {
             this->m_stptRobotState->dQ[i] = dptQIn[i], this->m_stptRobotState->dU[i] = dptUIn[i];
         }
@@ -82,6 +82,24 @@ public:
         this->fnbUpdateAnk();
         return true;
     }
+    inline bool fnbGetPointJacobian(int nBodyNum, double dptPosIn[3], double dptJacobian[6][__DoFNum]) {
+        double dLinTemp[3] = { 0.0 }, dLinW[3] = { 0.0 }, dRotTemp[3] = { 0.0 }, dRotW[3] = { 0.0 };
+        for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) {
+            sdrel2cart(i, nBodyNum, dptPosIn, dLinTemp, dRotTemp); // obatin the change
+            sdtrans(i, dLinTemp, -1, dLinW); // transform the linear change
+            sdtrans(i, dRotTemp, -1, dRotW); // transform the rotational change
+            for(int j = 0; j < 3; j++) dptJacobian[j][i] = dLinW[i], dptJacobian[j + 3][i] = dRotW[i];
+        }
+    }
+    // inline bool fnbGetPointState(int nBodyNum, double dptPosIn[3], double dptPosOut[3], double dptRotOut[3], double dptJacoOut[6][__DoFNum]) {
+    //     sdpos(nBodyNum, dptPosIn, dptPosOut); // input the local position and obtain the world postion 
+    //     double dTRotTemp[3][3] = { 0.0 };
+    //     sdorient(nBodyNum, dTRotTemp); // obtain the world rotation
+    //     *(dptRotOut) = atan2(dTRotTemp[2][1], dTRotTemp[2][2]);
+    //     *(dptRotOut + 1) = atan2(-dTRotTemp[2][0], sqrt(dTRotTemp[2][1] * dTRotTemp[2][1] + dTRotTemp[2][2] * dTRotTemp[2][2]));
+    //     *(dptRotOut + 2) = atan2(dTRotTemp[1][0], dTRotTemp[0][0]);
+    //     sdjacobian()
+    // }
 private:
     double dCoMOld[3], dMomOld[6], dMatAOld[6][__DoFNum], dTime;
     tp_stSDMech * m_stptRobotMech;
@@ -139,15 +157,21 @@ private:
         sdstate(0, this->m_stptRobotState->dQ, this->m_stptRobotState->dU); // return the sdfast to the current state
         return true; 
     }
-    inline bool fnbUpdateAnk() {
-        double dPosAnkTemp[3] = { 0.010, 0.010, 0.050 }, dTRotTemp[3][3]; // nfy
-        sdpos(6, dPosAnkTemp, this->m_stptRobotState->dAnk[0]); // update the lfoot's position
-        sdpos(9, dPosAnkTemp, this->m_stptRobotState->dAnk[1]); // update the rfoot's position
-        sdorient(6, dTRotTemp); // nfy
-        sdorient(9, dTRotTemp); // nfy
+    inline bool fnbUpdateAnk() { // nfy
+        double dPosAnkTemp[3] = { 0.0 }, dTRotTemp[3][3] = { 0.0 };
+        dPosAnkTemp[2] = this->m_stptRobotMech->rfoot[6]; // find the position of the ankle
+        sdpos(lfoot, dPosAnkTemp, this->m_stptRobotState->dAnk[0]); // update the lfoot's position
+        sdpos(rfoot, dPosAnkTemp, this->m_stptRobotState->dAnk[1]); // update the rfoot's position
+        sdorient(lfoot, dTRotTemp); 
+        this->m_stptRobotState->dAnk[0][0] = atan2(dTRotTemp[2][1], dTRotTemp[2][2]);
+        this->m_stptRobotState->dAnk[0][1] = atan2(-dTRotTemp[2][0], sqrt(dTRotTemp[2][1] * dTRotTemp[2][1] + dTRotTemp[2][2] * dTRotTemp[2][2]));
+        this->m_stptRobotState->dAnk[0][2] = atan2(dTRotTemp[1][0], dTRotTemp[0][0]);
+        sdorient(rfoot, dTRotTemp); 
+        this->m_stptRobotState->dAnk[1][0] = atan2(dTRotTemp[2][1], dTRotTemp[2][2]);
+        this->m_stptRobotState->dAnk[1][1] = atan2(-dTRotTemp[2][0], sqrt(dTRotTemp[2][1] * dTRotTemp[2][1] + dTRotTemp[2][2] * dTRotTemp[2][2]));
+        this->m_stptRobotState->dAnk[1][2] = atan2(dTRotTemp[1][0], dTRotTemp[0][0]);
         return true;
     }
-
 };
 
 _D_SDFAST_END

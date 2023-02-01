@@ -1,4 +1,4 @@
-// DSDMechDefs.hpp
+// DSDMechDefs.h
 // 20221223 Dcc <3120195094@bit.edu.cn>
 
 #pragma once
@@ -11,6 +11,10 @@ _D_SDFAST_BEGIN
 #define __BodyNum 10
 #define __DoFNum 21
 #define __MechParasNum 10
+
+enum enBody { // body name
+    midbody, uppbody, larm, rarm, lthigh, lshank, lfoot, rthigh, rshank, rfoot
+};
 
 // joint series
 
