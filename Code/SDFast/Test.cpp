@@ -12,10 +12,11 @@
 // #define __TEST_DCOM
 // #define __TEST_MOM
 // #define __TEST_DMOM
-// #define __TEST_ANK
+#define __TEST_ANK
 // #define __TEST_MATA
 // #define __TEST_MATDA
-#define __TEST_JACO
+// #define __TEST_JACO
+// #define __TEST_DJACO
 
 _D_USING_SDT // dcc
 using namespace Chz; // chz
@@ -61,8 +62,8 @@ void main() {
     cSDCalcu7p2.fnbInitState(dQInit); // init state
     cSDCalcu7p2.fnbSetState(dQIn, dUIn); // set state
     cSDCalcu7p2.fnbUpdateFK(); // update state
-    double dJaco[6][__DoFNum] = { 0.0 }, dPosTemp[3] = { 0.01, 0.02, 0.03 };
-    cSDCalcu7p2.fnbGetPointJacobian(lfoot, dPosTemp, dJaco);
+    double dPos[3] = { 0.0 }, dRot[3] = { 0.0 }, dJaco[6][__DoFNum] = { 0.0 },  ddJaco[6][__DoFNum] = { 0.0 }, dPosTemp[3] = { 0.01, 0.02, 0.03 };
+    cSDCalcu7p2.fnbGetPointState(lfoot, dPosTemp, dPos, dRot, dJaco, ddJaco);
 
     // chz calcuprog
     Eigen::Vectornd q, dq;
@@ -94,7 +95,9 @@ void main() {
 	QMC1.OutputCoM(CoM, dCoM);
 	QMC1.OutputMom(Mom, dMom);
     QMC1.OutputAnk(Ank, dAnk);
-    
+    double dJacoChz[6][__DoFNum] = { 0.0 }, ddJacoChz[6][__DoFNum] = { 0.0 };;
+    sdjacobian(6, dPosTemp, dJacoChz);
+    sddjacobian(dQIn, dUIn, 6, dPosTemp, ddJacoChz);
     
 
     // plot 
@@ -208,6 +211,46 @@ void main() {
 #endif
 
 #ifdef __TEST_JACO
+    _STD cout << "===================== dJaco: ======================" << _STD endl;
+    printf("from dcc: \n");
+    for(int i = 0; i < 6; i++) {
+        for(int j = 0; j < __DoFNum; j++) {
+            printf("%lf, ", dJaco[i][j]);
+        }
+        printf("\n");
+    }
+    printf("from chz: \n");
+    for(int i = 0; i < 6; i++) {
+        for(int j = 0; j < __DoFNum; j++) {
+            printf("%lf, ", dJacoChz[i][j]);
+        }
+        printf("\n");
+    }
+    double dErrJaco = 0.0;
+    for(int i = 0; i < 6; i++) for(int j = 0; j < __DoFNum; j++) dErrJaco += (dJaco[i][j] - dJacoChz[i][j]);
+    printf("dJaco Err: \n %lf\n", dErrJaco);
+    _STD cout << "==================================================" << _STD endl;
+#endif
 
+#ifdef __TEST_DJACO
+    _STD cout << "===================== ddJaco: ======================" << _STD endl;
+    printf("from dcc: \n");
+    for(int i = 0; i < 6; i++) {
+        for(int j = 0; j < __DoFNum; j++) {
+            printf("%lf, ", ddJaco[i][j]);
+        }
+        printf("\n");
+    }
+    printf("from chz: \n");
+    for(int i = 0; i < 6; i++) {
+        for(int j = 0; j < __DoFNum; j++) {
+            printf("%lf, ", ddJacoChz[i][j]);
+        }
+        printf("\n");
+    }
+    double dErrdJaco = 0.0;
+    for(int i = 0; i < 6; i++) for(int j = 0; j < __DoFNum; j++) dErrdJaco += (ddJaco[i][j] - ddJacoChz[i][j]);
+    printf("ddJaco Err: \n %lf\n", dErrdJaco);
+    _STD cout << "==================================================" << _STD endl;
 #endif
 }

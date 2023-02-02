@@ -37,6 +37,8 @@ typedef struct { // input [ dQ & dU ], then update the others for kinematics & d
     double dMatA[6][__DoFNum]; // centroidal kinematics metrix
     double dMatdA[6][__DoFNum]; // rate of centroidal kinematics metrix
     double dAnk[2][6]; // ankle position & rotation: [L, R][pos3, rot3]
+    double dJacoFt[2][6][__DoFNum]; // foot jacobian: [L, R][spacevect][DoF]
+    double ddJacoFt[2][6][__DoFNum]; // foot jacobian derivative: [L, R][spacevect][DoF]
 }tp_stSDState; 
 
 class c_SDCalcu {
@@ -82,24 +84,51 @@ public:
         this->fnbUpdateAnk();
         return true;
     }
-    inline bool fnbGetPointJacobian(int nBodyNum, double dptPosIn[3], double dptJacobian[6][__DoFNum]) {
-        double dLinTemp[3] = { 0.0 }, dLinW[3] = { 0.0 }, dRotTemp[3] = { 0.0 }, dRotW[3] = { 0.0 };
+    inline bool fnbGetPointJacobian(int nBody, double dptPosIn[3], double dptJacobian[6][__DoFNum]) {
+        static double dLinTemp[3] = { 0.0 }, dLinW[3] = { 0.0 }, dRotTemp[3] = { 0.0 }, dRotW[3] = { 0.0 };
         for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) {
-            sdrel2cart(i, nBodyNum, dptPosIn, dLinTemp, dRotTemp); // obatin the change
-            sdtrans(i, dLinTemp, -1, dLinW); // transform the linear change
-            sdtrans(i, dRotTemp, -1, dRotW); // transform the rotational change
-            for(int j = 0; j < 3; j++) dptJacobian[j][i] = dLinW[i], dptJacobian[j + 3][i] = dRotW[i];
+            sdrel2cart(i, nBody, dptPosIn, dLinTemp, dRotTemp); // obatin the change
+            sdtrans(nBody, dLinTemp, -1, dLinW); // transform the linear change
+            sdtrans(nBody, dRotTemp, -1, dRotW); // transform the rotational change
+            for(int j = 0; j < 3; j++) dptJacobian[j][i] = dLinW[j], dptJacobian[j + 3][i] = dRotW[j];
         }
+        return true;
     }
-    // inline bool fnbGetPointState(int nBodyNum, double dptPosIn[3], double dptPosOut[3], double dptRotOut[3], double dptJacoOut[6][__DoFNum]) {
-    //     sdpos(nBodyNum, dptPosIn, dptPosOut); // input the local position and obtain the world postion 
-    //     double dTRotTemp[3][3] = { 0.0 };
-    //     sdorient(nBodyNum, dTRotTemp); // obtain the world rotation
-    //     *(dptRotOut) = atan2(dTRotTemp[2][1], dTRotTemp[2][2]);
-    //     *(dptRotOut + 1) = atan2(-dTRotTemp[2][0], sqrt(dTRotTemp[2][1] * dTRotTemp[2][1] + dTRotTemp[2][2] * dTRotTemp[2][2]));
-    //     *(dptRotOut + 2) = atan2(dTRotTemp[1][0], dTRotTemp[0][0]);
-    //     sdjacobian()
-    // }
+    inline bool fnvGetPointdJacobian(int nBody, double dptPosIn[3], double dptdJacobian[6][__DoFNum]) { // calculate the dJ by using numerical differentiation 
+        double dDeltaQ = 1e-5;
+        static double dQ[__DoFNum] = { 0.0 }, dJacoTemp[2 * __DoFNum][6][__DoFNum] = { 0.0 };
+        for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) dQ[i] = this->m_stptRobotState->dQ[i];
+        for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) {
+            dQ[i] = this->m_stptRobotState->dQ[i] + dDeltaQ;
+            sdstate(0, dQ, this->m_stptRobotState->dU);
+            this->fnbGetPointJacobian(nBody, dptPosIn, dJacoTemp[2 * i]); // q+
+            dQ[i] = this->m_stptRobotState->dQ[i] - dDeltaQ;
+            sdstate(0, dQ, this->m_stptRobotState->dU);
+            this->fnbGetPointJacobian(nBody, dptPosIn, dJacoTemp[2 * i + 1]); // q-
+            dQ[i] = this->m_stptRobotState->dQ[i];
+        }
+        sdstate(0, this->m_stptRobotState->dQ, this->m_stptRobotState->dU); // reset the sdfast to the current state
+        for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) for(int j = 0; j < 6; j++) {
+            dptdJacobian[j][i] = 0.0;
+            for(int k = 0; k < this->m_stptRobotMech->nDoFNum; k++) dptdJacobian[j][i] += (dJacoTemp[2 * k][j][i] - dJacoTemp[2 * k + 1][j][i]) / 2.0 / dDeltaQ * this->m_stptRobotState->dU[k];
+        }
+        return true;
+    }
+    inline bool fnbGetPointPosRot(int nBody, double dptPosIn[3], double dptPosOut[3], double dptRotOut[3]) {
+        sdpos(nBody, dptPosIn, dptPosOut); // input the local position and obtain the world postion 
+        double dTRotTemp[3][3] = { 0.0 };
+        sdorient(nBody, dTRotTemp); // obtain the world rotation
+        *(dptRotOut) = atan2(dTRotTemp[2][1], dTRotTemp[2][2]);
+        *(dptRotOut + 1) = atan2(-dTRotTemp[2][0], sqrt(dTRotTemp[2][1] * dTRotTemp[2][1] + dTRotTemp[2][2] * dTRotTemp[2][2]));
+        *(dptRotOut + 2) = atan2(dTRotTemp[1][0], dTRotTemp[0][0]);
+        return true;
+    }
+    inline bool fnbGetPointState(int nBody, double dptPosIn[3], double dptPosOut[3], double dptRotOut[3], double dptJacoOut[6][__DoFNum], double dptdJacoOut[6][__DoFNum]) {
+        fnbGetPointPosRot(nBody, dptPosIn, dptPosOut, dptRotOut);
+        fnbGetPointJacobian(nBody, dptPosIn, dptJacoOut);
+        fnvGetPointdJacobian(nBody, dptPosIn, dptdJacoOut);
+        return true;
+    }
 private:
     double dCoMOld[3], dMomOld[6], dMatAOld[6][__DoFNum], dTime;
     tp_stSDMech * m_stptRobotMech;
@@ -107,7 +136,7 @@ private:
     inline bool fnbSetMechParas() {
         for(int i = 0; i < this->m_stptRobotMech->nBodNum; i++) {
             sdmass(i, *((double *)m_stptRobotMech + i * __MechParasNum + 0)); // reset mass
-            double dInerTemp[3][3] = {
+            static double dInerTemp[3][3] = {
                 { *((double *)m_stptRobotMech + i * __MechParasNum + 1), 0.0, 0.0 }, 
                 { 0.0, *((double *)m_stptRobotMech + i * __MechParasNum + 2), 0.0 },
                 { 0.0, 0.0, *((double *)m_stptRobotMech + i * __MechParasNum + 3) }
@@ -160,16 +189,8 @@ private:
     inline bool fnbUpdateAnk() { // nfy
         double dPosAnkTemp[3] = { 0.0 }, dTRotTemp[3][3] = { 0.0 };
         dPosAnkTemp[2] = this->m_stptRobotMech->rfoot[6]; // find the position of the ankle
-        sdpos(lfoot, dPosAnkTemp, this->m_stptRobotState->dAnk[0]); // update the lfoot's position
-        sdpos(rfoot, dPosAnkTemp, this->m_stptRobotState->dAnk[1]); // update the rfoot's position
-        sdorient(lfoot, dTRotTemp); 
-        this->m_stptRobotState->dAnk[0][0] = atan2(dTRotTemp[2][1], dTRotTemp[2][2]);
-        this->m_stptRobotState->dAnk[0][1] = atan2(-dTRotTemp[2][0], sqrt(dTRotTemp[2][1] * dTRotTemp[2][1] + dTRotTemp[2][2] * dTRotTemp[2][2]));
-        this->m_stptRobotState->dAnk[0][2] = atan2(dTRotTemp[1][0], dTRotTemp[0][0]);
-        sdorient(rfoot, dTRotTemp); 
-        this->m_stptRobotState->dAnk[1][0] = atan2(dTRotTemp[2][1], dTRotTemp[2][2]);
-        this->m_stptRobotState->dAnk[1][1] = atan2(-dTRotTemp[2][0], sqrt(dTRotTemp[2][1] * dTRotTemp[2][1] + dTRotTemp[2][2] * dTRotTemp[2][2]));
-        this->m_stptRobotState->dAnk[1][2] = atan2(dTRotTemp[1][0], dTRotTemp[0][0]);
+        this->fnbGetPointState(lfoot, dPosAnkTemp, this->m_stptRobotState->dAnk[0], this->m_stptRobotState->dAnk[0] + 3, this->m_stptRobotState->dJacoFt[0], this->m_stptRobotState->ddJacoFt[0]);
+        this->fnbGetPointState(rfoot, dPosAnkTemp, this->m_stptRobotState->dAnk[1], this->m_stptRobotState->dAnk[1] + 3, this->m_stptRobotState->dJacoFt[1], this->m_stptRobotState->ddJacoFt[1]);
         return true;
     }
 };

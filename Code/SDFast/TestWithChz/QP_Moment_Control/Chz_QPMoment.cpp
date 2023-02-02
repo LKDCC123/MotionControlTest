@@ -75,7 +75,7 @@ void Chz::QP_Moment_Controller::_GetQcAb_Joint()
 void Chz::QP_Moment_Controller::_GetQcAb_Foot()
 {
 	double pos[3], posw[3], Rot[3][3], Eul[3];
-	pos[0] = 0.01; pos[1] = 0.01; pos[2] = RobotGeom.FindBody("lfoot").bodytojoint[2];
+	pos[0] = 0.0; pos[1] = 0.0; pos[2] = RobotGeom.FindBody("lfoot").bodytojoint[2];
 	if(!ifinit) ChzF(i, 0, 2) D_ank(i) = D_ank(i + 6) = 3000.0, D_ank(i + 3) = D_ank(i + 9) = 300.0;
 
 	if (ifinit) Ank[0] = Ank[1], Ank[1] = Ank[2];
