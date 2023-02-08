@@ -37,14 +37,9 @@ typedef struct { // input [ dQ & dU ], then update the others for kinematics & d
     double dMatA[6][__DoFNum]; // centroidal kinematics metrix
     double dMatdA[6][__DoFNum]; // rate of centroidal kinematics metrix
     double dAnk[2][6]; // ankle position & rotation: [L, R][pos3, rot3]
-    double ddAnk[2][6]; // ankle position & rotation rate: [L, R][pos3, rot3]
     double dJacoFt[2][6][__DoFNum]; // foot jacobian: [L, R][spacevect][DoF]
     double ddJacoFt[2][6][__DoFNum]; // foot jacobian derivative: [L, R][spacevect][DoF]
 }tp_stSDState; 
-
-enum enState { // state name
-    Q, CoM, Mom, A, Ank, Jaco
-};
 
 class c_SDCalcu {
 public:
@@ -101,136 +96,37 @@ public:
     }
     inline bool fnvGetPointdJacobian(int nBody, double dptPosIn[3], double dptdJacobian[6][__DoFNum]) { // calculate the dJ by using numerical differentiation 
         double dDeltaQ = 1e-5;
-        static double dQ[__DoFNum] = { 0.0 }, dJacoTemp[__DoFNum][2][6][__DoFNum] = { 0.0 };
+        static double dQ[__DoFNum] = { 0.0 }, dJacoTemp[2 * __DoFNum][6][__DoFNum] = { 0.0 };
         for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) dQ[i] = this->m_stptRobotState->dQ[i];
         for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) {
             dQ[i] = this->m_stptRobotState->dQ[i] + dDeltaQ;
             sdstate(0, dQ, this->m_stptRobotState->dU);
-            this->fnbGetPointJacobian(nBody, dptPosIn, dJacoTemp[i][0]); // q+
+            this->fnbGetPointJacobian(nBody, dptPosIn, dJacoTemp[2 * i]); // q+
             dQ[i] = this->m_stptRobotState->dQ[i] - dDeltaQ;
             sdstate(0, dQ, this->m_stptRobotState->dU);
-            this->fnbGetPointJacobian(nBody, dptPosIn, dJacoTemp[i][1]); // q-
+            this->fnbGetPointJacobian(nBody, dptPosIn, dJacoTemp[2 * i + 1]); // q-
             dQ[i] = this->m_stptRobotState->dQ[i];
         }
         sdstate(0, this->m_stptRobotState->dQ, this->m_stptRobotState->dU); // reset the sdfast to the current state
         for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) for(int j = 0; j < 6; j++) {
             dptdJacobian[j][i] = 0.0;
-            for(int k = 0; k < this->m_stptRobotMech->nDoFNum; k++) dptdJacobian[j][i] += (dJacoTemp[k][0][j][i] - dJacoTemp[k][1][j][i]) / 2.0 / dDeltaQ * this->m_stptRobotState->dU[k];
+            for(int k = 0; k < this->m_stptRobotMech->nDoFNum; k++) dptdJacobian[j][i] += (dJacoTemp[2 * k][j][i] - dJacoTemp[2 * k + 1][j][i]) / 2.0 / dDeltaQ * this->m_stptRobotState->dU[k];
         }
         return true;
     }
-    inline bool fnbGetPointPosRot(int nBody, double dptPosIn[3], double dptSpcOut[6]) {
-        sdpos(nBody, dptPosIn, dptSpcOut); // input the local position and obtain the world postion 
+    inline bool fnbGetPointPosRot(int nBody, double dptPosIn[3], double dptPosOut[3], double dptRotOut[3]) {
+        sdpos(nBody, dptPosIn, dptPosOut); // input the local position and obtain the world postion 
         double dTRotTemp[3][3] = { 0.0 };
         sdorient(nBody, dTRotTemp); // obtain the world rotation
-        *(dptSpcOut + 3) = atan2(dTRotTemp[2][1], dTRotTemp[2][2]);
-        *(dptSpcOut + 4) = atan2(-dTRotTemp[2][0], sqrt(dTRotTemp[2][1] * dTRotTemp[2][1] + dTRotTemp[2][2] * dTRotTemp[2][2]));
-        *(dptSpcOut + 5) = atan2(dTRotTemp[1][0], dTRotTemp[0][0]);
+        *(dptRotOut) = atan2(dTRotTemp[2][1], dTRotTemp[2][2]);
+        *(dptRotOut + 1) = atan2(-dTRotTemp[2][0], sqrt(dTRotTemp[2][1] * dTRotTemp[2][1] + dTRotTemp[2][2] * dTRotTemp[2][2]));
+        *(dptRotOut + 2) = atan2(dTRotTemp[1][0], dTRotTemp[0][0]);
         return true;
     }
-    inline bool fnbGetPointdPosRot(int nBody, double dptPosIn[3], double dptdSpcOut[6]) {
-        double dDeltaQ = 1e-5;
-        static double dQ[__DoFNum] = { 0.0 }, dAnkTemp[__DoFNum][2][6] = { 0.0 };
-        for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) dQ[i] = this->m_stptRobotState->dQ[i];
-        for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) {
-            dQ[i] = this->m_stptRobotState->dQ[i] + dDeltaQ;
-            sdstate(0, dQ, this->m_stptRobotState->dU);
-            this->fnbGetPointPosRot(nBody, dptPosIn, dAnkTemp[i][0]); // q+
-            dQ[i] = this->m_stptRobotState->dQ[i] - dDeltaQ;
-            sdstate(0, dQ, this->m_stptRobotState->dU);
-            this->fnbGetPointPosRot(nBody, dptPosIn, dAnkTemp[i][1]); // q-
-            dQ[i] = this->m_stptRobotState->dQ[i];
-        }
-        sdstate(0, this->m_stptRobotState->dQ, this->m_stptRobotState->dU); // reset the sdfast to the current state
-        for(int i = 0; i <= 6; i++) for(int j = 0; j <= this->m_stptRobotMech->nDoFNum; j++) {
-            dptdSpcOut[i] += (dAnkTemp[j][0][i] - dAnkTemp[j][1][i]) / 2.0 / dDeltaQ * this->m_stptRobotState->dQ[j];
-        }
-        return true;
-    }
-    inline bool fnbGetPointState(int nBody, double dptPosIn[3], double dptSpcOut[6], double dptdSpcOut[6], double dptJacoOut[6][__DoFNum], double dptdJacoOut[6][__DoFNum]) {
-        fnbGetPointPosRot(nBody, dptPosIn, dptSpcOut);
-        fnbGetPointdPosRot(nBody, dptPosIn, dptdSpcOut);
+    inline bool fnbGetPointState(int nBody, double dptPosIn[3], double dptPosOut[3], double dptRotOut[3], double dptJacoOut[6][__DoFNum], double dptdJacoOut[6][__DoFNum]) {
+        fnbGetPointPosRot(nBody, dptPosIn, dptPosOut, dptRotOut);
         fnbGetPointJacobian(nBody, dptPosIn, dptJacoOut);
         fnvGetPointdJacobian(nBody, dptPosIn, dptdJacoOut);
-        return true;
-    }
-    inline bool fnbDisp(int nDispName) {
-        switch(nDispName) {
-        case Q: 
-            _STD cout << "==================================== Q ====================================:" << _STD endl;
-            for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) printf("%lf, ", this->m_stptRobotState->dQ[i]);
-            printf("\n");
-            _STD cout << "==================================== U ====================================:" << _STD endl;
-            for(int i = 0; i < this->m_stptRobotMech->nDoFNum; i++) printf("%lf, ", this->m_stptRobotState->dU[i]);
-            printf("\n");
-            break;
-        case CoM:
-            _STD cout << "==================================== CoM ====================================:" << _STD endl;
-            for(int i = 0; i < 3; i++) printf("%lf, ", this->m_stptRobotState->dCoM[i]);
-            printf("\n");
-            _STD cout << "==================================== dCoM ====================================:" << _STD endl;
-            for(int i = 0; i < 3; i++) printf("%lf, ", this->m_stptRobotState->ddCoM[i]);
-            printf("\n");
-            break;
-        case Mom:
-            _STD cout << "==================================== Mom ====================================:" << _STD endl;
-            for(int i = 0; i < 6; i++) printf("%lf, ", this->m_stptRobotState->dMom[i]);
-            printf("\n");
-            _STD cout << "==================================== dMom ====================================:" << _STD endl;
-            for(int i = 0; i < 6; i++) printf("%lf, ", this->m_stptRobotState->ddMom[i]);
-            printf("\n");
-            break;
-        case A:
-            _STD cout << "==================================== A ====================================:" << _STD endl;
-            for(int i = 0; i < 6; i++) {
-                for(int j = 0; j < this->m_stptRobotMech->nDoFNum; j++) printf("%lf, ", this->m_stptRobotState->dMatA[i][j]);
-                printf("\n");
-            }
-            _STD cout << "==================================== dA ====================================:" << _STD endl;
-            for(int i = 0; i < 6; i++) {
-                for(int j = 0; j < this->m_stptRobotMech->nDoFNum; j++) printf("%lf, ", this->m_stptRobotState->dMatdA[i][j]);
-                printf("\n");
-            }
-            break;
-        case Ank:
-            _STD cout << "==================================== Ank ====================================:" << _STD endl;
-            for(int i = 0; i < 2; i++) {
-                for(int j = 0; j < 6; j++) printf("%lf, ", this->m_stptRobotState->dAnk[i][j]);
-                printf("\n");
-            }
-            _STD cout << "==================================== dAnk ====================================:" << _STD endl;
-            for(int i = 0; i < 2; i++) {
-                for(int j = 0; j < 6; j++) printf("%lf, ", this->m_stptRobotState->ddAnk[i][j]);
-                printf("\n");
-            }
-            break;
-        case Jaco:
-            _STD cout << "==================================== Jaco ====================================:" << _STD endl;
-            _STD cout << "left:" << _STD endl;
-            for(int i = 0; i < 6; i++) {
-                for(int j = 0; j < this->m_stptRobotMech->nDoFNum; j++) printf("%lf, ", this->m_stptRobotState->dJacoFt[0][i][j]);
-                printf("\n");
-            }
-            _STD cout << "right:" << _STD endl;
-            for(int i = 0; i < 6; i++) {
-                for(int j = 0; j < this->m_stptRobotMech->nDoFNum; j++) printf("%lf, ", this->m_stptRobotState->dJacoFt[1][i][j]);
-                printf("\n");
-            }
-            _STD cout << "==================================== dJaco ====================================:" << _STD endl;
-            _STD cout << "left:" << _STD endl;
-            for(int i = 0; i < 6; i++) {
-                for(int j = 0; j < this->m_stptRobotMech->nDoFNum; j++) printf("%lf, ", this->m_stptRobotState->ddJacoFt[0][i][j]);
-                printf("\n");
-            }
-            _STD cout << "right:" << _STD endl;
-            for(int i = 0; i < 6; i++) {
-                for(int j = 0; j < this->m_stptRobotMech->nDoFNum; j++) printf("%lf, ", this->m_stptRobotState->ddJacoFt[1][i][j]);
-                printf("\n");
-            }
-            break;
-        default:
-            break;
-        }
         return true;
     }
 private:
@@ -290,11 +186,11 @@ private:
         sdstate(0, this->m_stptRobotState->dQ, this->m_stptRobotState->dU); // return the sdfast to the current state
         return true; 
     }
-    inline bool fnbUpdateAnk() { 
+    inline bool fnbUpdateAnk() { // nfy
         double dPosAnkTemp[3] = { 0.0 }, dTRotTemp[3][3] = { 0.0 };
         dPosAnkTemp[2] = this->m_stptRobotMech->rfoot[6]; // find the position of the ankle
-        this->fnbGetPointState(lfoot, dPosAnkTemp, this->m_stptRobotState->dAnk[0], this->m_stptRobotState->ddAnk[0], this->m_stptRobotState->dJacoFt[0], this->m_stptRobotState->ddJacoFt[0]);
-        this->fnbGetPointState(rfoot, dPosAnkTemp, this->m_stptRobotState->dAnk[1], this->m_stptRobotState->ddAnk[1], this->m_stptRobotState->dJacoFt[1], this->m_stptRobotState->ddJacoFt[1]);
+        this->fnbGetPointState(lfoot, dPosAnkTemp, this->m_stptRobotState->dAnk[0], this->m_stptRobotState->dAnk[0] + 3, this->m_stptRobotState->dJacoFt[0], this->m_stptRobotState->ddJacoFt[0]);
+        this->fnbGetPointState(rfoot, dPosAnkTemp, this->m_stptRobotState->dAnk[1], this->m_stptRobotState->dAnk[1] + 3, this->m_stptRobotState->dJacoFt[1], this->m_stptRobotState->ddJacoFt[1]);
         return true;
     }
 };
