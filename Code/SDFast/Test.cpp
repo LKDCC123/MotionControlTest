@@ -10,12 +10,12 @@
 // tests
 // #define __TEST_COM
 // #define __TEST_DCOM
-#define __TEST_MOM // prob
-// #define __TEST_DMOM // prob
+// #define __TEST_MOM 
+// #define __TEST_DMOM 
 // #define __TEST_ANK
-// #define __TEST_DANK // prob
-// #define __TEST_MATA // prob
-// #define __TEST_MATDA // prob
+#define __TEST_DANK // prob
+// #define __TEST_MATA 
+// #define __TEST_MATDA 
 // #define __TEST_JACO
 // #define __TEST_DJACO 
 // #define __TEST_DISP
@@ -45,12 +45,12 @@ double  // initial joints position
         dQInit[__DoFNum] = {    10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                 0.0, 0.0, 0.0, 
                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                0.0, 0.0, 0.0, 0.0, 0.0, 0.0    },
+                                0.0, 0.01, 0.0, 0.0, 0.0, 0.0   },
         // input joints position
-        dQIn[__DoFNum]   = {    10.0, 0.4, 0.3, 0.2, 0.3, 0.2, 
-                                0.2, 0.2, 0.2, 
-                                0.1, 0.12, -0.15, 0.11, 0.2, 0.2,
-                                0.2, 0.11, -0.13, 0.2, 0.1, 0.3    },
+        dQIn[__DoFNum]   = {    10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                0.0, 0.0, 0.0, 
+                                0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                0.0, 0.0, 0.0, 0.0, 0.0, 0.0  },
         // input joint speed
         dUIn[__DoFNum] = { 0.0 };
 void main() {
@@ -68,20 +68,14 @@ void main() {
     // chz calcuprog
     Eigen::Vectornd qin, q, dq;
     QMC1.ifinit = 1;
-    qin <<  10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-            0.0, 0.0, 0.0, 
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+    for(int i = 0; i < __DoFNum; i++) qin(i) = dQInit[i];
     dq <<   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
             0.0, 0.0, 0.0, 
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
     QMC1.Setq(qin, dq);
     QMC1.Update();
-    q <<    10.0, 0.4, 0.3, 0.2, 0.3, 0.2, 
-            0.2, 0.2, 0.2, 
-            0.1, 0.12, -0.15, 0.11, 0.2, 0.2,
-            0.2, 0.11, -0.13, 0.2, 0.1, 0.3;
+    for(int i = 0; i < __DoFNum; i++) q(i) = dQIn[i];
     dq = (q - qin) / dControlT;
     Eigen::Vector3d cCoM, dCoM;
     Eigen::Vector6d cMom, dMom;

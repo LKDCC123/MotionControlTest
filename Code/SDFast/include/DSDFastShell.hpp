@@ -83,10 +83,10 @@ public:
         return true;
     }
     inline bool fnbUpdateFK() { // obtain: major -> [ com, momentum, A, ank ] and their rate; minor -> [ inertia, energy, mass ]
-        // this->fnbUpdateCoM();
+        this->fnbUpdateCoM();
         this->fnbUpdateMom();
-        // this->fnbUpdateMatA();
-        // this->fnbUpdateAnk();
+        this->fnbUpdateMatA();
+        this->fnbUpdateAnk();
         return true;
     }
     inline bool fnbGetPointJacobian(int nBody, double dptPosIn[3], double dptJacobian[6][__DoFNum]) {
@@ -142,8 +142,9 @@ public:
             dQ[i] = this->m_stptRobotState->dQ[i];
         }
         sdstate(0, this->m_stptRobotState->dQ, this->m_stptRobotState->dU); // reset the sdfast to the current state
-        for(int i = 0; i <= 6; i++) for(int j = 0; j <= this->m_stptRobotMech->nDoFNum; j++) {
-            dptdSpcOut[i] += (dAnkTemp[j][0][i] - dAnkTemp[j][1][i]) / 2.0 / dDeltaQ * this->m_stptRobotState->dQ[j];
+        for(int i = 0; i < 6; i++) {
+            dptdSpcOut[i] = 0.0;
+            for(int j = 0; j <= this->m_stptRobotMech->nDoFNum; j++) dptdSpcOut[i] += (dAnkTemp[j][0][i] - dAnkTemp[j][1][i]) / 2.0 / dDeltaQ * this->m_stptRobotState->dU[j];
         }
         return true;
     }
@@ -240,7 +241,7 @@ private:
     inline bool fnbSetMechParas() {
         for(int i = 0; i < this->m_stptRobotMech->nBodNum; i++) {
             sdmass(i, *((double *)m_stptRobotMech + i * __MechParasNum + 0)); // reset mass
-            static double dInerTemp[3][3] = {
+            double dInerTemp[3][3] = {
                 { *((double *)m_stptRobotMech + i * __MechParasNum + 1), 0.0, 0.0 }, 
                 { 0.0, *((double *)m_stptRobotMech + i * __MechParasNum + 2), 0.0 },
                 { 0.0, 0.0, *((double *)m_stptRobotMech + i * __MechParasNum + 3) }
