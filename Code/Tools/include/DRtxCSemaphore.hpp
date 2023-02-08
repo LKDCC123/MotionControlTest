@@ -18,12 +18,8 @@ private:
     int m_nNameFlag;
 public:
     inline c_RtxCSem(const WCHAR * wcptName) {
-        WCHAR wcNameTemp[60];
-        wcscpy_s(wcNameTemp, wcptName);
-        wcscat_s(wcNameTemp, L"_Sem");
-        this->m_wstrName = wcNameTemp;
+        this->fnbSetName(wcptName);
         this->m_hSem = NULL;
-        this->m_nNameFlag = TRUE;
     }
     inline c_RtxCSem() {
         this->m_wstrName = L"Default_Sem";

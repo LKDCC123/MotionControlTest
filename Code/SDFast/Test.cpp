@@ -10,13 +10,15 @@
 // tests
 // #define __TEST_COM
 // #define __TEST_DCOM
-// #define __TEST_MOM
-// #define __TEST_DMOM
-#define __TEST_ANK
-// #define __TEST_MATA
-// #define __TEST_MATDA
+#define __TEST_MOM // prob
+// #define __TEST_DMOM // prob
+// #define __TEST_ANK
+// #define __TEST_DANK // prob
+// #define __TEST_MATA // prob
+// #define __TEST_MATDA // prob
 // #define __TEST_JACO
-// #define __TEST_DJACO
+// #define __TEST_DJACO 
+// #define __TEST_DISP
 
 _D_USING_SDT // dcc
 using namespace Chz; // chz
@@ -48,27 +50,25 @@ double  // initial joints position
         dQIn[__DoFNum]   = {    10.0, 0.4, 0.3, 0.2, 0.3, 0.2, 
                                 0.2, 0.2, 0.2, 
                                 0.1, 0.12, -0.15, 0.11, 0.2, 0.2,
-                                0.2, 0.11, -0.13, 0.2, 0.1, 0.3    },             
-        // input joints position
-        dUIn[__DoFNum]   = {    0.4, 0.3, 0.2, 0.1, 0.1, 0.1, 
-                                0.2, 0.2, 0.2, 
-                                0.2, 0.2, 0.1, 0.1, 0.1, 0.1,
-                                0.1, 0.1, 0.1, 0.2, 0.2, 0.1    };   
-
+                                0.2, 0.11, -0.13, 0.2, 0.1, 0.3    },
+        // input joint speed
+        dUIn[__DoFNum] = { 0.0 };
 void main() {
     double dControlT = 0.004;
+    for(int i = 0; i < __DoFNum; i++) dUIn[i] = (dQIn[i] - dQInit[i]) / dControlT;
     // dcc calcuprog
     c_SDCalcu cSDCalcu7p2(&stptRobotMech, &stptRobotStateOut, dControlT);
-    cSDCalcu7p2.fnbInitState(dQInit); // init state
-    cSDCalcu7p2.fnbSetState(dQIn, dUIn); // set state
-    cSDCalcu7p2.fnbUpdateFK(); // update state
-    double dPos[3] = { 0.0 }, dRot[3] = { 0.0 }, dJaco[6][__DoFNum] = { 0.0 },  ddJaco[6][__DoFNum] = { 0.0 }, dPosTemp[3] = { 0.01, 0.02, 0.03 };
-    cSDCalcu7p2.fnbGetPointState(lfoot, dPosTemp, dPos, dRot, dJaco, ddJaco);
+    #define _SD7p2 cSDCalcu7p2
+    _SD7p2.fnbInitState(dQInit); // init state
+    _SD7p2.fnbSetState(dQIn, dUIn); // set state
+    _SD7p2.fnbUpdateFK(); // update state
+    double dSpc[6] = { 0.0 }, ddSpc[6] = { 0.0 }, dJaco[6][__DoFNum] = { 0.0 },  ddJaco[6][__DoFNum] = { 0.0 }, dPosTemp[3] = { 0.01, 0.02, 0.03 };
+    _SD7p2.fnbGetPointState(lfoot, dPosTemp, dSpc, ddSpc, dJaco, ddJaco);
 
     // chz calcuprog
-    Eigen::Vectornd q, dq;
+    Eigen::Vectornd qin, q, dq;
     QMC1.ifinit = 1;
-    q <<    10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+    qin <<  10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
             0.0, 0.0, 0.0, 
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
@@ -76,25 +76,22 @@ void main() {
             0.0, 0.0, 0.0, 
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-    QMC1.Setq(q, dq);
+    QMC1.Setq(qin, dq);
     QMC1.Update();
     q <<    10.0, 0.4, 0.3, 0.2, 0.3, 0.2, 
             0.2, 0.2, 0.2, 
             0.1, 0.12, -0.15, 0.11, 0.2, 0.2,
             0.2, 0.11, -0.13, 0.2, 0.1, 0.3;
-    dq <<   0.4, 0.3, 0.2, 0.1, 0.1, 0.1, 
-            0.2, 0.2, 0.2, 
-            0.2, 0.2, 0.1, 0.1, 0.1, 0.1,
-            0.1, 0.1, 0.1, 0.2, 0.2, 0.1;
-    Eigen::Vector3d CoM, dCoM;
-    Eigen::Vector6d Mom, dMom;
-    Eigen::Vector12d Ank, dAnk;
+    dq = (q - qin) / dControlT;
+    Eigen::Vector3d cCoM, dCoM;
+    Eigen::Vector6d cMom, dMom;
+    Eigen::Vector12d cAnk, dAnk;
     QMC1.SetPeriod(dControlT);
     QMC1.Setq(q, dq);
     QMC1.Update();
-	QMC1.OutputCoM(CoM, dCoM);
-	QMC1.OutputMom(Mom, dMom);
-    QMC1.OutputAnk(Ank, dAnk);
+	QMC1.OutputCoM(cCoM, dCoM);
+	QMC1.OutputMom(cMom, dMom);
+    QMC1.OutputAnk(cAnk, dAnk);
     double dJacoChz[6][__DoFNum] = { 0.0 }, ddJacoChz[6][__DoFNum] = { 0.0 };;
     sdjacobian(6, dPosTemp, dJacoChz);
     sddjacobian(dQIn, dUIn, 6, dPosTemp, ddJacoChz);
@@ -115,7 +112,7 @@ void main() {
     for(int i = 0; i < 3; i++) printf("%lf, ", stptRobotStateOut.dCoM[i]);
     printf("\n");
     printf("from chz: \t");
-    for(int i = 0; i < 3; i++) printf("%lf, ", CoM(i));
+    for(int i = 0; i < 3; i++) printf("%lf, ", cCoM(i));
     printf("\n");
     _STD cout << "==================================================" << _STD endl;
 #endif
@@ -137,7 +134,7 @@ void main() {
     for(int i = 0; i < 6; i++) printf("%lf, ", stptRobotStateOut.dMom[i]);
     printf("\n");
     printf("from chz: \t");
-    for(int i = 0; i < 6; i++) printf("%lf, ", Mom(i));
+    for(int i = 0; i < 6; i++) printf("%lf, ", cMom(i));
     printf("\n");
     _STD cout << "==================================================" << _STD endl;
 #endif
@@ -160,8 +157,21 @@ void main() {
     for(int i = 0; i < 3; i++) printf("%lf, ", stptRobotStateOut.dAnk[1][i]);
     printf("\n");
     printf("from chz: \t");
-    for(int i = 0; i < 3; i++) printf("%lf, ", Ank(i));
-    for(int i = 0; i < 3; i++) printf("%lf, ", Ank(i + 6));
+    for(int i = 0; i < 3; i++) printf("%lf, ", cAnk(i));
+    for(int i = 0; i < 3; i++) printf("%lf, ", cAnk(i + 6));
+    printf("\n");
+    _STD cout << "==================================================" << _STD endl;
+#endif
+
+#ifdef __TEST_DANK
+    _STD cout << "===================== ddAnk: ======================" << _STD endl;
+    printf("from dcc: \t");
+    for(int i = 0; i < 3; i++) printf("%lf, ", stptRobotStateOut.ddAnk[0][i]);
+    for(int i = 0; i < 3; i++) printf("%lf, ", stptRobotStateOut.ddAnk[1][i]);
+    printf("\n");
+    printf("from chz: \t");
+    for(int i = 0; i < 3; i++) printf("%lf, ", dAnk(i));
+    for(int i = 0; i < 3; i++) printf("%lf, ", dAnk(i + 6));
     printf("\n");
     _STD cout << "==================================================" << _STD endl;
 #endif
@@ -252,5 +262,14 @@ void main() {
     for(int i = 0; i < 6; i++) for(int j = 0; j < __DoFNum; j++) dErrdJaco += (ddJaco[i][j] - ddJacoChz[i][j]);
     printf("ddJaco Err: \n %lf\n", dErrdJaco);
     _STD cout << "==================================================" << _STD endl;
+#endif
+
+#ifdef __TEST_DISP
+    _SD7p2.fnbDisp(Q);
+    _SD7p2.fnbDisp(CoM);
+    _SD7p2.fnbDisp(Mom);
+    _SD7p2.fnbDisp(A);
+    _SD7p2.fnbDisp(Ank);
+    _SD7p2.fnbDisp(Jaco);
 #endif
 }
