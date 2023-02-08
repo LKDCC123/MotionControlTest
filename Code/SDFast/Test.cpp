@@ -10,8 +10,8 @@
 // tests
 // #define __TEST_COM
 // #define __TEST_DCOM
-#define __TEST_MOM // prob
-// #define __TEST_DMOM // prob
+// #define __TEST_MOM
+// #define __TEST_DMOM
 // #define __TEST_ANK
 // #define __TEST_DANK // prob
 // #define __TEST_MATA // prob
@@ -63,7 +63,7 @@ void main() {
     _SD7p2.fnbSetState(dQIn, dUIn); // set state
     _SD7p2.fnbUpdateFK(); // update state
     double dSpc[6] = { 0.0 }, ddSpc[6] = { 0.0 }, dJaco[6][__DoFNum] = { 0.0 },  ddJaco[6][__DoFNum] = { 0.0 }, dPosTemp[3] = { 0.01, 0.02, 0.03 };
-    _SD7p2.fnbGetPointState(lfoot, dPosTemp, dSpc, ddSpc, dJaco, ddJaco);
+    // _SD7p2.fnbGetPointState(lfoot, dPosTemp, dSpc, ddSpc, dJaco, ddJaco);
 
     // chz calcuprog
     Eigen::Vectornd qin, q, dq;

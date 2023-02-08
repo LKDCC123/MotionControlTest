@@ -83,10 +83,10 @@ public:
         return true;
     }
     inline bool fnbUpdateFK() { // obtain: major -> [ com, momentum, A, ank ] and their rate; minor -> [ inertia, energy, mass ]
-        // this->fnbUpdateCoM();
+        this->fnbUpdateCoM();
         this->fnbUpdateMom();
-        // this->fnbUpdateMatA();
-        // this->fnbUpdateAnk();
+        this->fnbUpdateMatA();
+        this->fnbUpdateAnk();
         return true;
     }
     inline bool fnbGetPointJacobian(int nBody, double dptPosIn[3], double dptJacobian[6][__DoFNum]) {
@@ -240,7 +240,7 @@ private:
     inline bool fnbSetMechParas() {
         for(int i = 0; i < this->m_stptRobotMech->nBodNum; i++) {
             sdmass(i, *((double *)m_stptRobotMech + i * __MechParasNum + 0)); // reset mass
-            static double dInerTemp[3][3] = {
+            double dInerTemp[3][3] = {
                 { *((double *)m_stptRobotMech + i * __MechParasNum + 1), 0.0, 0.0 }, 
                 { 0.0, *((double *)m_stptRobotMech + i * __MechParasNum + 2), 0.0 },
                 { 0.0, 0.0, *((double *)m_stptRobotMech + i * __MechParasNum + 3) }
