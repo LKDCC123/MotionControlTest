@@ -12,11 +12,11 @@
 // #define __TEST_DCOM
 // #define __TEST_MOM
 // #define __TEST_DMOM
-#define __TEST_ANK
+// #define __TEST_ANK
 // #define __TEST_MATA
 // #define __TEST_MATDA
 // #define __TEST_JACO
-// #define __TEST_DJACO
+#define __TEST_DJACO
 
 _D_USING_SDT // dcc
 using namespace Chz; // chz
