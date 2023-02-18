@@ -22,7 +22,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{0EF91A78-85A5-3F8D-9CA2-072E760BAF1E}</ProjectGuid>
+    <ProjectGuid>{A6F90301-B1F6-3279-9DFC-405815900453}</ProjectGuid>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
     <Keyword>Win32Proj</Keyword>
     <Platform>x64</Platform>
@@ -59,25 +59,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\GitHUB\MotionControlTest\Code\Control\build\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\L.B\GitHUB\MotionControlTest\Code\Control\build\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ControlTest.dir\Debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ControlTest</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\GitHUB\MotionControlTest\Code\Control\build\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\L.B\GitHUB\MotionControlTest\Code\Control\build\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ControlTest.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ControlTest</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\GitHUB\MotionControlTest\Code\Control\build\MinSizeRel\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\L.B\GitHUB\MotionControlTest\Code\Control\build\MinSizeRel\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">ControlTest.dir\MinSizeRel\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">ControlTest</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\GitHUB\MotionControlTest\Code\Control\build\RelWithDebInfo\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\L.B\GitHUB\MotionControlTest\Code\Control\build\RelWithDebInfo\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">ControlTest.dir\RelWithDebInfo\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">ControlTest</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
@@ -86,7 +86,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\GitHUB\MotionControlTest\Code\Control\.\include;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\L.B\GitHUB\MotionControlTest\Code\Control\.\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\SDFast\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Sim_SDK\Mujocolib;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\LeeQP_SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <CompileAs>CompileAsCpp</CompileAs>
@@ -100,15 +100,15 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CNSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CONSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;NDEBUG;_CNSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\GitHUB\MotionControlTest\Code\Control\.\include;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;NDEBUG;_CONSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\L.B\GitHUB\MotionControlTest\Code\Control\.\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\SDFast\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Sim_SDK\Mujocolib;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\LeeQP_SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\GitHUB\MotionControlTest\Code\Control\.\include;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\L.B\GitHUB\MotionControlTest\Code\Control\.\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\SDFast\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Sim_SDK\Mujocolib;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\LeeQP_SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -116,13 +116,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64 /out: ControlTest.exe</AdditionalOptions>
+      <AdditionalDependencies>glfw3.lib;mujoco200.lib;LEigenQP_CPP.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/Sim_SDK/Mujocolib/bin;D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/Sim_SDK/Mujocolib/bin/$(Configuration);D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/LeeQP_SDK/lib;D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/LeeQP_SDK/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>D:/GitHUB/MotionControlTest/Code/Control/build/Debug/ControlTest.lib</ImportLibrary>
-      <ProgramDataBaseFile>D:/GitHUB/MotionControlTest/Code/Control/build/Debug/ControlTest.pdb</ProgramDataBaseFile>
+      <ImportLibrary>D:/L.B/GitHUB/MotionControlTest/Code/Control/build/Debug/ControlTest.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/L.B/GitHUB/MotionControlTest/Code/Control/build/Debug/ControlTest.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -131,7 +131,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\GitHUB\MotionControlTest\Code\Control\.\include;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\L.B\GitHUB\MotionControlTest\Code\Control\.\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\SDFast\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Sim_SDK\Mujocolib;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\LeeQP_SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -143,17 +143,17 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CNSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CONSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CNSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\GitHUB\MotionControlTest\Code\Control\.\include;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CONSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\L.B\GitHUB\MotionControlTest\Code\Control\.\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\SDFast\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Sim_SDK\Mujocolib;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\LeeQP_SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\GitHUB\MotionControlTest\Code\Control\.\include;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\L.B\GitHUB\MotionControlTest\Code\Control\.\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\SDFast\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Sim_SDK\Mujocolib;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\LeeQP_SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -161,13 +161,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64 /out: ControlTest.exe</AdditionalOptions>
+      <AdditionalDependencies>glfw3.lib;mujoco200.lib;LEigenQP_CPP.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/Sim_SDK/Mujocolib/bin;D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/Sim_SDK/Mujocolib/bin/$(Configuration);D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/LeeQP_SDK/lib;D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/LeeQP_SDK/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>D:/GitHUB/MotionControlTest/Code/Control/build/Release/ControlTest.lib</ImportLibrary>
-      <ProgramDataBaseFile>D:/GitHUB/MotionControlTest/Code/Control/build/Release/ControlTest.pdb</ProgramDataBaseFile>
+      <ImportLibrary>D:/L.B/GitHUB/MotionControlTest/Code/Control/build/Release/ControlTest.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/L.B/GitHUB/MotionControlTest/Code/Control/build/Release/ControlTest.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -176,7 +176,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\GitHUB\MotionControlTest\Code\Control\.\include;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\L.B\GitHUB\MotionControlTest\Code\Control\.\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\SDFast\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Sim_SDK\Mujocolib;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\LeeQP_SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -188,17 +188,17 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CNSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CONSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CNSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\GitHUB\MotionControlTest\Code\Control\.\include;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CONSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\L.B\GitHUB\MotionControlTest\Code\Control\.\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\SDFast\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Sim_SDK\Mujocolib;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\LeeQP_SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\GitHUB\MotionControlTest\Code\Control\.\include;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\L.B\GitHUB\MotionControlTest\Code\Control\.\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\SDFast\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Sim_SDK\Mujocolib;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\LeeQP_SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -206,13 +206,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64 /out: ControlTest.exe</AdditionalOptions>
+      <AdditionalDependencies>glfw3.lib;mujoco200.lib;LEigenQP_CPP.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/Sim_SDK/Mujocolib/bin;D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/Sim_SDK/Mujocolib/bin/$(Configuration);D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/LeeQP_SDK/lib;D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/LeeQP_SDK/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>D:/GitHUB/MotionControlTest/Code/Control/build/MinSizeRel/ControlTest.lib</ImportLibrary>
-      <ProgramDataBaseFile>D:/GitHUB/MotionControlTest/Code/Control/build/MinSizeRel/ControlTest.pdb</ProgramDataBaseFile>
+      <ImportLibrary>D:/L.B/GitHUB/MotionControlTest/Code/Control/build/MinSizeRel/ControlTest.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/L.B/GitHUB/MotionControlTest/Code/Control/build/MinSizeRel/ControlTest.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -221,7 +221,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\GitHUB\MotionControlTest\Code\Control\.\include;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\L.B\GitHUB\MotionControlTest\Code\Control\.\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\SDFast\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Sim_SDK\Mujocolib;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\LeeQP_SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -234,15 +234,15 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CNSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CONSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CNSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\GitHUB\MotionControlTest\Code\Control\.\include;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CONSOLE;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\L.B\GitHUB\MotionControlTest\Code\Control\.\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\SDFast\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Sim_SDK\Mujocolib;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\LeeQP_SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\GitHUB\MotionControlTest\Code\Control\.\include;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\L.B\GitHUB\MotionControlTest\Code\Control\.\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\SDFast\include;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Eigen_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\SDFast_SDK;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\Sim_SDK\Mujocolib;D:\L.B\GitHUB\MotionControlTest\Code\Control\.\..\..\SDK\LeeQP_SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -250,13 +250,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64 /out: ControlTest.exe</AdditionalOptions>
+      <AdditionalDependencies>glfw3.lib;mujoco200.lib;LEigenQP_CPP.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/Sim_SDK/Mujocolib/bin;D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/Sim_SDK/Mujocolib/bin/$(Configuration);D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/LeeQP_SDK/lib;D:/L.B/GitHUB/MotionControlTest/Code/Control/./../../SDK/LeeQP_SDK/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>D:/GitHUB/MotionControlTest/Code/Control/build/RelWithDebInfo/ControlTest.lib</ImportLibrary>
-      <ProgramDataBaseFile>D:/GitHUB/MotionControlTest/Code/Control/build/RelWithDebInfo/ControlTest.pdb</ProgramDataBaseFile>
+      <ImportLibrary>D:/L.B/GitHUB/MotionControlTest/Code/Control/build/RelWithDebInfo/ControlTest.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/L.B/GitHUB/MotionControlTest/Code/Control/build/RelWithDebInfo/ControlTest.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -264,10 +264,10 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\GitHUB\MotionControlTest\Code\Control\CMakeLists.txt">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/GitHUB/MotionControlTest/Code/Control/CMakeLists.txt</Message>
+    <CustomBuild Include="D:\L.B\GitHUB\MotionControlTest\Code\Control\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/L.B/GitHUB/MotionControlTest/Code/Control/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-D:\cmake-3.17.3-win64-x64\bin\cmake.exe -SD:/GitHUB/MotionControlTest/Code/Control -BD:/GitHUB/MotionControlTest/Code/Control/build --check-stamp-file D:/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/generate.stamp
+D:\PRO\cmake-3.17.3-win64-x64\bin\cmake.exe -SD:/L.B/GitHUB/MotionControlTest/Code/Control -BD:/L.B/GitHUB/MotionControlTest/Code/Control/build --check-stamp-file D:/L.B/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -275,12 +275,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCCompiler.cmake;D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCXXCompiler.cmake;D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeRCCompiler.cmake;D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeSystem.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCXXInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCommonLanguageInclude.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeGenericSystem.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeInitializeConfigs.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeLanguageInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeRCInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInitialize.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-C.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-CXX.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-C.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-CXX.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\WindowsPaths.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCCompiler.cmake;D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCXXCompiler.cmake;D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeRCCompiler.cmake;D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeSystem.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCXXInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCommonLanguageInclude.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeGenericSystem.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeInitializeConfigs.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeLanguageInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeRCInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInitialize.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-C.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-CXX.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-C.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-CXX.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\WindowsPaths.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/GitHUB/MotionControlTest/Code/Control/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/L.B/GitHUB/MotionControlTest/Code/Control/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-D:\cmake-3.17.3-win64-x64\bin\cmake.exe -SD:/GitHUB/MotionControlTest/Code/Control -BD:/GitHUB/MotionControlTest/Code/Control/build --check-stamp-file D:/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/generate.stamp
+D:\PRO\cmake-3.17.3-win64-x64\bin\cmake.exe -SD:/L.B/GitHUB/MotionControlTest/Code/Control -BD:/L.B/GitHUB/MotionControlTest/Code/Control/build --check-stamp-file D:/L.B/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -288,12 +288,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCCompiler.cmake;D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCXXCompiler.cmake;D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeRCCompiler.cmake;D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeSystem.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCXXInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCommonLanguageInclude.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeGenericSystem.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeInitializeConfigs.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeLanguageInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeRCInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInitialize.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-C.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-CXX.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-C.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-CXX.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\WindowsPaths.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCCompiler.cmake;D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCXXCompiler.cmake;D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeRCCompiler.cmake;D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeSystem.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCXXInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCommonLanguageInclude.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeGenericSystem.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeInitializeConfigs.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeLanguageInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeRCInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInitialize.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-C.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-CXX.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-C.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-CXX.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\WindowsPaths.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/GitHUB/MotionControlTest/Code/Control/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/L.B/GitHUB/MotionControlTest/Code/Control/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
-D:\cmake-3.17.3-win64-x64\bin\cmake.exe -SD:/GitHUB/MotionControlTest/Code/Control -BD:/GitHUB/MotionControlTest/Code/Control/build --check-stamp-file D:/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/generate.stamp
+D:\PRO\cmake-3.17.3-win64-x64\bin\cmake.exe -SD:/L.B/GitHUB/MotionControlTest/Code/Control -BD:/L.B/GitHUB/MotionControlTest/Code/Control/build --check-stamp-file D:/L.B/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -301,12 +301,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCCompiler.cmake;D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCXXCompiler.cmake;D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeRCCompiler.cmake;D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeSystem.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCXXInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCommonLanguageInclude.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeGenericSystem.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeInitializeConfigs.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeLanguageInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeRCInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInitialize.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-C.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-CXX.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-C.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-CXX.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\WindowsPaths.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCCompiler.cmake;D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCXXCompiler.cmake;D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeRCCompiler.cmake;D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeSystem.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCXXInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCommonLanguageInclude.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeGenericSystem.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeInitializeConfigs.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeLanguageInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeRCInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInitialize.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-C.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-CXX.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-C.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-CXX.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\WindowsPaths.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/GitHUB/MotionControlTest/Code/Control/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/L.B/GitHUB/MotionControlTest/Code/Control/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
-D:\cmake-3.17.3-win64-x64\bin\cmake.exe -SD:/GitHUB/MotionControlTest/Code/Control -BD:/GitHUB/MotionControlTest/Code/Control/build --check-stamp-file D:/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/generate.stamp
+D:\PRO\cmake-3.17.3-win64-x64\bin\cmake.exe -SD:/L.B/GitHUB/MotionControlTest/Code/Control -BD:/L.B/GitHUB/MotionControlTest/Code/Control/build --check-stamp-file D:/L.B/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -314,17 +314,33 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCCompiler.cmake;D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCXXCompiler.cmake;D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeRCCompiler.cmake;D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeSystem.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCXXInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCommonLanguageInclude.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeGenericSystem.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeInitializeConfigs.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeLanguageInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeRCInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInformation.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInitialize.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-C.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-CXX.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-C.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-CXX.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows.cmake;D:\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\WindowsPaths.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCCompiler.cmake;D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeCXXCompiler.cmake;D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeRCCompiler.cmake;D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\3.17.3\CMakeSystem.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCXXInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeCommonLanguageInclude.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeGenericSystem.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeInitializeConfigs.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeLanguageInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeRCInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInformation.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\CMakeSystemSpecificInitialize.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-C.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Compiler\MSVC-CXX.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-C.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC-CXX.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows-MSVC.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\Windows.cmake;D:\PRO\cmake-3.17.3-win64-x64\share\cmake-3.17\Modules\Platform\WindowsPaths.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\L.B\GitHUB\MotionControlTest\Code\Control\build\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\Code\Control\Test.cpp" />
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\Code\Control\Test.cpp" />
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\Sim_SDK\Mj_DataExchange.cpp" />
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\Sim_SDK\Mujocolib\MujocoBHR_api.cpp" />
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\Sim_SDK\Mujocolib\include\uitools.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\Code\Control\src\Test_control.cpp" />
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFiles\SDRobot_d.cpp" />
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFiles\SDRobot_s.cpp" />
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFiles\sdlib.cpp" />
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFastDefs.cpp" />
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\LeeQP_SDK\src\QuadProg.cpp" />
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\LeeQP_SDK\src\solve.QP.compact.cpp" />
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\LeeQP_SDK\src\solve.QP.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="D:\GitHUB\MotionControlTest\Code\Control\build\ZERO_CHECK.vcxproj">
-      <Project>{7664B763-0DE2-3B02-B3F1-EAC3C5B8CA6D}</Project>
+    <ProjectReference Include="D:\L.B\GitHUB\MotionControlTest\Code\Control\build\ZERO_CHECK.vcxproj">
+      <Project>{AA409F89-BCEF-3739-B735-7D507A5ED703}</Project>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\L.B\GitHUB\MotionControlTest\SDK\LeeQP_SDK\build\CMakeFiles\683380d61cdbd9ff7af58e48f5b5a0b9\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{84224F01-4A70-3B0F-9CD8-FDBFA248D6AA}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

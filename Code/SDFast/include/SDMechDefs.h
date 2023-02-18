@@ -10,6 +10,7 @@ _D_SDFAST_BEGIN
 
 #define __BodyNum 10
 #define __DoFNum 21
+#define __JointNum 15
 #define __MechParasNum 10
 
 enum enBody { // body name

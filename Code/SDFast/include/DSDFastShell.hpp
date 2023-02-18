@@ -5,7 +5,6 @@
 #ifndef DSDFASTFUNS_H
 #define DSDFASTFUNS_H
 #include <SDFastDefs.h>
-#include "SDMechDefs.h"
 
 _D_SDFAST_BEGIN
 
@@ -24,6 +23,7 @@ typedef struct { // mass, iner_x, iner_y, iner_z, bodytojoint_x, bodytojoint_y, 
     int nDoFNum;
 }tp_stSDMech;
 
+// state seq: trunk [z, y, x, rz, ry, rx], waist yaw, L arm, R arm, L leg [1-6], R leg [1-6]
 typedef struct { // input [ dQ & dU ], then update the others for kinematics & dynamics
     double dQ[__DoFNum]; // q of the robot
     double dU[__DoFNum]; // dq of the robot
@@ -155,7 +155,8 @@ public:
         fnvGetPointdJacobian(nBody, dptPosIn, dptdJacoOut);
         return true;
     }
-    inline bool fnbDisp(int nDispName) {
+    // Q, U, CoM, dCoM, Mom, dMom, A, dA, Ank, dAnk, Jaco, dJaco
+    inline bool fnbDisp(int nDispName) { 
         switch(nDispName) {
         case Q: 
             _STD cout << "==================================== Q ====================================:" << _STD endl;

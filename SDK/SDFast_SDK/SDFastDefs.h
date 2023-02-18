@@ -2,6 +2,7 @@
 #include <SDFastHeaders.h>
 #include <stdio.h>
 #include <iostream>
+#include <SDMechDefs.h>
 
 _D_SDFAST_BEGIN
 

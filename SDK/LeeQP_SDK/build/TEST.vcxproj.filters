@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\LeeQP_SDK\test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\LeeQP_SDK\src\QuadProg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\LeeQP_SDK\src\solve.QP.compact.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\LeeQP_SDK\src\solve.QP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\L.B\GitHUB\MotionControlTest\SDK\LeeQP_SDK\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{8C192F2D-9C9C-3E58-9DBA-2AC4FB3BBC03}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

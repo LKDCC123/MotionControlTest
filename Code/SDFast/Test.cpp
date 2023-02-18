@@ -13,9 +13,9 @@
 // #define __TEST_MOM 
 // #define __TEST_DMOM 
 // #define __TEST_ANK
-#define __TEST_DANK // prob
-// #define __TEST_MATA 
-// #define __TEST_MATDA 
+#define __TEST_DANK // now: numerical partial derivative, not the same with the resault from numerical difference 
+// #define __TEST_MATA // now: numerical partial derivative, required upgrate with explicit analytical mechod
+// #define __TEST_MATDA // now: numerical difference
 // #define __TEST_JACO
 // #define __TEST_DJACO 
 // #define __TEST_DISP
@@ -45,7 +45,7 @@ double  // initial joints position
         dQInit[__DoFNum] = {    10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                 0.0, 0.0, 0.0, 
                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                0.0, 0.01, 0.0, 0.0, 0.0, 0.0   },
+                                0.0, 0.0, 0.04, 0.04, 0.0, 0.0   },
         // input joints position
         dQIn[__DoFNum]   = {    10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                 0.0, 0.0, 0.0, 
