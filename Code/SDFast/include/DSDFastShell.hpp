@@ -155,7 +155,7 @@ public:
         fnvGetPointdJacobian(nBody, dptPosIn, dptdJacoOut);
         return true;
     }
-    // Q, U, CoM, dCoM, Mom, dMom, A, dA, Ank, dAnk, Jaco, dJaco
+    // Q, U, CoM, Mom, A, Ank, Jaco
     inline bool fnbDisp(int nDispName) { 
         switch(nDispName) {
         case Q: 

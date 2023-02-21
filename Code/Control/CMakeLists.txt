@@ -54,3 +54,6 @@ target_link_options(ControlTest PUBLIC
 )
 
 file(COPY "${ROOT_PATH}/../../SDK/Sim_SDK/Mujocolib/bin/mjkey.txt" DESTINATION "Debug") # COPY 后路径相对cmakelist，DESTINATION 后路径则相对于build文件夹
+file(COPY "${ROOT_PATH}/../../SDK/Sim_SDK/Mujocolib/bin/glfw3.dll" DESTINATION "Debug") 
+file(COPY "${ROOT_PATH}/../../SDK/Sim_SDK/Mujocolib/bin/mujoco200.dll" DESTINATION "Debug") 
+file(COPY "${ROOT_PATH}/../../SDK/Sim_SDK/Mujocolib/bin/mujoco200nogl.dll" DESTINATION "Debug") 

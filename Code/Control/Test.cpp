@@ -7,7 +7,7 @@
 
 void main() {
     // choose your model
-    fnvMujocoSimuInit(1, "D:/L.B/GitHUB/MotionControlTest/SDK/Sim_SDK/Mujocolib/models/bhr7p2_origin.xml"); 
+    fnvMujocoSimuInit(1, "../../../../SDK/Sim_SDK/Mujocolib/models/bhr7p2_origin.xml"); 
 
     // start simulation in a background thread
     std::thread MujocoSimThread(fnvMujocoSimuLoop); 
