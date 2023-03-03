@@ -1,2 +1,1 @@
-
-void fnvTestCon();
+void fnvTestCon(int nKpre);

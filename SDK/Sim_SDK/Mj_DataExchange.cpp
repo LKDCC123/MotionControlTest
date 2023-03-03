@@ -39,7 +39,7 @@ int fndMjDataExchange(double dptJointsPosition[50], double dptJointsVelocity[50]
 
 	// your control should be added here s--------------------------------------
 	
-	fnvTestCon();
+	fnvTestCon(k_pre);
 
 	// your control should be added here e--------------------------------------
 

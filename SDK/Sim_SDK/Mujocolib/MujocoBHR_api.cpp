@@ -35,9 +35,9 @@ const double _dFcSensorDirection[50] = { -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, // lef
                                          };
 // joints control
 const double _dJointsGear[50] = { 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0 };
-const double _dJointsDirection[50] = { 1.0, -1.0, -1.0, // waist yaw, left arm, right arm
-                                       1.0, -1.0, 1.0, 1.0, 1.0, -1.0, // left leg
-                                       1.0, -1.0, 1.0, 1.0, 1.0, -1.0 // right leg
+const double _dJointsDirection[50] = { 1.0, 1.0, 1.0, // waist yaw, left arm, right arm
+                                       1.0, 1.0, 1.0, 1.0, 1.0, 1.0, // left leg
+                                       1.0, 1.0, 1.0, 1.0, 1.0, 1.0 // right leg
                                        };
 const double _dJointsInitPos[50] = { 0.0, 0.0, 0.72, // trunk position
                                      0.0, 0.0, 0.0, 0.0, // trunk quaternion
@@ -1780,6 +1780,13 @@ void fnvMjDataRecording() {
 
 	// ********************************************************** Default Data ****************************************************************
 	//chzlog
+	for (i = 0; i < ChzLogNum; i++, nDataStartTemp++)
+	{
+		if (ChzFrame::FrameHandler.N_Control() == i + 10) strcat(MjLogName[nDataStartTemp], ChzLogNames[i]);
+		fptDataBuff[nDataStartTemp] = ChzLogVals[i];
+	}
+
+
 	if (nDataStartTemp > nMjMaxColumn) {
 		printf("Error: Too many data to save!!\n");
 	}

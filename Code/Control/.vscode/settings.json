@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "core": "cpp",
+        "ostream": "cpp",
+        "istream": "cpp",
+        "memory": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "xlocnum": "cpp",
+        "cmath": "cpp",
+        "xcomplex": "cpp"
+    }
+}
