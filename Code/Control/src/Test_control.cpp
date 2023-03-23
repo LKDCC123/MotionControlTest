@@ -18,14 +18,14 @@ tp_stSDMech stRobotMech = {
 //		      mass     inerx   inery   inerz    bodytojoint           inbtojoint
 /*midbody*/	{ 15.733,  0.1760, 0.1149, 0.1099,  0.000, 0.000, 0.000,  0.000, 0.000, 0.000 }, 
 /*uppbody*/	{ 15.401,  0.4813, 0.1584, 0.4315,  0.000, 0.000,-0.167,  0.008, 0.000, 0.150 }, 
-/*larm*/	{ 01.520,  0.0264, 0.0277, 0.0021,  0.000, 0.000, 0.291,  0.000, 0.268, 0.017 },
+/*larm*/	  { 01.520,  0.0264, 0.0277, 0.0021,  0.000, 0.000, 0.291,  0.000, 0.268, 0.017 },
 /*rarm*/    { 01.520,  0.0264, 0.0277, 0.0021,  0.000, 0.000, 0.291,  0.000,-0.268, 0.017 },
 /*lthigh*/	{ 06.042,  0.0530, 0.0550, 0.0140,  0.000, 0.000, 0.196,  0.000, 0.080,-0.086 },
 /*lshank*/	{ 00.719,  0.0121, 0.0124, 0.0005,  0.000, 0.000, 0.132,  0.000, 0.000,-0.124 },
-/*lfoot*/	{ 01.152,  0.0017, 0.0047, 0.0052,  0.000, 0.000, 0.050,  0.000, 0.000,-0.188 },
+/*lfoot*/	  { 01.152,  0.0017, 0.0047, 0.0052,  0.000, 0.000, 0.050,  0.000, 0.000,-0.188 },
 /*rthigh*/	{ 06.042,  0.0530, 0.0550, 0.0140,  0.000, 0.000, 0.196,  0.000,-0.080,-0.086 },
 /*rshank*/	{ 00.719,  0.0121, 0.0124, 0.0005,  0.000, 0.000, 0.132,  0.000, 0.000,-0.124 },
-/*rfoot*/	{ 01.152,  0.0017, 0.0047, 0.0052,  0.000, 0.000, 0.050,  0.000, 0.000,-0.188 },
+/*rfoot*/	  { 01.152,  0.0017, 0.0047, 0.0052,  0.000, 0.000, 0.050,  0.000, 0.000,-0.188 },
             __BodyNum,
             __DoFNum,
 };
@@ -50,13 +50,14 @@ c_WholeBC cProgWBC(&stWBC, &stRobotMech, &stGains, dControlT);
 
 double Zc, Zc_last = 0.0, dZc, T1 = 5.0, T2 = 1.0, T3 = 2.0;
 void fnvTestCon(int nKpre) {
-    printf("%d\n", nKpre);
+    // printf("%d\n", nKpre);
     cProgWBC.fnbInit(dStateInit);
-    if(nKpre * dControlT <= T1 * 0.5) Zc = 0.743834 - 0.3 * sin(2 * 3.1415 / T1 * nKpre * dControlT);
-    else if(nKpre * dControlT <= T1 * 0.5 + T2 * 0.5) Zc = 0.743834 - 0.3 + 0.3 * sin(2 * 3.1415 / T2 * (nKpre * dControlT - T1 * 0.5));
-    else if(nKpre * dControlT <= T1 * 0.5 + T2 * 0.5 + T3 * 0.5) Zc = 0.743834 - 0.2 * sin(2 * 3.1415 / T3 * (nKpre * dControlT - T1 * 0.5 - T2 * 0.5));
-    else Zc = 0.743834 - 0.2;
-    dZc = (Zc - Zc_last) / dControlT;
+    Zc = 0.743834; 
+    // if(nKpre * dControlT <= T1 * 0.5) Zc = 0.743834 - 0.3 * sin(2 * 3.1415 / T1 * nKpre * dControlT);
+    // else if(nKpre * dControlT <= T1 * 0.5 + T2 * 0.5) Zc = 0.743834 - 0.3 + 0.3 * sin(2 * 3.1415 / T2 * (nKpre * dControlT - T1 * 0.5));
+    // else if(nKpre * dControlT <= T1 * 0.5 + T2 * 0.5 + T3 * 0.5) Zc = 0.743834 - 0.2 * sin(2 * 3.1415 / T3 * (nKpre * dControlT - T1 * 0.5 - T2 * 0.5));
+    // else Zc = 0.743834 - 0.2;
+    // dZc = (Zc - Zc_last) / dControlT;
     Zc_last = Zc;
 
     
@@ -87,6 +88,7 @@ void fnvTestCon(int nKpre) {
     stRefIn.ddAnk[1][3] = 0.0, stRefIn.ddAnk[1][4] = 0.0, stRefIn.ddAnk[1][5] = 0.0;
 
     cProgWBC.fnbUpdateWBC(dSensQIn, dSensUIn, stRefIn, dCmdJointsPos);
+  
     // cProgWBC.fnvShowTrackingErr();
     // cProgWBC.fnvShowHf();
 }

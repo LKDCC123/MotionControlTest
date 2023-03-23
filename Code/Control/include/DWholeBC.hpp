@@ -5,8 +5,8 @@
 2）在线控制：将从仿真、实际机器人本体估计得到的真实sta给SD算rel，用ref和rel做反馈控制得到con， 优化得到ddq后，积分更新WBC的sta
 */
 #pragma once
-#ifndef DWHOLEBC_H
-#define DWHOLEBC_H
+#ifndef DWHOLEBC_HPP
+#define DWHOLEBC_HPP
 #include "ControlHeaders.h"
 
 _D_CONTROL_BEGIN
@@ -195,9 +195,6 @@ private:
                                         + this->m_stGains->dh[i][5] * (this->m_stptWBCDat->ref.dpos[i] - this->m_stptWBCDat->rel.dpos[i]);      // kdc
         // printf("%.3lf, %.3lf\n", this->m_stptWBCDat->ref.c[1], this->m_stptWBCDat->rel.c[1]);
         // printf("%.3lf, %.3lf, %.3lf, %.3lf \n", this->m_stptWBCDat->ref.c[2], this->m_stptWBCDat->rel.c[2], this->m_stptWBCDat->rel.dc[2], this->m_stptWBCDat->con.dh_ref[2]); __DEBUG // for test
-        
-        FrameAddLogsC(987, "Zc_ref",  &this->m_stptWBCDat->ref.c[2], 1);
-        FrameAddLogsC(987, "Zc_rel",  &this->m_stptWBCDat->rel.c[2], 1);
         return true;
     }
     bool fnbClearHf() {
