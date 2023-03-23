@@ -1780,11 +1780,11 @@ void fnvMjDataRecording() {
 
 	// ********************************************************** Default Data ****************************************************************
 	//chzlog
-	for (i = 0; i < ChzLogNum; i++, nDataStartTemp++)
-	{
-		if (ChzFrame::FrameHandler.N_Control() == i + 10) strcat(MjLogName[nDataStartTemp], ChzLogNames[i]);
-		fptDataBuff[nDataStartTemp] = ChzLogVals[i];
-	}
+	// for (i = 0; i < ChzLogNum; i++, nDataStartTemp++)
+	// {
+	// 	if (ChzFrame::FrameHandler.N_Control() == i + 10) strcat(MjLogName[nDataStartTemp], ChzLogNames[i]);
+	// 	fptDataBuff[nDataStartTemp] = ChzLogVals[i];
+	// }
 
 
 	if (nDataStartTemp > nMjMaxColumn) {

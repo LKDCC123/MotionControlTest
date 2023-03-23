@@ -196,8 +196,8 @@ private:
         // printf("%.3lf, %.3lf\n", this->m_stptWBCDat->ref.c[1], this->m_stptWBCDat->rel.c[1]);
         // printf("%.3lf, %.3lf, %.3lf, %.3lf \n", this->m_stptWBCDat->ref.c[2], this->m_stptWBCDat->rel.c[2], this->m_stptWBCDat->rel.dc[2], this->m_stptWBCDat->con.dh_ref[2]); __DEBUG // for test
         
-        FrameAddLogsC(987, "Zc_ref",  &this->m_stptWBCDat->ref.c[2], 1);
-        FrameAddLogsC(987, "Zc_rel",  &this->m_stptWBCDat->rel.c[2], 1);
+        // FrameAddLogsC(987, "Zc_ref",  &this->m_stptWBCDat->ref.c[2], 1);
+        // FrameAddLogsC(987, "Zc_rel",  &this->m_stptWBCDat->rel.c[2], 1);
         return true;
     }
     bool fnbClearHf() {
