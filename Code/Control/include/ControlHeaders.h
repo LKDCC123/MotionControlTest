@@ -9,6 +9,7 @@
 #include <iostream>
 #include <DSDFastTools.h>
 #include <LEigenQP_CPP/Core.hpp>
+#include <DBase.hpp>
 
 #define _D_CONTROL_BEGIN namespace Dcc { namespace CONTROL_FILES {
 #define _D_CONTROL_END }}

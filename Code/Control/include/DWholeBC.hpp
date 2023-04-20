@@ -5,8 +5,8 @@
 2）在线控制：将从仿真、实际机器人本体估计得到的真实sta给SD算rel，用ref和rel做反馈控制得到con， 优化得到ddq后，积分更新WBC的sta
 */
 #pragma once
-#ifndef DWHOLEBC_H
-#define DWHOLEBC_H
+#ifndef DWHOLEBC_HPP
+#define DWHOLEBC_HPP
 #include "ControlHeaders.h"
 
 _D_CONTROL_BEGIN

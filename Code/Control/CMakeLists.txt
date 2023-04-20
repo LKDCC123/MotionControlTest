@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 project(ControlTest)
 set(ROOT_PATH .)
 
+find_package(DBase)
+
 include_directories(
     "${ROOT_PATH}/include"
     "${ROOT_PATH}/../SDFast/include"

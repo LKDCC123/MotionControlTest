@@ -1,5 +1,6 @@
 #include <Test_control.h>
 #include <DWholeBC.hpp>
+#include <DHdCon.hpp>
 _D_USING_WBC
 
 double dControlT = 0.004;
@@ -47,7 +48,6 @@ double dSensQIn[__DoFNum], dSensUIn[__DoFNum];
 st_Target stRefIn;
 
 c_WholeBC cProgWBC(&stWBC, &stRobotMech, &stGains, dControlT);
-
 double Zc, Zc_last = 0.0, dZc, T1 = 5.0, T2 = 1.0, T3 = 2.0;
 void fnvTestCon(int nKpre) {
     printf("%d\n", nKpre);
@@ -89,4 +89,9 @@ void fnvTestCon(int nKpre) {
     cProgWBC.fnbUpdateWBC(dSensQIn, dSensUIn, stRefIn, dCmdJointsPos);
     // cProgWBC.fnvShowTrackingErr();
     // cProgWBC.fnvShowHf();
+}
+
+// st_RobotConfig stRobDonfig = { 42.0, 5.0, 0.16, 0.112 };
+void fnvTestDHd() {
+
 }
