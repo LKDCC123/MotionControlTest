@@ -14,4 +14,4 @@
 #define _D_CONTROL_BEGIN namespace Dcc { namespace CONTROL_FILES {
 #define _D_CONTROL_END }}
 #define _D_CON ::Dcc::CONTROL_FILES::
-#define _D_USING_WBC using namespace Dcc::CONTROL_FILES;
+#define _D_USING_DCON using namespace Dcc::CONTROL_FILES;

@@ -6,6 +6,7 @@ find_package(DBase)
 
 include_directories(
     "${ROOT_PATH}/include"
+    "${ROOT_PATH}/test"
     "${ROOT_PATH}/../SDFast/include"
     "${ROOT_PATH}/../../SDK/Eigen_SDK"
     "${ROOT_PATH}/../../SDK/SDFast_SDK"
@@ -27,6 +28,7 @@ aux_source_directory("${ROOT_PATH}/../../SDK/SDFast_SDK" SRC_SDFAST)
 aux_source_directory("${ROOT_PATH}/../../SDK/LeeQP_SDK/src" SRC_LEEQP)
 
 add_executable(ControlTest
+    test/Test_control.cpp
     Test.cpp
     ${SRC_SIM}
     ${SRC_TEST}
@@ -59,3 +61,6 @@ file(COPY "${ROOT_PATH}/../../SDK/Sim_SDK/Mujocolib/bin/mjkey.txt" DESTINATION "
 file(COPY "${ROOT_PATH}/../../SDK/Sim_SDK/Mujocolib/bin/glfw3.dll" DESTINATION "Debug") 
 file(COPY "${ROOT_PATH}/../../SDK/Sim_SDK/Mujocolib/bin/mujoco200.dll" DESTINATION "Debug") 
 file(COPY "${ROOT_PATH}/../../SDK/Sim_SDK/Mujocolib/bin/mujoco200nogl.dll" DESTINATION "Debug") 
+
+# if install
+include(config.cmake)

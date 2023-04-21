@@ -11,25 +11,53 @@ _D_USING_BASE
 
 #define __FzMin 50.0
 
-struct st_RobotConfig{
+struct st_RobotConfig{ // init required
     double Tc; 
     double Mass;
     double UpperMass;
     double UpperIner;
     double Zc; // height of the nominal CoM
     double AnkWidth;
-    double AnkHeight;
     double FootGeom[4]; // positive: forw, back, iner, outer
+};
+
+struct st_DHdConGains{ // init required
+    double UpperPos[3]; // [k_posture, kp, kd]
+    double CalMStab[2]; // [kp, kd]
+    double MdZMP[2]; // [kp_pos, kd_pos, kp_rot, kd_rot]
+    double GRFC[9];
+    double Compliance[2];
+};
+
+struct st_Filters{ // init required
+    double TLagIMU;
+    double TLagGro;
+    double TLagFrc;
+    double TLagTrq;
+};
+
+struct st_DHdConIO{ // init required
+    // input
+    double BasePG[6]; // pattern generated base position and posture [x, y, z, rx, ry, rz]
+    double LAnkPG_W[6]; // pattern generated left ankle position and posture in world frame [x, y, z, rx, ry, rz]
+    double RAnkPG_W[6]; // pattern generated right ankle position and posture in world frame [x, y, z, rx, ry, rz]
+    double LFTPG_B[6]; // left reference foot contact force and torque in base frame [fx, fy, fz, tx, ty, tz]
+    double RFTPG_B[6]; // right reference foot contact force and torque in base frame [fx, fy, fz, tx, ty, tz]
+    double IMUSen[2]; // sensed IMU data [rx, ry]
+    double LFTSen_B[6]; // left sensed foot contact force and torque in base frame
+    double RFTSen_B[6]; // right sensed foot contact force and torque in base frame
+    int SupSignal;
+    int PressKey;
+    // output
+    double BaseCmd[6]; // commanded base position and posture [x, y, z, rx, ry, rz]
+    double LAnkCmd_W[6]; // commanded left ankle position and posture in world frame [x, y, z, rx, ry, rz]
+    double RAnkCmd_W[6]; // commanded right ankle position and posture in world frame [x, y, z, rx, ry, rz]
 };
 
 struct st_DHdConData{
     double Base[6]; // Base position and posture in world frame [x, y, z, rx, ry, rz]
     double dBase[6]; // Base position and posture rate in world frame [x, y, z, rx, ry, rz]
     double ddBase[6]; // Base position and posture acc in world frame [x, y, z, rx, ry, rz]
-    struct {
-        double B[2]; // ZMP in base frame [x, y]
-        double W[2]; // ZMP in world frame [x, y]
-    }ZMP;
     struct {
         struct{
             double B[6]; // left ankle position and posture in base frame [x, y, z, rx, ry, rz]
@@ -73,51 +101,71 @@ struct st_DHdConData{
     int SupLeg;
 };
 
-struct st_DHdConIO{
-    // input
-    double BasePG[6]; // pattern generated base position and posture [x, y, z, rx, ry, rz]
-    double ZMPPG_W[2]; // pattern generated ZMP in world frame [x, y]
-    double LAnkPG_W[6]; // pattern generated left ankle position and posture in world frame [x, y, z, rx, ry, rz]
-    double RAnkPG_W[6]; // pattern generated right ankle position and posture in world frame [x, y, z, rx, ry, rz]
-    double LFTPG_B[6]; // left reference foot contact force and torque in base frame [fx, fy, fz, tx, ty, tz]
-    double RFTPG_B[6]; // right reference foot contact force and torque in base frame [fx, fy, fz, tx, ty, tz]
-    double IMUSen[2]; // sensed IMU data [rx, ry]
-    double ZMPSen_B[2]; // sensed ZMP in body frame [x, y]
-    int SupSignal;
-    int PressKey;
-    // output
-    double BaseCmd[6]; // commanded base position and posture [x, y, z, rx, ry, rz]
-    double LAnkCmd_W[6]; // commanded left ankle position and posture in world frame [x, y, z, rx, ry, rz]
-    double RAnkCmd_W[6]; // commanded right ankle position and posture in world frame [x, y, z, rx, ry, rz]
-};
-
-struct st_DHdConGains{
-    double UpperPos[3]; // [k_posture, kp, kd]
-    double CalMStab[2]; // [kp, kd]
-    double MdZMP[2]; // [kp_pos, kd_pos, kp_rot, kd_rot]
-    double GRFC[18];
-    double TrqBias[2];
-};
-
-class c_DHcCon {
+class c_DHdCon {
 public:
-    inline c_DHcCon(st_DHdConIO * stConIO, st_DHdConGains * stDHdConGains, st_RobotConfig * stRobConfig) {
+    inline c_DHdCon(st_DHdConIO * stConIO, st_RobotConfig * stRobConfig, st_DHdConGains * stDHdConGains, st_Filters * stFilters) {
         this->m_stIO = stConIO;
         this->m_stGains = stDHdConGains;
+        this->m_stFilters = stFilters;
         this->m_stRobConfig = stRobConfig;
+        this->m_nIfConOn = this->m_nIfInit = 0;
     }
-    inline ~c_DHcCon() {
+    inline ~c_DHdCon() {
         
     }
+    // init the control
+    void Init(
+        int nPosCon, 
+        int nMdZMP, 
+        int nFftFB, 
+        int nGRFC, 
+        int nComp) {
+        this->SetCon(nPosCon, nMdZMP, nFftFB, nGRFC, nComp);
+        this->Reset();
+        this->m_nIfInit = 1;
+    }
+    // set control flag
+    void SetCon(int nPosCon, int nMdZMP, int nFftFB, int nGRFC, int nComp) {
+        this->m_nPosCon = nPosCon, this->m_nMdZMP = nMdZMP, this->m_nFftFB = nFftFB, this->m_nGRFC = nGRFC, this->m_nComp = nComp;
+    }
+    // reset the control
+    void Reset() {
+        memset(&this->m_stPG, 0, sizeof(this->m_stPG));
+        memset(&this->m_stRef, 0, sizeof(this->m_stRef));
+        memset(&this->m_stSen, 0, sizeof(this->m_stSen));
+        memset(&this->m_stErr, 0, sizeof(this->m_stErr));
+        memset(&this->m_stCoV, 0, sizeof(this->m_stCoV));
+        memset(&this->m_stCmd, 0, sizeof(this->m_stCmd));
+    }
+    // return 1: control applied, 0: control banished, -1: didn't init yet
+    int Loop() { 
+        int nErrCode;
+        this->fnbGetTra(); 
+        this->fnbGetSen();
+        if(this->m_nIfInit) {
+            if(this->m_nIfConOn) {
+                this->fnbGetConV();
+                nErrCode = 1;
+            }
+            nErrCode = 0;
+        }
+        nErrCode = -1;
+        this->fnbSendCmd();
+        return nErrCode;
+    }
+    inline void On() { this->m_nIfConOn = 1; }
+    inline void Off() { this->m_nIfConOn = 0; }
 private:
     st_DHdConData m_stPG, m_stRef, m_stSen, m_stErr, m_stCoV, m_stCmd;
     st_DHdConGains * m_stGains;
+    st_Filters * m_stFilters;
     st_DHdConIO * m_stIO;
     st_RobotConfig * m_stRobConfig;
+    int m_nPosCon, m_nMdZMP, m_nFftFB, m_nGRFC, m_nComp; // singal control flag
+    int m_nIfInit, m_nIfConOn; // init flag and total control flag
     double m_dSubPoly_B[4]; // [-x, x, -y, y]
     double m_dMStabLimit[4]; // [-tx, tx, -ty, ty]
     double m_dMStab[6], m_dMFeet[6], m_dMMdZMP[6], m_dMPend[6], m_dMWheel[6];
-    double m_dMdZMPBase[6], m_dMdZMPdBase[6], m_dMdZMPddBase[6];
     inline double fndIfLTD() { if(this->m_stSen.Fft.L.B[__z] > __FzMin) return 1.0; return 0.0; } // check if left foot touch down the ground
     inline double fndIfRTD() { if(this->m_stSen.Fft.R.B[__z] > __FzMin) return 1.0; return 0.0; } // check if right foot touch down the ground
     inline double fndIfTD() { if(this->m_stSen.Fft.L.B[__z] + this->m_stSen.Fft.R.B[__z] > __FzMin) return 1.0; return 0.0; } // check if the robot touch down the ground
@@ -142,26 +190,28 @@ private:
             return 1.0;
         }
     }
-    inline int fnnEulerNum(int nIn) { // transpose the rotational to positional cite number and vise versa
+    // transpose the rotational to positional cite number and vise versa
+    inline int fnnEulerNum(int nIn) { 
         if(nIn < _ya && nIn != __z) return (__z + __z - nIn);
         return nIn;
     }
-    bool fnbUpperPosCon(int nIfCon) { // upper body posture control of the robot to make the robot behave more like a LIPM
+    // upper body posture control of the robot to make the robot behave more like a LIPM
+    bool fnbUpperPosCon(int nIfCon) { 
         double dLimit[6] = { -__D2R(15.0), __D2R(15.0), -100.0, 100.0, -50.0, 50.0 };
-        static double BasePosCon[6] = { 0.0 }, dBasePosCon[6] = { 0.0 }, ddBasePosCon[6] = { 0.0 };
         auto k_posture = this->m_stGains->UpperPos[0], kp = this->m_stGains->UpperPos[1], kd = this->m_stGains->UpperPos[2];
-        auto ref = this->m_stRef, sen = this->m_stSen, con = this->m_stCoV;
+        auto ref = this->m_stRef, sen = this->m_stSen, con = this->m_stCoV, cmd = this->m_stCmd;;
         for(int i = _rl; i < _pt; i++) {
-            ddBasePosCon[i] = this->fndIfTD() * k_posture * (ref.Base[i] - sen.Base[i]) - kp * BasePosCon[i] - kd * dBasePosCon[i];
-            fnvIntegAccLimit(&BasePosCon[i], &dBasePosCon[i], ddBasePosCon[i], dLimit, this->m_stRobConfig->Tc);
+            con.ddBase[i] = this->fndIfTD() * k_posture * (ref.Base[i] - sen.Base[i]) - kp * con.Base[i] - kd * con.dBase[i];
+            fnvIntergAccLimit(&con.Base[i], &con.dBase[i], con.ddBase[i], dLimit, this->m_stRobConfig->Tc);
         }
         if(nIfCon) {
-            for(int i = _rl; i < _pt; i++) con.Base[i] = BasePosCon[i];
+            for(int i = _rl; i < _pt; i++) cmd.Base[i] += con.Base[i];
             return true;
         }
         return false;
     }
-    bool fnbCalSupPolyPG() { // calculate the support polygon region
+    // calculate the support polygon region
+    bool fnbCalSupPolyPG() { 
         auto cfg = this->m_stRobConfig;
         switch(this->m_stIO->SupSignal) {
         case DSup: // double leg support phase
@@ -188,7 +238,8 @@ private:
         }
         return true;
     }
-    bool fnbCalMStabLimitPG() { // calculate the moment limitation due to the foot region
+    // calculate the moment limitation due to the foot region
+    bool fnbCalMStabLimitPG() { 
         auto cfg = this->m_stRobConfig;
         switch(this->m_stIO->SupSignal) {
         case DSup: // double leg support phase
@@ -211,7 +262,8 @@ private:
         m_dMStabLimit[3] = cfg->FootGeom[1] * cfg->Mass * __Gravity;
         return true;
     }
-    bool fnbCalCoMErr() { // calculate the CoM error using simple direct reading state estimate method
+    // calculate the CoM error using simple direct reading state estimate method
+    bool fnbCalCoMErr() { 
         auto ref = this->m_stRef, sen = this->m_stSen, con = this->m_stCoV, err = this->m_stErr;
         auto cfg = this->m_stRobConfig;
         for(int i = _rl; i < _pt; i++ ) {
@@ -222,10 +274,19 @@ private:
         }
         return true;
     }
-    bool fnbCalMStabFB() { // calculate the feedback moment to stablize the CoM and CoM rate error
+    // calculate the footft error
+    bool fnbCalFftErr() { 
+        auto ref = this->m_stRef, sen = this->m_stSen, err = this->m_stErr;
+        for(int i = __x; i < _ya; i++) err.Fft.L.B[i] = sen.Fft.L.B[i] - ref.Fft.L.B[i], err.Fft.L.B[i] =  sen.Fft.R.B[i] - ref.Fft.R.B[i];
+        return true;
+    }
+    // calculate the feedback moment to stablize the CoM and CoM rate error
+    bool fnbCalMStabFB() { 
         double dLagTSplit = 0.1;
         auto err = this->m_stErr;
         auto kp = this->m_stGains->CalMStab[0], kd = this->m_stGains->CalMStab[1];
+        this->fnbCalMStabLimitPG();
+        this->fnbCalCoMErr();
         // calculate Mfeet, Mmdzmp and Mstab
         for(int i = _rl; i < _pt; i++) this->m_dMStab[i] = this->fnbEulerSign(i) * (kp * err.Base[this->fnnEulerNum(i)] + kd * err.dBase[this->fnnEulerNum(i)]); // calculate the stablize moment
         this->m_dMFeet[_rl] = fndAddLimit(this->m_dMStab[_rl], 0.0, &this->m_dMMdZMP[_rl], this->m_dMStabLimit);
@@ -238,25 +299,29 @@ private:
         }
         return true;
     }
-    bool fnbMdZMPCon(int nIfCon) { // calculate the positional and rotational control value of model ZMP
+    // calculate the positional and rotational control value of model ZMP
+    bool fnbMdZMPCon(int nIfCon) { 
         double dLimit_pos[6] = { -0.03, 0.03, -10.0, 10.0, -2500.0, 2500.0 };
         double dLimit_rot[6] = { -0.03 * 6.0, 0.03 * 6.0, -10.0 * 6.0, 10.0 * 6.0, -2500.0 * 6.0, 2500.0 * 6.0 };
         auto kp_pos = this->m_stGains->MdZMP[0], kd_pos = this->m_stGains->MdZMP[1], kp_rot = this->m_stGains->MdZMP[2], kd_rot = this->m_stGains->MdZMP[3];
-        auto con = this->m_stCoV;
+        auto ref = this->m_stRef, con = this->m_stCoV, cmd = this->m_stCmd;
         auto cfg = this->m_stRobConfig;
+        static double dMdZMPBase[6], dMdZMPddBase[6], dMdZMPdBase[6];
+        this->fnbCalMStabFB();
         for(int i = __x; i < __y; i++) {
-            m_dMdZMPddBase[i] = -this->fnbEulerSign(i) * this->m_dMPend[this->fnnEulerNum(i)] / cfg->UpperMass / cfg->Zc - kp_pos * m_dMdZMPBase[i] - kd_pos * m_dMdZMPdBase[i];
-            m_dMdZMPddBase[this->fnnEulerNum(i)] = -this->m_dMWheel[this->fnnEulerNum(i)] / cfg->UpperIner - kp_rot * m_dMdZMPBase[this->fnnEulerNum(i)] - kd_pos * m_dMdZMPdBase[this->fnnEulerNum(i)];
-            fnvIntegAccLimit(&m_dMdZMPBase[i], &m_dMdZMPdBase[i], m_dMdZMPddBase[i], dLimit_pos, cfg->Tc);
-            fnvIntegAccLimit(&m_dMdZMPBase[this->fnnEulerNum(i)], &m_dMdZMPdBase[this->fnnEulerNum(i)], m_dMdZMPddBase[this->fnnEulerNum(i)], dLimit_rot, cfg->Tc);
+            dMdZMPddBase[i] = -this->fnbEulerSign(i) * this->m_dMPend[this->fnnEulerNum(i)] / cfg->UpperMass / cfg->Zc - kp_pos * dMdZMPBase[i] - kd_pos * dMdZMPdBase[i];
+            dMdZMPddBase[this->fnnEulerNum(i)] = -this->m_dMWheel[this->fnnEulerNum(i)] / cfg->UpperIner - kp_rot * dMdZMPBase[this->fnnEulerNum(i)] - kd_pos * dMdZMPdBase[this->fnnEulerNum(i)];
+            fnvIntergAccLimit(&dMdZMPBase[i], &dMdZMPdBase[i], dMdZMPddBase[i], dLimit_pos, cfg->Tc);
+            fnvIntergAccLimit(&dMdZMPBase[this->fnnEulerNum(i)], &dMdZMPdBase[this->fnnEulerNum(i)], dMdZMPddBase[this->fnnEulerNum(i)], dLimit_rot, cfg->Tc);
         }
         if(nIfCon) {
-            for(int i = __x; i < __y; i++) con.Base[i] = m_dMdZMPBase[i], con.Base[this->fnnEulerNum(i)] += m_dMdZMPBase[this->fnnEulerNum(i)];
+            for(int i = __x; i < __y; i++) cmd.Base[i] += dMdZMPBase[i], ref.Base[this->fnnEulerNum(i)] += dMdZMPBase[this->fnnEulerNum(i)];
             return true;
         }
         return false;
     }
-    bool fnbAddFftFb(int nIfCon) { // split the feedback moment to each foot and add them to the reference
+    // split the feedback moment to each foot and add them to the reference
+    bool fnbAddFftFb(int nIfCon) { 
         double dFzAmp = 1.0;
         auto dIfCon = (double)nIfCon;
         auto pg = this->m_stPG, ref = this->m_stRef, sen = this->m_stSen;
@@ -288,7 +353,113 @@ private:
         }
         return nIfCon;
     }
-
+    // the ground reaction force control, simple compliance if the feedback moment is not applied
+    bool fnbGRFC(int nIfCon) { 
+        double dlimit_z[6] = { -0.0 * 0.02, 0.04, -10.0, 10.0, -2500.0, 2500.0 }, dLimit_r[4] = { -__D2R(15.0), __D2R(15.0), -60.0, 60.0 };
+        double dThresh_z[2] = { -10.0, 10.0 }, dThresh_r[2] = { -1.0, 1.0 };
+        auto ga = this->m_stGains;
+        auto kfz = ga->GRFC[0], kpz = ga->GRFC[1], kdz = ga->GRFC[2], kvcz = ga->GRFC[3], kacz = ga->GRFC[4], kdfz = ga->GRFC[5], kdfcz = ga->GRFC[6], kfr = ga->GRFC[7], kpr = ga->GRFC[8];
+        auto con = this->m_stCoV, err = this->m_stErr, cmd = this->m_stCmd;
+        auto Tc = this->m_stRobConfig->Tc;
+        static double dFzLErr, dFzRErr, dFzLdErr, dFzRdErr;
+        this->fnbCalFftErr();
+        // calculate compliance z
+        dFzLdErr = (err.Fft.L.B[__z] - dFzLErr) / Tc, dFzRdErr = (err.Fft.R.B[__z] - dFzRErr) / Tc;
+        con.ddAnk.L.B[__z] = kfz * fndThreshold(err.Fft.L.B[__z], dThresh_z) - kpz * con.Ank.L.B[__z] - kdz * con.dAnk.L.B[__z] + kvcz * con.dAnk.R.B[__z] + kacz * con.ddAnk.R.B[__z] + kdfz * dFzLdErr + kdfcz * dFzRdErr;
+        con.ddAnk.R.B[__z] = kfz * fndThreshold(err.Fft.R.B[__z], dThresh_z) - kpz * con.Ank.R.B[__z] - kdz * con.dAnk.R.B[__z] + kvcz * con.dAnk.L.B[__z] + kacz * con.ddAnk.L.B[__z] + kdfz * dFzRdErr + kdfcz * dFzLdErr;
+        dFzLErr = err.Fft.L.B[__z], dFzRErr = err.Fft.R.B[__z];
+        fnvIntergAccLimit(&con.Ank.L.B[__z], &con.dAnk.L.B[__z], con.ddAnk.L.B[__z], dlimit_z, Tc);
+        fnvIntergAccLimit(&con.Ank.R.B[__z], &con.dAnk.R.B[__z], con.ddAnk.R.B[__z], dlimit_z, Tc);
+        // calculate dAnk pitch and roll
+        for(int i = _rl; i < _pt; i++) {
+            con.dAnk.L.B[i] = kfr * fndThreshold(err.Fft.L.B[i], dThresh_r) - kpr * con.Ank.L.B[i];
+            con.dAnk.R.B[i] = kfr * fndThreshold(err.Fft.R.B[i], dThresh_r) - kpr * con.Ank.R.B[i];
+            fnvIntergVeloLimit(&con.Ank.L.B[i], con.dAnk.L.B[i], dLimit_r, Tc);
+            fnvIntergVeloLimit(&con.Ank.R.B[i], con.dAnk.R.B[i], dLimit_r, Tc);
+        }
+        if(nIfCon) {
+            for(int i = __x; i < _ya; i++) cmd.Ank.L.W[i] += con.Ank.L.B[i], cmd.Ank.R.W[i] += con.Ank.R.B[i];
+            return true;
+        }
+        return false;
+    }
+    // simple compliance control to absorb the impact
+    bool fnvCompliance(int nIfCon) {
+        double dLimit[4] = { -__D2R(5.0), __D2R(5.0), -60.0, 60.0 };
+        auto kf = this->m_stGains->Compliance[0], kp = this->m_stGains->Compliance[1];
+        static double AnkL[6], AnkR[6], dAnkL[6], dAnkR[6];
+        auto sen = this->m_stSen, cmd = this->m_stCmd;
+        for(int i = _rl; i < _pt; i++) {
+            dAnkL[i] = kf * sen.Fft.L.B[i] - kp * AnkL[i];
+            dAnkR[i] = kf * sen.Fft.R.B[i] - kp * AnkR[i];
+            fnvIntergVeloLimit(&AnkL[i], dAnkL[i], dLimit, this->m_stRobConfig->Tc);
+            fnvIntergVeloLimit(&AnkR[i], dAnkR[i], dLimit, this->m_stRobConfig->Tc);
+        }
+        if(nIfCon) {
+            for(int i = _rl; i < _pt; i++) cmd.Ank.L.B[i] += AnkL[i], cmd.Ank.R.B[i] += AnkR[i]; 
+            return true;
+        }
+        return false;
+    }
+    // read pg trajectory and reference
+    bool fnbGetTra() {
+        auto pg = this->m_stPG, ref = this->m_stRef, cmd = this->m_stCmd;
+        auto io = this->m_stIO;
+        for(int i = __x; i < _ya; i++) {
+            cmd.Base[i]     = pg.Base[i]        = io->BasePG[i];
+            cmd.Ank.L.W[i]  = pg.Ank.L.W[i]     = io->LAnkPG_W[i];
+            cmd.Ank.R.W[i]  = pg.Ank.R.W[i]     = io->RAnkPG_W[i];
+            pg.Fft.L.B[i]   = io->LFTPG_B[i];
+            pg.Fft.R.B[i]   = io->RFTPG_B[i];
+        }
+        for(int i = _rl; i < _pt; i++) ref.Base[i] = pg.Base[i];
+        return true;
+    }
+    // read sensors data
+    bool fnbGetSen() {
+        auto sen = this->m_stSen;
+        auto io = this->m_stIO;
+        auto filter = this->m_stFilters;
+        auto Tc = this->m_stRobConfig->Tc;
+        static int nIfFirst = 1;
+        if(nIfFirst) {
+            for(int i = _rl; i < _pt; i++) sen.Base[i] = io->IMUSen[this->fnnEulerNum(i)];
+            nIfFirst = 0;
+        }
+        for(int i = _rl; i < _pt; i++) {
+            sen.dBase[i] = fndFilterTimeLag(sen.dBase[i], (io->IMUSen[this->fnnEulerNum(i)] - sen.Base[i]) / Tc, Tc, filter->TLagGro); // Todo[filter maybe wrong]
+            sen.Base[i] =  fndFilterTimeLag(sen.Base[i], io->IMUSen[this->fnnEulerNum(i)], Tc, filter->TLagIMU);
+        }
+        for(int i = __x; i < __z; i++) {
+            sen.Fft.L.B[i] = fndFilterTimeLag(sen.Fft.L.B[i], io->LFTSen_B[i], Tc, filter->TLagFrc);
+            sen.Fft.R.B[i] = fndFilterTimeLag(sen.Fft.R.B[i], io->RFTSen_B[i], Tc, filter->TLagFrc);
+        }
+        for(int i = _rl; i = _pt; i++) {
+            sen.Fft.L.B[i] = fndFilterTimeLag(sen.Fft.L.B[i], io->LFTSen_B[i], Tc, filter->TLagTrq);
+            sen.Fft.R.B[i] = fndFilterTimeLag(sen.Fft.R.B[i], io->RFTSen_B[i], Tc, filter->TLagTrq);
+        }
+        return true;
+    }
+    // get the control value
+    bool fnbGetConV() {
+        this->fnbUpperPosCon(this->m_nPosCon);
+        this->fnbMdZMPCon(this->m_nMdZMP);
+        this->fnbAddFftFb(this->m_nFftFB);
+        this->fnbGRFC(this->m_nGRFC);
+        this->fnvCompliance(this->m_nComp);
+        return true;
+    }
+    // send commands data 
+    bool fnbSendCmd() {
+        auto cmd = this->m_stCmd;
+        auto io = this->m_stIO;
+        for(int i = __x; i < _ya; i++) {
+            io->BaseCmd[i] = cmd.Base[i];
+            io->LAnkCmd_W[i] = cmd.Ank.L.W[i];
+            io->RAnkCmd_W[i] = cmd.Ank.R.W[i];
+        }
+        return true;
+    }
 };
 
 _D_CONTROL_END
