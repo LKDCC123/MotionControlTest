@@ -1,4 +1,4 @@
-D:/L.B/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/ControlTest.dir
-D:/L.B/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/INSTALL.dir
-D:/L.B/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/ALL_BUILD.dir
-D:/L.B/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/ZERO_CHECK.dir
+D:/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/ControlTest.dir
+D:/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/INSTALL.dir
+D:/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/ALL_BUILD.dir
+D:/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/ZERO_CHECK.dir
