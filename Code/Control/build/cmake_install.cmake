@@ -1,8 +1,8 @@
-# Install script for directory: D:/GitHUB/MotionControlTest/Code/Control
+# Install script for directory: D:/L.B/GitHUB/MotionControlTest/Code/Control
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/ControlTest")
+  set(CMAKE_INSTALL_PREFIX "D:/_pkg/DPackages")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,26 +34,26 @@ endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "C:/Program Files (x86)/ControlTest/DCon/include")
+   "D:/_pkg/DPackages/DCon/include")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "C:/Program Files (x86)/ControlTest/DCon" TYPE DIRECTORY FILES "D:/GitHUB/MotionControlTest/Code/Control/include")
+file(INSTALL DESTINATION "D:/_pkg/DPackages/DCon" TYPE DIRECTORY FILES "D:/L.B/GitHUB/MotionControlTest/Code/Control/include")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xdevx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "C:/Program Files (x86)/ControlTest/DCon/share/DCon/DConConfig.cmake")
+   "D:/_pkg/DPackages/DCon/share/DCon/DConConfig.cmake")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "C:/Program Files (x86)/ControlTest/DCon/share/DCon" TYPE FILE FILES "D:/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/DConConfig.cmake")
+file(INSTALL DESTINATION "D:/_pkg/DPackages/DCon/share/DCon" TYPE FILE FILES "D:/L.B/GitHUB/MotionControlTest/Code/Control/build/CMakeFiles/DConConfig.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -64,5 +64,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "D:/GitHUB/MotionControlTest/Code/Control/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "D:/L.B/GitHUB/MotionControlTest/Code/Control/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

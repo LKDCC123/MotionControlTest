@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.0)
 project(ControlTest)
 set(ROOT_PATH .)
 
+set(CMAKE_PREFIX_PATH "D:/_pkg/DPackages")
 find_package(DBase)
+
+set(CMAKE_INSTALL_PREFIX "D:/_pkg/DPackages")
 
 include_directories(
     "${ROOT_PATH}/include"

@@ -1,49 +1,49 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\Code\Control\test\Test_control.cpp">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\Code\Control\test\Test_control.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\Code\Control\Test.cpp">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\Code\Control\Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\Sim_SDK\Mj_DataExchange.cpp">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\Sim_SDK\Mj_DataExchange.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\Sim_SDK\Mujocolib\MujocoBHR_api.cpp">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\Sim_SDK\Mujocolib\MujocoBHR_api.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\Sim_SDK\Mujocolib\include\uitools.c">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\Sim_SDK\Mujocolib\include\uitools.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFiles\SDRobot_d.cpp">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFiles\SDRobot_d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFiles\SDRobot_s.cpp">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFiles\SDRobot_s.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFiles\sdlib.cpp">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFiles\sdlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFastDefs.cpp">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\SDFast_SDK\SDFastDefs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\LeeQP_SDK\src\QuadProg.cpp">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\LeeQP_SDK\src\QuadProg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\LeeQP_SDK\src\solve.QP.compact.cpp">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\LeeQP_SDK\src\solve.QP.compact.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\GitHUB\MotionControlTest\SDK\LeeQP_SDK\src\solve.QP.cpp">
+    <ClCompile Include="D:\L.B\GitHUB\MotionControlTest\SDK\LeeQP_SDK\src\solve.QP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\GitHUB\MotionControlTest\Code\Control\CMakeLists.txt" />
+    <CustomBuild Include="D:\L.B\GitHUB\MotionControlTest\Code\Control\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{352B61D6-A66A-3060-A27D-B3BA063D7720}</UniqueIdentifier>
+      <UniqueIdentifier>{73279A9A-1C9C-3BFF-8B4A-23D9104E11F2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

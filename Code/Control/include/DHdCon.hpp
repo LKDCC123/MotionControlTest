@@ -22,6 +22,7 @@ struct st_RobotConfig{ // init required
 };
 
 struct st_DHdConGains{ // init required
+    double Vip;
     double UpperPos[3]; // [k_posture, kp, kd]
     double CalMStab[2]; // [kp, kd]
     double MdZMP[2]; // [kp_pos, kd_pos, kp_rot, kd_rot]
@@ -34,6 +35,7 @@ struct st_Filters{ // init required
     double TLagGro;
     double TLagFrc;
     double TLagTrq;
+    double AmpTrq;
 };
 
 struct st_DHdConIO{ // init required
@@ -176,24 +178,20 @@ private:
         switch (nIn) {
         case __x: // to _pt
             return 1.0;
-            break;
         case __y: // to _rl
             return -1.0;
-            break;
         case _rl: // to __y
             return -1.0;
-            break;
         case _pt: // to __x
             return 1.0;
-            break;
         default:
             return 1.0;
         }
     }
     // transpose the rotational to positional cite number and vise versa
     inline int fnnEulerNum(int nIn) { 
-        if(nIn < _ya && nIn != __z) return (__z + __z - nIn);
-        return nIn;
+        if(nIn != __z && nIn <= _pt) return (__z + __z - nIn);
+        else return nIn;
     }
     // upper body posture control of the robot to make the robot behave more like a LIPM
     bool fnbUpperPosCon(int nIfCon) { 
@@ -205,7 +203,7 @@ private:
             fnvIntergAccLimit(&con.Base[i], &con.dBase[i], con.ddBase[i], dLimit, this->m_stRobConfig->Tc);
         }
         if(nIfCon) {
-            for(int i = _rl; i < _pt; i++) cmd.Base[i] += con.Base[i];
+            for(int i = _rl; i <= _pt; i++) cmd.Base[i] += con.Base[i];
             return true;
         }
         return false;
@@ -277,7 +275,7 @@ private:
     // calculate the footft error
     bool fnbCalFftErr() { 
         auto &ref = this->m_stRef, &sen = this->m_stSen, &err = this->m_stErr;
-        for(int i = __x; i <= _ya; i++) err.Fft.L.B[i] = sen.Fft.L.B[i] - ref.Fft.L.B[i], err.Fft.L.B[i] =  sen.Fft.R.B[i] - ref.Fft.R.B[i];
+        for(int i = __x; i <= _ya; i++) err.Fft.L.B[i] = sen.Fft.L.B[i] - ref.Fft.L.B[i], err.Fft.R.B[i] =  sen.Fft.R.B[i] - ref.Fft.R.B[i];
         return true;
     }
     // calculate the feedback moment to stablize the CoM and CoM rate error
@@ -288,7 +286,7 @@ private:
         this->fnbCalMStabLimitPG();
         this->fnbCalCoMErr();
         // calculate Mfeet, Mmdzmp and Mstab
-        for(int i = _rl; i <= _pt; i++) this->m_dMStab[i] = this->fnbEulerSign(i) * (kp * err.Base[this->fnnEulerNum(i)] + kd * err.dBase[this->fnnEulerNum(i)]); // calculate the stablize moment
+        for(int i = _rl; i <= _pt; i++) this->m_dMStab[i] = -this->fnbEulerSign(i) * (kp * err.Base[this->fnnEulerNum(i)] + kd * err.dBase[this->fnnEulerNum(i)]); // calculate the stablize moment
         this->m_dMFeet[_rl] = fndAddLimit(this->m_dMStab[_rl], 0.0, &this->m_dMMdZMP[_rl], this->m_dMStabLimit);
         this->m_dMFeet[_pt] = fndAddLimit(this->m_dMStab[_pt], 0.0, &this->m_dMMdZMP[_pt], this->m_dMStabLimit + 2);
         this->m_dMFeet[__z] = 0.5 * this->m_dMFeet[_rl] / this->m_stRobConfig->AnkWidth; // left foot positive, Todo[more accurate split]
@@ -315,7 +313,7 @@ private:
             fnvIntergAccLimit(&dMdZMPBase[this->fnnEulerNum(i)], &dMdZMPdBase[this->fnnEulerNum(i)], dMdZMPddBase[this->fnnEulerNum(i)], dLimit_rot, cfg->Tc);
         }
         if(nIfCon) {
-            for(int i = __x; i < __y; i++) cmd.Base[i] += dMdZMPBase[i], ref.Base[this->fnnEulerNum(i)] += dMdZMPBase[this->fnnEulerNum(i)];
+            for(int i = __x; i <= __y; i++) cmd.Base[i] += dMdZMPBase[i], ref.Base[this->fnnEulerNum(i)] += dMdZMPBase[this->fnnEulerNum(i)];
             return true;
         }
         return false;
@@ -323,28 +321,29 @@ private:
     // split the feedback moment to each foot and add them to the reference
     bool fnbAddFftFb(int nIfCon) { 
         double dFzAmp = 1.0;
-        auto &dIfCon = (double)nIfCon;
+        auto dIfCon = (double)nIfCon;
         auto &pg = this->m_stPG, &ref = this->m_stRef, &sen = this->m_stSen;
         double dAlphaL;
         if(this->fnnIfTD()) dAlphaL = sen.Fft.L.B[__z] / (sen.Fft.L.B[__z] + sen.Fft.R.B[__z]); // calculate the split rate for the feedback force
         else dAlphaL = 0.5; // if fly
+        dAlphaL = 0.5; // test
         double dAlphaR = 1.0 - dAlphaL;
         dAlphaL *= dIfCon, dAlphaR *= dIfCon, dFzAmp *= dIfCon; // check if feedback control is triggered Todo[these 3 val add filter]
         memset(ref.Fft.L.B, 0, sizeof(ref.Fft.L.B)), memset(ref.Fft.R.B, 0, sizeof(ref.Fft.R.B)); // init referenced footft every control circle
-        ref.Fft.L.B[__z] = pg.Fft.L.B[__z], ref.Fft.R.B[__z] = pg.Fft.R.B[__z]; // init referenced footft z
+        ref.Fft.L.B[__z] = this->m_stGains->Vip * pg.Fft.L.B[__z], ref.Fft.R.B[__z] = this->m_stGains->Vip * pg.Fft.R.B[__z]; // init referenced footft z
         if(this->fnnIfTD()) { // add feedback force when the robot touch down
             switch(this->m_stIO->SupSignal) {
             case DSup: // double leg support phase
-                if(this->fnnIfLTD()) for(int i = _rl; i < _pt; i++) ref.Fft.L.B[i] = pg.Fft.L.B[i] + dAlphaL * this->m_dMStab[i];
-                if(this->fnnIfRTD()) for(int i = _rl; i < _pt; i++) ref.Fft.R.B[i] = pg.Fft.R.B[i] + dAlphaR * this->m_dMStab[i];
+                if(this->fnnIfLTD()) for(int i = _rl; i <= _pt; i++) ref.Fft.L.B[i] = pg.Fft.L.B[i] + dAlphaL * this->m_dMFeet[i];
+                if(this->fnnIfRTD()) for(int i = _rl; i <= _pt; i++) ref.Fft.R.B[i] = pg.Fft.R.B[i] + dAlphaR * this->m_dMFeet[i];
                 ref.Fft.L.B[__z] += dFzAmp * this->m_dMFeet[__z];
                 ref.Fft.R.B[__z] -= dFzAmp * this->m_dMFeet[__z];
                 break;
             case LSup: // left leg support phase
-                if(this->fnnIfLTD()) for(int i = _rl; i < _pt; i++) ref.Fft.L.B[i] = pg.Fft.L.B[i] + dAlphaL * this->m_dMStab[i];
+                if(this->fnnIfLTD()) for(int i = _rl; i < _pt; i++) ref.Fft.L.B[i] = pg.Fft.L.B[i] + dAlphaL * this->m_dMFeet[i];
                 break;
             case RSup: // right leg support phase
-                if(this->fnnIfRTD()) for(int i = _rl; i < _pt; i++) ref.Fft.R.B[i] = pg.Fft.R.B[i] + dAlphaR * this->m_dMStab[i];
+                if(this->fnnIfRTD()) for(int i = _rl; i < _pt; i++) ref.Fft.R.B[i] = pg.Fft.R.B[i] + dAlphaR * this->m_dMFeet[i];
                 break;
             default: // fly
                 ref.Fft.L.B[__z] = ref.Fft.R.B[__z] = 0.0;
@@ -423,20 +422,20 @@ private:
         auto &Tc = this->m_stRobConfig->Tc;
         static int nIfFirst = 1;
         if(nIfFirst) {
-            for(int i = _rl; i <= _pt; i++) sen.Base[i] = io->IMUSen[this->fnnEulerNum(i)];
+            for(int i = _rl; i <= _pt; i++) sen.Base[i] = io->IMUSen[i - 3];
             nIfFirst = 0;
         }
         for(int i = _rl; i <= _pt; i++) {
-            sen.dBase[i] = fndFilterTimeLag(sen.dBase[i], (io->IMUSen[this->fnnEulerNum(i)] - sen.Base[i]) / Tc, Tc, filter->TLagGro); // Todo[filter maybe wrong]
-            sen.Base[i] =  fndFilterTimeLag(sen.Base[i], io->IMUSen[this->fnnEulerNum(i)], Tc, filter->TLagIMU);
+            sen.dBase[i] = fndFilterTimeLag(sen.dBase[i], (io->IMUSen[i - 3] - sen.Base[i]) / Tc, Tc, filter->TLagGro); // Todo[filter maybe wrong]
+            sen.Base[i] =  fndFilterTimeLag(sen.Base[i], io->IMUSen[i - 3], Tc, filter->TLagIMU);
         }
         for(int i = __x; i <= __z; i++) {
             sen.Fft.L.B[i] = fndFilterTimeLag(sen.Fft.L.B[i], io->LFTSen_B[i], Tc, filter->TLagFrc);
             sen.Fft.R.B[i] = fndFilterTimeLag(sen.Fft.R.B[i], io->RFTSen_B[i], Tc, filter->TLagFrc);
         }
         for(int i = _rl; i <= _pt; i++) {
-            sen.Fft.L.B[i] = fndFilterTimeLag(sen.Fft.L.B[i], io->LFTSen_B[i], Tc, filter->TLagTrq);
-            sen.Fft.R.B[i] = fndFilterTimeLag(sen.Fft.R.B[i], io->RFTSen_B[i], Tc, filter->TLagTrq);
+            sen.Fft.L.B[i] = fndFilterTimeLag(sen.Fft.L.B[i], filter->AmpTrq * io->LFTSen_B[i], Tc, filter->TLagTrq);
+            sen.Fft.R.B[i] = fndFilterTimeLag(sen.Fft.R.B[i], filter->AmpTrq * io->RFTSen_B[i], Tc, filter->TLagTrq);
         }
         return true;
     }
