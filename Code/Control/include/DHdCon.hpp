@@ -11,6 +11,7 @@ _D_USING_BASE
 
 #define __FzMin 50.0
 
+        static double dMdZMPBase[6], dMdZMPddBase[6], dMdZMPdBase[6];// test
 struct st_RobotConfig{ // init required
     double Tc; 
     double Mass;
@@ -113,7 +114,7 @@ public:
         this->m_nIfConOn = this->m_nIfInit = 0;
     }
     inline ~c_DHdCon() {
-        
+
     }
     // init the control
     void Init(
@@ -153,10 +154,54 @@ public:
         }
         nErrCode = -1;
         this->fnbSendCmd();
+        // re test
+        Logger.startLog(); // test
+        Logger.addLog(this->m_stRef.Fft.R.B[__z], "Fz_r_ref");	
+		Logger.addLog(this->m_stSen.Fft.R.B[__z], "Fz_r_sens");		
+		Logger.addLog(this->m_stCoV.Ank.R.B[__z], "z_r_conval");		
+		Logger.addLog(this->m_stRef.Fft.L.B[__z], "Fz_l_ref");		
+		Logger.addLog(this->m_stSen.Fft.L.B[__z], "Fz_l_sens");		
+		Logger.addLog(this->m_stCoV.Ank.L.B[__z], "z_l_conval");		
+		Logger.addLog(this->m_stRef.Fft.R.B[_rl], "Trol_r_ref");		
+		Logger.addLog(this->m_stSen.Fft.R.B[_rl], "Trol_r_sens");		
+		Logger.addLog(this->m_stCoV.Ank.R.B[_rl], "rol_r_conval");		
+		Logger.addLog(this->m_stRef.Fft.L.B[_rl], "Trol_l_ref");		
+		Logger.addLog(this->m_stSen.Fft.L.B[_rl], "Trol_l_sens");		
+		Logger.addLog(this->m_stCoV.Ank.L.B[_rl], "rol_l_conval");		
+		Logger.addLog(this->m_stRef.Fft.R.B[_pt], "Tpit_r_ref");		
+		Logger.addLog(this->m_stSen.Fft.R.B[_pt], "Tpit_r_sens");		
+		Logger.addLog(this->m_stCoV.Ank.R.B[_pt], "pit_r_conval");		
+		Logger.addLog(this->m_stRef.Fft.L.B[_pt], "Tpit_l_ref");		
+		Logger.addLog(this->m_stSen.Fft.L.B[_pt], "Tpit_l_sens");		
+		Logger.addLog(this->m_stCoV.Ank.L.B[_pt], "pit_l_conval");	
+
+		Logger.addLog(this->m_stSen.Base[_pt]			 , "sen_pit");	
+		Logger.addLog(this->m_stSen.Base[_rl]			 , "sen_rol");	
+		Logger.addLog(this->m_stSen.dBase[_pt]			 , "sen_dpit");	
+		Logger.addLog(this->m_stSen.dBase[_rl]			 , "sen_drol");	
+		Logger.addLog(this->m_dMStab[_pt] 				 , "Mstab_pit");	
+		Logger.addLog(this->m_dMFeet[_pt]				 , "Mfeet_pit");	
+		Logger.addLog(this->m_dMMdZMP[_pt]	 			 , "Mmdzmp_pit");	
+		Logger.addLog(this->m_dMPend[_pt]				 , "Mpend_pit");	
+		Logger.addLog(this->m_dMWheel[_pt]	 			 , "Mwheel_pit");	
+		Logger.addLog(this->m_dMStab[_rl] 				 , "Mstab_rol");	
+		Logger.addLog(this->m_dMFeet[_rl]				 , "Mfeet_rol");	
+		Logger.addLog(this->m_dMMdZMP[_rl]	 			 , "Mmdzmp_rol");	
+		Logger.addLog(this->m_dMPend[_rl]				 , "Mpend_rol");	
+		Logger.addLog(this->m_dMWheel[_rl]	 			 , "Mwheel_rol");	
+
+        Logger.addLog(dMdZMPBase[__x]	 			     , "MdZMP_x");	
+        Logger.addLog(dMdZMPBase[__y]	 			     , "MdZMP_y");	
+        Logger.addLog(dMdZMPBase[_pt]	 			     , "MdZMP_pit");	
+        Logger.addLog(dMdZMPBase[_rl]	 			     , "MdZMP_rol");	
+        // re test
         return nErrCode;
     }
-    inline void On() { this->m_nIfConOn = 1; }
-    inline void Off() { this->m_nIfConOn = 0; }
+    void Clear() {
+        Logger.saveLog("dccdatanew.dat"); //test
+    }
+    inline void On() { this->m_nIfConOn = 1; } // turn on the control
+    inline void Off() { this->m_nIfConOn = 0; } // turn off the control
 private:
     st_DHdConData m_stPG, m_stRef, m_stSen, m_stErr, m_stCoV, m_stCmd;
     st_DHdConGains * m_stGains;
@@ -265,8 +310,8 @@ private:
         auto &ref = this->m_stRef, &sen = this->m_stSen, &con = this->m_stCoV, &err = this->m_stErr;
         auto &cfg = this->m_stRobConfig;
         for(int i = _rl; i <= _pt; i++ ) {
-            err.Base[i] = sen.Base[i] - ref.Base[i] - con.Base[i]; // calculate posture error
-            err.dBase[i] = sen.dBase[i] - ref.dBase[i] - con.dBase[i]; // calculate posture rate error
+            err.Base[i] = sen.Base[i] - ref.Base[i] - this->m_nPosCon * con.Base[i]; // calculate posture error
+            err.dBase[i] = sen.dBase[i] - ref.dBase[i] - this->m_nPosCon * con.dBase[i]; // calculate posture rate error
             err.Base[this->fnnEulerNum(i)] = this->fnbEulerSign(i) * cfg->Zc * sin(err.Base[i]); // calculate the CoM error
             err.dBase[this->fnnEulerNum(i)] = this->fnbEulerSign(i) * cfg->Zc * sin(err.dBase[i]); // calculate the CoM rate error
         }
@@ -284,7 +329,7 @@ private:
         auto &err = this->m_stErr;
         auto &kp = this->m_stGains->CalMStab[0], &kd = this->m_stGains->CalMStab[1];
         this->fnbCalMStabLimitPG();
-        this->fnbCalCoMErr();
+        this->fnbCalCoMErr(); 
         // calculate Mfeet, Mmdzmp and Mstab
         for(int i = _rl; i <= _pt; i++) this->m_dMStab[i] = -this->fnbEulerSign(i) * (kp * err.Base[this->fnnEulerNum(i)] + kd * err.dBase[this->fnnEulerNum(i)]); // calculate the stablize moment
         this->m_dMFeet[_rl] = fndAddLimit(this->m_dMStab[_rl], 0.0, &this->m_dMMdZMP[_rl], this->m_dMStabLimit);
@@ -304,7 +349,7 @@ private:
         auto &kp_pos = this->m_stGains->MdZMP[0], &kd_pos = this->m_stGains->MdZMP[1], &kp_rot = this->m_stGains->MdZMP[2], &kd_rot = this->m_stGains->MdZMP[3];
         auto &ref = this->m_stRef, &con = this->m_stCoV, &cmd = this->m_stCmd;
         auto &cfg = this->m_stRobConfig;
-        static double dMdZMPBase[6], dMdZMPddBase[6], dMdZMPdBase[6];
+        //static double dMdZMPBase[6], dMdZMPddBase[6], dMdZMPdBase[6]; // test
         this->fnbCalMStabFB();
         for(int i = __x; i <= __y; i++) {
             dMdZMPddBase[i] = -this->fnbEulerSign(i) * this->m_dMPend[this->fnnEulerNum(i)] / cfg->UpperMass / cfg->Zc - kp_pos * dMdZMPBase[i] - kd_pos * dMdZMPdBase[i];
