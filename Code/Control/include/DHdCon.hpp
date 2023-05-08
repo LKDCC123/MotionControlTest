@@ -10,9 +10,6 @@ _D_CONTROL_BEGIN
 _D_USING_BASE
 
 #define __FzMin 50.0
-
-        static double dMdZMPBase[6], dMdZMPddBase[6], dMdZMPdBase[6];// test
-    double hehe, hehehehehe; // test
 struct st_RobotConfig{ // init required
     double Tc; 
     double Mass;
@@ -158,63 +155,10 @@ public:
         }
         nErrCode = -1;
         this->fnbSendCmd();
-        // re test
-        Logger.startLog(); // test
-        Logger.addLog(this->m_stRef.Fft.R.B[__z], "Fz_r_ref");	
-		Logger.addLog(this->m_stSen.Fft.R.B[__z], "Fz_r_sens");		
-		Logger.addLog(this->m_stCoV.Ank.R.B[__z], "z_r_conval");		
-		Logger.addLog(this->m_stRef.Fft.L.B[__z], "Fz_l_ref");		
-		Logger.addLog(this->m_stSen.Fft.L.B[__z], "Fz_l_sens");		
-		Logger.addLog(this->m_stCoV.Ank.L.B[__z], "z_l_conval");		
-		Logger.addLog(this->m_stRef.Fft.R.B[_rl], "Trol_r_ref");		
-		Logger.addLog(this->m_stSen.Fft.R.B[_rl], "Trol_r_sens");		
-		Logger.addLog(this->m_stCoV.Ank.R.B[_rl], "rol_r_conval");		
-		Logger.addLog(this->m_stRef.Fft.L.B[_rl], "Trol_l_ref");		
-		Logger.addLog(this->m_stSen.Fft.L.B[_rl], "Trol_l_sens");		
-		Logger.addLog(this->m_stCoV.Ank.L.B[_rl], "rol_l_conval");		
-		Logger.addLog(this->m_stRef.Fft.R.B[_pt], "Tpit_r_ref");		
-		Logger.addLog(this->m_stSen.Fft.R.B[_pt], "Tpit_r_sens");		
-		Logger.addLog(this->m_stCoV.Ank.R.B[_pt], "pit_r_conval");		
-		Logger.addLog(this->m_stRef.Fft.L.B[_pt], "Tpit_l_ref");		
-		Logger.addLog(this->m_stSen.Fft.L.B[_pt], "Tpit_l_sens");		
-		Logger.addLog(this->m_stCoV.Ank.L.B[_pt], "pit_l_conval");	
-
-		Logger.addLog(this->m_stSen.Base[_pt]			 , "sen_pit");	
-		Logger.addLog(this->m_stSen.Base[_rl]			 , "sen_rol");	
-		Logger.addLog(this->m_stSen.dBase[_pt]			 , "sen_dpit");	
-		Logger.addLog(this->m_stSen.dBase[_rl]			 , "sen_drol");	
-        Logger.addLog(this->m_stCoV.Base[_pt]	 	     , "Con_pit");	
-        Logger.addLog(this->m_stCoV.dBase[_pt]	 	     , "Con_dpit");	
-
-		Logger.addLog(this->m_dMStabLimit[2]			 , "MLimit_pit");
-		Logger.addLog(this->m_dMStabLimit[3]			 , "MLimit_pit");
-		Logger.addLog(this->m_dMStab[_pt] 				 , "Mstab_pit");	
-		Logger.addLog(this->m_dMFeet[_pt]				 , "Mfeet_pit");	
-		Logger.addLog(this->m_dMMdZMP[_pt]	 			 , "Mmdzmp_pit");	
-		Logger.addLog(this->m_dMPend[_pt]				 , "Mpend_pit");	
-		Logger.addLog(this->m_dMWheel[_pt]	 			 , "Mwheel_pit");	
-		Logger.addLog(this->m_dMStabLimit[0]			 , "MLimit_rol");
-		Logger.addLog(this->m_dMStabLimit[1]			 , "MLimit_rol");
-		Logger.addLog(this->m_dMStab[_rl] 				 , "Mstab_rol");	
-		Logger.addLog(this->m_dMFeet[_rl]				 , "Mfeet_rol");	
-		Logger.addLog(this->m_dMMdZMP[_rl]	 			 , "Mmdzmp_rol");	
-		Logger.addLog(this->m_dMPend[_rl]				 , "Mpend_rol");	
-		Logger.addLog(this->m_dMWheel[_rl]	 			 , "Mwheel_rol");	
-
-        Logger.addLog(dMdZMPBase[__x]	 			     , "MdZMP_x");	
-        Logger.addLog(dMdZMPBase[__y]	 			     , "MdZMP_y");	
-        Logger.addLog(dMdZMPBase[_pt]	 			     , "MdZMP_pit");	
-        Logger.addLog(dMdZMPBase[_rl]	 			     , "MdZMP_rol");	
-
-        Logger.addLog(this->m_stSen.ZMP[__x]             , "ZMP_x");	
-        Logger.addLog(this->m_stSen.ZMP[__y]             , "ZMP_y");	
-        Logger.addLog(hehehehehe                         , "Mid_y");
-        Logger.addLog(hehe	 			                 , "Alpha");	
-        // re test
         return nErrCode;
     }
     void Clear() {
-        Logger.saveLog("dccdatanew.dat"); //test
+        
     }
     inline void On() { this->m_nIfConOn = 1; } // turn on the control
     inline void Off() { this->m_nIfConOn = 0; } // turn off the control
@@ -368,7 +312,7 @@ private:
         auto &kp_pos = this->m_stGains->MdZMP[0], &kd_pos = this->m_stGains->MdZMP[1], &kp_rot = this->m_stGains->MdZMP[2], &kd_rot = this->m_stGains->MdZMP[3];
         auto &ref = this->m_stRef, &con = this->m_stCoV, &cmd = this->m_stCmd;
         auto &cfg = this->m_stRobConfig;
-        //static double dMdZMPBase[6], dMdZMPddBase[6], dMdZMPdBase[6]; // test
+        static double dMdZMPBase[6], dMdZMPddBase[6], dMdZMPdBase[6]; 
         this->fnbCalMStabFB();
         for(int i = __x; i <= __y; i++) {
             dMdZMPddBase[i] = -this->fnbEulerSign(i) * this->m_dMPend[this->fnnEulerNum(i)] / cfg->UpperMass / cfg->Zc - kp_pos * dMdZMPBase[i] - kd_pos * dMdZMPdBase[i];
@@ -395,7 +339,6 @@ private:
         // if(this->fnnIfTD()) dAlphaL = sen.Fft.L.B[__z] / (sen.Fft.L.B[__z] + sen.Fft.R.B[__z]); // calculate the split rate for the feedback force
         // else dAlphaL = 0.5; // if fly
         double dAlphaR = 1.0 - dAlphaL;
-        hehe = dAlphaR, hehehehehe = dMidPoint_y; // test
         dAlphaL *= dIfCon, dAlphaR *= dIfCon, dFzAmp *= dIfCon; // check if feedback control is triggered Todo[these 3 val add filter]
         memset(ref.Fft.L.B, 0, sizeof(ref.Fft.L.B)), memset(ref.Fft.R.B, 0, sizeof(ref.Fft.R.B)); // init referenced footft every control circle
         ref.Fft.L.B[__z] = this->m_stGains->Vip * pg.Fft.L.B[__z], ref.Fft.R.B[__z] = this->m_stGains->Vip * pg.Fft.R.B[__z]; // init referenced footft z
