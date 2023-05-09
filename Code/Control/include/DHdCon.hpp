@@ -328,7 +328,7 @@ private:
         auto &cfg = this->m_stRobConfig;
         for(int i = _rl; i <= _pt; i++ ) {
             err.Base[i] = sen.Base[i] - ref.Base[i] - (double)this->m_nPosCon * con.Base[i]; // calculate posture error
-            err.dBase[i] = sen.dBase[i] - ref.dBase[i] - 0.0 * (double)this->m_nPosCon * con.dBase[i]; // calculate posture rate error // test
+            err.dBase[i] = sen.dBase[i] - ref.dBase[i] - (double)this->m_nPosCon * con.dBase[i]; // calculate posture rate error 
             err.Base[this->fnnEulerNum(i)] = this->fnbEulerSign(i) * cfg->Zc * sin(err.Base[i]); // calculate the CoM error
             err.dBase[this->fnnEulerNum(i)] = this->fnbEulerSign(i) * cfg->Zc * sin(err.dBase[i]); // calculate the CoM rate error
         }
@@ -346,14 +346,16 @@ private:
         double dFBMAmp[2] = { 1.2, 1.0 }, dFBkd[2] = { 1.5, 1.0 }; // [rl, pt]
         auto &err = this->m_stErr;
         auto &kp = this->m_stGains->CalMStab[0], &kd = this->m_stGains->CalMStab[1];
+        auto &Lx = this->m_stCmd.Ank.L.B[__x], &Ly = this->m_stCmd.Ank.L.B[__y], &Rx = this->m_stCmd.Ank.R.B[__x], &Ry = this->m_stCmd.Ank.R.B[__y];
         this->fnbCalMStabLimitPG();
         this->fnbCalCoMErr(); 
         // calculate Mfeet, Mmdzmp and Mstab
         for(int i = _rl; i <= _pt; i++) this->m_dMStab[i] = -this->fnbEulerSign(i) * dFBMAmp[i - 3] * (kp * err.Base[this->fnnEulerNum(i)] + kd * dFBkd[i - 3] * err.dBase[this->fnnEulerNum(i)]); // calculate the stablize moment
         this->m_dMFeet[_rl] = fndAddLimit(this->m_dMStab[_rl], 0.0, &this->m_dMMdZMP[_rl], this->m_dMStabLimit);
         this->m_dMFeet[_pt] = fndAddLimit(this->m_dMStab[_pt], 0.0, &this->m_dMMdZMP[_pt], this->m_dMStabLimit + 2);
-        if(this->m_stIO->SupSignal == DSup) this->m_dMFeet[__z] = fndFilterTimeLag(this->m_dMFeet[__z], this->m_dMFeet[_rl] / this->m_stRobConfig->AnkWidth, this->m_stRobConfig->Tc, dLagTFz);
-        else this->m_dMFeet[__z] = fndFilterTimeLag(this->m_dMFeet[__z], 0.0, this->m_stRobConfig->Tc, dLagTFz);; // left foot positive, Todo[more accurate split]
+        if(this->m_stIO->SupSignal == DSup) this->m_dMFeet[__z] = fndFilterTimeLag(this->m_dMFeet[__z], (this->m_dMFeet[_rl]/pow(((Lx - Rx)*(Lx - Rx))/((Ly - Ry)*(Ly - Ry)) + 1, 0.5) - (this->m_dMFeet[_pt]*(Lx - Rx)/(pow(((Lx - Rx)*(Lx - Rx))/((Ly - Ry)*(Ly - Ry)) + 1, 0.5)*(Ly - Ry)))) / sqrt((Lx - Rx)*(Lx - Rx) + (Ly - Ry)*(Ly - Ry)), this->m_stRobConfig->Tc, dLagTFz);
+        // if(this->m_stIO->SupSignal == DSup) this->m_dMFeet[__z] = fndFilterTimeLag(this->m_dMFeet[__z], this->m_dMFeet[_rl] / this->m_stRobConfig->AnkWidth, this->m_stRobConfig->Tc, dLagTFz);
+        else this->m_dMFeet[__z] = fndFilterTimeLag(this->m_dMFeet[__z], 0.0, this->m_stRobConfig->Tc, dLagTFz); // left foot positive, Todo[more accurate split]
         // calculate Mpend and Mwheel by spliting Mmdzmp
         for(int i = _rl; i <= _pt; i++) {
             this->m_dMPend[i] = fndFilterTimeLag(this->m_dMPend[i], this->m_dMMdZMP[i], this->m_stRobConfig->Tc, dLagTSplit);
@@ -390,11 +392,11 @@ private:
         auto &Lx = this->m_stCmd.Ank.L.B[__x], &Ly = this->m_stCmd.Ank.L.B[__y], &Rx = this->m_stCmd.Ank.R.B[__x], &Ry = this->m_stCmd.Ank.R.B[__y];
         auto &Zx = this->m_stSen.ZMP[__x], &Zy = this->m_stSen.ZMP[__y];
         double dMidPoint_y = (Lx*Lx*Ry - Lx*Ly*Rx + Zx*Lx*Ly - Lx*Rx*Ry - Zx*Lx*Ry + Zy*Ly*Ly + Ly*Rx*Rx - Zx*Ly*Rx - 2*Zy*Ly*Ry + Zx*Rx*Ry + Zy*Ry*Ry)/(Lx*Lx - 2*Lx*Rx + Ly*Ly - 2*Ly*Ry + Rx*Rx + Ry*Ry);
-        double dLimitAlpha[2] = { 0.0, 1.0 };
-        double dAlphaL = fndLimit((dMidPoint_y - Ry) / (Ly - Ry), dLimitAlpha);
-        // if(this->fnnIfTD()) dAlphaL = sen.Fft.L.B[__z] / (sen.Fft.L.B[__z] + sen.Fft.R.B[__z]); // calculate the split rate for the feedback force
-        // else dAlphaL = 0.5; // if fly
-        double dAlphaR = 1.0 - dAlphaL;
+        double dLimitAlpha[2] = { 0.0, 1.0 }, dAlphaL, dAlphaR;
+        // if(this->fnnIfTD()) dAlphaL = fndLimit((dMidPoint_y - Ry) / (Ly - Ry), dLimitAlpha);
+        if(this->fnnIfTD()) dAlphaL = this->m_stSen.Fft.L.B[__z] / (this->m_stSen.Fft.L.B[__z] + this->m_stSen.Fft.R.B[__z]); // calculate the split rate for the feedback force
+        else dAlphaL = 0.5; // if fly
+        dAlphaR = 1.0 - dAlphaL;
         hehe = dAlphaR, hehehehehe = dMidPoint_y; // test
         dAlphaL *= dIfCon, dAlphaR *= dIfCon, dFzAmp *= dIfCon; // check if feedback control is triggered Todo[these 3 val add filter]
         memset(ref.Fft.L.B, 0, sizeof(ref.Fft.L.B)), memset(ref.Fft.R.B, 0, sizeof(ref.Fft.R.B)); // init referenced footft every control circle
