@@ -17,8 +17,10 @@ static double dPr[4]; // test
 static double dConL[6], dConR[6], dCondL[6], dCondR[6], dConddL[6], dConddR[6]; // test
 
 #ifdef __Aver3Filter
-double3 dWeightT = { 0.05, 0.1, 0.95 }, dWeightF = { 0.05, 0.15, 0.85 }, dWeightM = { 0.05, 0.16, 0.62 };
+double3 dWeightT = { 0.05, 0.1, 0.95 }, dWeightF = { 0.05, 0.15, 0.85 }, dWeightM = { 0.15, 0.26, 0.62 };
 c_Filter3Aver cPitL(dWeightT), cPitR(dWeightT), cRolL(dWeightT), cRolR(dWeightT), cZL(dWeightF), cZR(dWeightF), cMPit(dWeightM), cMRol(dWeightM);
+double3 dWT = { 0.05, 0.1, 0.8 }, dWF = { 0.05, 0.1, 0.8 };
+c_Filter3Aver cTPitL(dWT), cTPitR(dWT), cTRolL(dWT), cTRolR(dWT), cFzL(dWF), cFzR(dWF);
 #endif
 
 struct st_RobotConfig{ // init required
@@ -139,6 +141,7 @@ public:
         this->Reset();
         #ifdef __Aver3Filter
         cPitL.Init(0.0), cPitR.Init(0.0), cRolL.Init(0.0), cRolR.Init(0.0), cZL.Init(0.0), cZR.Init(0.0), cMPit.Init(0.0), cMRol.Init(0.0);
+        cTPitL.Init(0.0), cTPitR.Init(0.0), cTRolL.Init(0.0), cTRolR.Init(0.0), cFzL.Init(0.5 * this->m_stRobConfig->Mass * __Gravity), cFzR.Init(0.5 * this->m_stRobConfig->Mass * __Gravity);
         #endif
         this->m_nIfInit = 1;
     }
@@ -447,7 +450,7 @@ private:
         double dDouAmp = 1.0, dDouStiff = 0.5;
         double dSupAmp = 1.2, dSupStiff = 0.2;
         double dSwiAmp = 1.5, dSwiStiff = 0.05;
-        double dDefStiff = 0.8, dRecStiff = 2.0;
+        double dDefStiff = 0.8, dRecStiff = 5.0;
         auto &ga = this->m_stGains;
         auto &kfr = ga->GRFC[7], &kpr = ga->GRFC[8];
         auto &kfr_L = dPr[0], &kfr_R = dPr[1], &kpr_L = dPr[2], &kpr_R = dPr[3];
@@ -455,7 +458,7 @@ private:
         #ifdef __VarStiff
         switch(this->m_stIO->SupSignal) {
         case DSup: // double support phase
-            kfr_L = kfr_R = kfr, kpr_L = kpr_R = dDefStiff * kpr; // paramaters that not touch down
+            kfr_L = kfr_R = kfr, kpr_L = kpr_R = dRecStiff * kpr; // paramaters that not touch down
             if(this->fndIfLTD()) kfr_L = dDouAmp * kfr, kpr_L = dDouStiff * kpr; // if left leg touch down
             if(this->fndIfRTD()) kfr_R = dDouAmp * kfr, kpr_R = dDouStiff * kpr; // if right leg touch down
             break;
@@ -578,7 +581,7 @@ private:
         for(int i = _rl; i <= _pt; i++) {
             sen.Fft.L.B[i] = fndFilterTimeLag(sen.Fft.L.B[i], filter->AmpTrq * io->LFTSen_B[i], Tc, filter->TLagTrq);
             sen.Fft.R.B[i] = fndFilterTimeLag(sen.Fft.R.B[i], filter->AmpTrq * io->RFTSen_B[i], Tc, filter->TLagTrq);
-        }
+        } // ToDo[add aver3filter]
         return true;
     }
     // get the control value
