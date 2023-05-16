@@ -19,7 +19,7 @@ static double dConL[6], dConR[6], dCondL[6], dCondR[6], dConddL[6], dConddR[6]; 
 #ifdef __Aver3Filter
 double3 dWeightT = { 0.05, 0.1, 0.95 }, dWeightF = { 0.05, 0.15, 0.85 }, dWeightM = { 0.15, 0.26, 0.62 };
 c_Filter3Aver cPitL(dWeightT), cPitR(dWeightT), cRolL(dWeightT), cRolR(dWeightT), cZL(dWeightF), cZR(dWeightF), cMPit(dWeightM), cMRol(dWeightM);
-double3 dWT = { 0.05, 0.1, 0.8 }, dWF = { 0.05, 0.1, 0.8 };
+double3 dWT = { 0.05, 0.1, 0.95 }, dWF = { 0.05, 0.1, 0.8 };
 c_Filter3Aver cTPitL(dWT), cTPitR(dWT), cTRolL(dWT), cTRolR(dWT), cFzL(dWF), cFzR(dWF);
 #endif
 
@@ -40,6 +40,7 @@ struct st_DHdConGains{ // init required
     double MdZMP[4]; // [kp_pos, kd_pos, kp_rot, kd_rot]
     double GRFC[9];
     double Compliance[2];
+    double ArmSwi[2]; // [k_L, virtualM]
 };
 
 struct st_Filters{ // init required
@@ -62,12 +63,15 @@ struct st_DHdConIO{ // init required
     double ZMPSen_B[2]; // sensed ZMP in base frame [x, y]
     double LFTSen_B[6]; // left sensed foot contact force and torque in base frame
     double RFTSen_B[6]; // right sensed foot contact force and torque in base frame
+    double LegQ[12]; // leg joints angle [left 1~6, right 1~6] 
+    double ArmQ[2]; // arm joints angle [left 1, right 1]
     int SupSignal;
     int PressKey;
     // output
     double BaseCmd[6]; // commanded base position and posture [x, y, z, rx, ry, rz]
     double LAnkCmd_W[6]; // commanded left ankle position and posture in world frame [x, y, z, rx, ry, rz]
     double RAnkCmd_W[6]; // commanded right ankle position and posture in world frame [x, y, z, rx, ry, rz]
+    double ArmQcmd[2]; // commanded arm joints angle [left 1, right 1]
 };
 
 struct st_DHdConData{
@@ -114,6 +118,18 @@ struct st_DHdConData{
             double W[6]; // right foot contact force and torque in world frame [fx, fy, fz, tx, ty, tz]
         }R;
     }Fft;
+    struct {
+        double L[6]; // left leg joints angle
+        double R[6]; // right leg joints angle
+    }LegQ;
+    struct {
+        double L[6]; // left leg joints speed
+        double R[6]; // right leg joints speed
+    }LegdQ;
+    struct {
+        double L; // left arm joints speed
+        double R; // right arm joints speed
+    }ArmQ;
     double ZMP[2]; // ZMP in base frame [x, y]
     int SupLeg;
 };
@@ -136,8 +152,9 @@ public:
         int nMdZMP, 
         int nFftFB, 
         int nGRFC, 
-        int nComp) {
-        this->SetCon(nPosCon, nMdZMP, nFftFB, nGRFC, nComp);
+        int nComp,
+        int nArmSwi) {
+        this->SetCon(nPosCon, nMdZMP, nFftFB, nGRFC, nComp, nArmSwi);
         this->Reset();
         #ifdef __Aver3Filter
         cPitL.Init(0.0), cPitR.Init(0.0), cRolL.Init(0.0), cRolR.Init(0.0), cZL.Init(0.0), cZR.Init(0.0), cMPit.Init(0.0), cMRol.Init(0.0);
@@ -146,8 +163,8 @@ public:
         this->m_nIfInit = 1;
     }
     // set control flag
-    void SetCon(int nPosCon, int nMdZMP, int nFftFB, int nGRFC, int nComp) {
-        this->m_nPosCon = nPosCon, this->m_nMdZMP = nMdZMP, this->m_nFftFB = nFftFB, this->m_nGRFC = nGRFC, this->m_nComp = nComp;
+    void SetCon(int nPosCon, int nMdZMP, int nFftFB, int nGRFC, int nComp, int nArmSwi) {
+        this->m_nPosCon = nPosCon, this->m_nMdZMP = nMdZMP, this->m_nFftFB = nFftFB, this->m_nGRFC = nGRFC, this->m_nComp = nComp, this->m_nArmSwi = nArmSwi;
     }
     // reset the control
     void Reset() {
@@ -172,77 +189,32 @@ public:
         }
         nErrCode = -1;
         this->fnbSendCmd();
-        // re test
-        Logger.startLog(); // test
-        Logger.addLog(this->m_stRef.Fft.R.B[__z], "Fz_r_ref");	
-		Logger.addLog(this->m_stSen.Fft.R.B[__z], "Fz_r_sens");		
-		Logger.addLog(this->m_stCoV.Ank.R.B[__z], "z_r_conval");		
-		Logger.addLog(this->m_stRef.Fft.L.B[__z], "Fz_l_ref");		
-		Logger.addLog(this->m_stSen.Fft.L.B[__z], "Fz_l_sens");		
-		Logger.addLog(this->m_stCoV.Ank.L.B[__z], "z_l_conval");		
-		Logger.addLog(this->m_stRef.Fft.R.B[_rl], "Trol_r_ref");		
-		Logger.addLog(this->m_stSen.Fft.R.B[_rl], "Trol_r_sens");		
-		Logger.addLog(this->m_stCoV.Ank.R.B[_rl], "rol_r_conval");	
-		Logger.addLog(dConR[_rl]                , "rol_r_conval");			
-		Logger.addLog(this->m_stRef.Fft.L.B[_rl], "Trol_l_ref");		
-		Logger.addLog(this->m_stSen.Fft.L.B[_rl], "Trol_l_sens");		
-		Logger.addLog(this->m_stCoV.Ank.L.B[_rl], "rol_l_conval");		
-		Logger.addLog(dConL[_rl]                , "rol_l_conval");		
-		Logger.addLog(this->m_stRef.Fft.R.B[_pt], "Tpit_r_ref");		
-		Logger.addLog(this->m_stSen.Fft.R.B[_pt], "Tpit_r_sens");		
-		Logger.addLog(this->m_stCoV.Ank.R.B[_pt], "pit_r_conval");	
-		Logger.addLog(dConR[_pt]                , "pit_r_conval");		
-		Logger.addLog(this->m_stRef.Fft.L.B[_pt], "Tpit_l_ref");		
-		Logger.addLog(this->m_stSen.Fft.L.B[_pt], "Tpit_l_sens");		
-		Logger.addLog(this->m_stCoV.Ank.L.B[_pt], "pit_l_conval");	
-		Logger.addLog(dConL[_pt]                , "pit_l_conval");		
-
-		Logger.addLog(this->m_stSen.Base[_pt]			 , "sen_pit");	
-		Logger.addLog(this->m_stSen.Base[_rl]			 , "sen_rol");	
-		Logger.addLog(this->m_stSen.dBase[_pt]			 , "sen_dpit");	
-		Logger.addLog(this->m_stSen.dBase[_rl]			 , "sen_drol");	
-        Logger.addLog(this->m_stCoV.Base[_pt]	 	     , "Con_pit");	
-        Logger.addLog(this->m_stCoV.dBase[_pt]	 	     , "Con_dpit");	
-
-		Logger.addLog(this->m_dMStabLimit[2]			 , "MLimit_pit");
-		Logger.addLog(this->m_dMStabLimit[3]			 , "MLimit_pit");
-		Logger.addLog(this->m_dMStab[_pt] 				 , "Mstab_pit");	
-		Logger.addLog(this->m_dMFeet[_pt]				 , "Mfeet_pit");	
-		Logger.addLog(this->m_dMMdZMP[_pt]	 			 , "Mmdzmp_pit");	
-		Logger.addLog(this->m_dMPend[_pt]				 , "Mpend_pit");	
-		Logger.addLog(this->m_dMWheel[_pt]	 			 , "Mwheel_pit");	
-		Logger.addLog(this->m_dMStabLimit[0]			 , "MLimit_rol");
-		Logger.addLog(this->m_dMStabLimit[1]			 , "MLimit_rol");
-		Logger.addLog(this->m_dMStab[_rl] 				 , "Mstab_rol");	
-		Logger.addLog(this->m_dMFeet[_rl]				 , "Mfeet_rol");	
-		Logger.addLog(this->m_dMMdZMP[_rl]	 			 , "Mmdzmp_rol");	
-		Logger.addLog(this->m_dMPend[_rl]				 , "Mpend_rol");	
-		Logger.addLog(this->m_dMWheel[_rl]	 			 , "Mwheel_rol");	
-
-        Logger.addLog(this->m_stSen.ZMP[__x]             , "ZMP_x");	
-        Logger.addLog(this->m_stSen.ZMP[__y]             , "ZMP_y");	
-
-        Logger.addLog(dPr[0]                             , "kfr_L");
-        Logger.addLog(dPr[1]                             , "kfr_R");
-        Logger.addLog(dPr[2]                             , "kpr_L");
-        Logger.addLog(dPr[3]                             , "kpr_R");
-        
-        Logger.addLog(this->m_stIO->SupSignal            , "SupSig");
-        // re test
         return nErrCode;
     }
     void Clear() {
-        Logger.saveLog("dccdatanew.dat"); //test
+        
     }
     inline void On() { this->m_nIfConOn = 1; } // turn on the control
     inline void Off() { this->m_nIfConOn = 0; } // turn off the control
+    st_DHdConData GetPGData() { return this->m_stPG; }
+    st_DHdConData GetRefData() { return this->m_stRef; }
+    st_DHdConData GetSenData() { return this->m_stSen; }
+    st_DHdConData GetErrData() { return this->m_stErr; }
+    st_DHdConData GetCoVData() { return this->m_stCoV; }
+    st_DHdConData GetCmdData() { return this->m_stCmd; }
+    double *GetMStabLimitData() { return this->m_dMStabLimit; };
+    double *GetMStabData() { return this->m_dMStab; };
+    double *GetMFeetData() { return this->m_dMFeet; };
+    double *GetMdZMPData() { return this->m_dMMdZMP; };
+    double *GetMPendData() { return this->m_dMPend; };
+    double *GetMWheelData() { return this->m_dMWheel; };
 private:
     st_DHdConData m_stPG, m_stRef, m_stSen, m_stErr, m_stCoV, m_stCmd;
     st_DHdConGains * m_stGains;
     st_Filters * m_stFilters;
     st_DHdConIO * m_stIO;
     st_RobotConfig * m_stRobConfig;
-    int m_nPosCon, m_nMdZMP, m_nFftFB, m_nGRFC, m_nComp; // singal control flag
+    int m_nPosCon, m_nMdZMP, m_nFftFB, m_nGRFC, m_nComp, m_nArmSwi; // singal control flag
     int m_nIfInit, m_nIfConOn; // init flag and total control flag
     double m_dSubPoly_B[4]; // [-x, x, -y, y]
     double m_dMStabLimit[4]; // [-tx, tx, -ty, ty]
@@ -540,8 +512,32 @@ private:
         }
         return false;
     }
+    // armswing based on leg joint speed
+    bool fnbArmSwing(int nIfCon) {
+        double dAnkWth = 0.16, dShouderWth = 0.4, dLArm = 0.4, dLShank = 0.32, dLThigh = 0.32, dMArm = 5.0, dMThigh = 9.0, dMShank = 2.0, dMFoot = 1.0;
+        static double dArmQL, dArmQR;
+        auto &K_L = this->m_stGains->ArmSwi[0], &v_M = this->m_stGains->ArmSwi[1];
+        auto &dQ = this->m_stPG.LegdQ;
+        auto &cmd = this->m_stCmd, &pg = this->m_stPG;
+        double K_P = 1.0 - K_L;
+	    double dql_arm[3], dqr_arm[3]; // L, P, L + P
+        dqr_arm[0] = 2.0 * dAnkWth / (dShouderWth * dLArm * (dMArm + v_M)) * ((0.5 * dMThigh + dMShank + dMFoot) * dLThigh * dQ.L[2] + (0.5 * dMShank + dMFoot) * dLShank * dQ.L[3]);
+        dql_arm[0] = 2.0 * dAnkWth / (dShouderWth * dLArm * (dMArm + v_M)) * ((0.5 * dMThigh + dMShank + dMFoot) * dLThigh * dQ.R[2] + (0.5 * dMShank + dMFoot) * dLShank * dQ.R[3]);
+        dql_arm[1] = -2.0 / (dLArm * (dMArm + v_M)) * ((0.5 * dMThigh + dMShank + dMFoot) * dLThigh * dQ.L[2] + (0.5 * dMShank + dMFoot) * dLShank * dQ.L[3]);
+        dqr_arm[1] = -2.0 / (dLArm * (dMArm + v_M)) * ((0.5 * dMThigh + dMShank + dMFoot) * dLThigh * dQ.R[2] + (0.5 * dMShank + dMFoot) * dLShank * dQ.R[3]);
+        dql_arm[2] = K_L * dql_arm[0] + K_P * dql_arm[1];
+        dqr_arm[2] = K_L * dqr_arm[0] + K_P * dqr_arm[1];
+        dArmQL += dql_arm[2] * this->m_stRobConfig->Tc, dArmQR += dqr_arm[2] * this->m_stRobConfig->Tc;
+        if(nIfCon) {
+            cmd.ArmQ.L = pg.ArmQ.L + dArmQL, cmd.ArmQ.R = pg.ArmQ.R + dArmQR;
+            return true;
+        }
+        return false;
+    }
     // read pg trajectory and reference
     bool fnbGetTra() {
+        static int nIfFirst = 2;
+        static double dLegQL_old[6], dLegQR_old[6];
         auto &pg = this->m_stPG, &ref = this->m_stRef, &cmd = this->m_stCmd;
         auto &io = this->m_stIO;
         for(int i = __x; i <= _ya; i++) {
@@ -555,10 +551,22 @@ private:
         }
         for(int i = __x; i <= __z; i++) cmd.Ank.L.B[i] = pg.Ank.L.B[i], cmd.Ank.R.B[i] = pg.Ank.R.B[i];
         for(int i = _rl; i <= _pt; i++) ref.Base[i] = pg.Base[i];
+        for(int i = 0; i < 6; i++) pg.LegQ.L[i] = io->LegQ[i], pg.LegQ.R[i] = io->LegQ[i + 6];
+        if(nIfFirst > 0) {
+            for(int i = 0; i < 6; i++) dLegQL_old[i] = pg.LegQ.L[i], dLegQR_old[i] = pg.LegQ.R[i]; // if is first
+            nIfFirst--;
+        }
+        for(int i = 0; i < 6; i++) {
+            pg.LegdQ.L[i] = (pg.LegQ.L[i] - dLegQL_old[i]) / this->m_stRobConfig->Tc;
+            pg.LegdQ.R[i] = (pg.LegQ.R[i] - dLegQR_old[i]) / this->m_stRobConfig->Tc;
+        }
+        for(int i = 0; i < 6; i++) dLegQL_old[i] = pg.LegQ.L[i], dLegQR_old[i] = pg.LegQ.R[i];
+        cmd.ArmQ.L = pg.ArmQ.L = io->ArmQ[0], cmd.ArmQ.R = pg.ArmQ.R = io->ArmQ[1];
         return true;
     }
     // read sensors data
     bool fnbGetSen() {
+        static double dFftL[6], dFftR[6];
         auto &sen = this->m_stSen;
         auto &io = this->m_stIO;
         auto &filter = this->m_stFilters;
@@ -575,13 +583,18 @@ private:
             sen.Base[i] =  fndFilterTimeLag(sen.Base[i], io->IMUSen[i - 3], Tc, filter->TLagIMU);
         }
         for(int i = __x; i <= __z; i++) {
-            sen.Fft.L.B[i] = fndFilterTimeLag(sen.Fft.L.B[i], io->LFTSen_B[i], Tc, filter->TLagFrc);
-            sen.Fft.R.B[i] = fndFilterTimeLag(sen.Fft.R.B[i], io->RFTSen_B[i], Tc, filter->TLagFrc);
+            sen.Fft.L.B[i] = dFftL[i] = fndFilterTimeLag(dFftL[i], io->LFTSen_B[i], Tc, filter->TLagFrc);
+            sen.Fft.R.B[i] = dFftR[i] = fndFilterTimeLag(dFftR[i], io->RFTSen_B[i], Tc, filter->TLagFrc);
+            
         }
         for(int i = _rl; i <= _pt; i++) {
-            sen.Fft.L.B[i] = fndFilterTimeLag(sen.Fft.L.B[i], filter->AmpTrq * io->LFTSen_B[i], Tc, filter->TLagTrq);
-            sen.Fft.R.B[i] = fndFilterTimeLag(sen.Fft.R.B[i], filter->AmpTrq * io->RFTSen_B[i], Tc, filter->TLagTrq);
-        } // ToDo[add aver3filter]
+            sen.Fft.L.B[i] = dFftL[i] = fndFilterTimeLag(dFftL[i], filter->AmpTrq * io->LFTSen_B[i], Tc, filter->TLagTrq);
+            sen.Fft.R.B[i] = dFftR[i] = fndFilterTimeLag(dFftR[i], filter->AmpTrq * io->RFTSen_B[i], Tc, filter->TLagTrq);
+        } 
+        #ifdef __Aver3Filter
+        sen.Fft.L.B[_pt] = cTPitL.Filter(dFftL[_pt]), sen.Fft.L.B[_rl] = cTRolL.Filter(dFftL[_rl]), sen.Fft.L.B[__z] = cFzL.Filter(dFftL[__z]);
+        sen.Fft.R.B[_pt] = cTPitR.Filter(dFftR[_pt]), sen.Fft.R.B[_rl] = cTRolR.Filter(dFftR[_rl]), sen.Fft.R.B[__z] = cFzR.Filter(dFftR[__z]);
+        #endif
         return true;
     }
     // get the control value
@@ -591,6 +604,7 @@ private:
         this->fnbAddFftFb(this->m_nFftFB); // must after the step position control
         this->fnbGRFC(this->m_nGRFC);
         this->fnvCompliance(this->m_nComp);
+        this->fnbArmSwing(this->m_nArmSwi);
         return true;
     }
     // send commands data 
@@ -602,6 +616,7 @@ private:
             io->LAnkCmd_W[i] = cmd.Ank.L.W[i];
             io->RAnkCmd_W[i] = cmd.Ank.R.W[i];
         }
+        io->ArmQcmd[0] = cmd.ArmQ.L, io->ArmQcmd[1] = cmd.ArmQ.R;
         return true;
     }
 };
