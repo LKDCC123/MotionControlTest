@@ -13,19 +13,17 @@ _D_USING_BASE
 #define __VarStiff
 #define __Aver3Filter
 // for stepcon ===============================
-#define __Theta
-// #define __Theta3
-// #define __ThetaInt
-// #define __CaptureP
-// #define __CaptureP3
+// #define __Theta
+// #define __Theta2
+// #define __ThetaInt 
+#define __CaptureP
 // #define __CapturePInt
-#define __Thresh 0.02
 // for stepcon ===============================
 
 static double dPr[4]; // test
 static double dConL[6], dConR[6], dCondL[6], dCondR[6], dConddL[6], dConddR[6]; // test
 static int nKInStep; // test
-static double dErr; // test
+static double dErr[2]; // test
 
 #ifdef __Aver3Filter
 double3 dWeightT = { 0.05, 0.1, 0.95 }, dWeightF = { 0.05, 0.15, 0.85 }, dWeightM = { 0.15, 0.26, 0.62 };
@@ -52,7 +50,7 @@ struct st_DHdConGains{ // init required
     double GRFC[9];
     double Compliance[2];
     double ArmSwi[2]; // [k_angluar, M_virtual]
-    double StepCon[4]; // [k_adj, ts, te, k_tra]
+    double StepCon[4]; // [k_adj, ts, te, thresh]
 };
 
 struct st_Filters{ // init required
@@ -167,8 +165,16 @@ public:
         int nFftFB, 
         int nGRFC, 
         int nComp,
-        int nArmSwi) {
-        this->SetCon(nPosCon, nMdZMP, nFftFB, nGRFC, nComp, nArmSwi);
+        int nArmSwi,
+        int nStepCon) {
+        this->SetCon(
+            nPosCon, 
+            nMdZMP, 
+            nFftFB, 
+            nGRFC, 
+            nComp, 
+            nArmSwi,
+            nStepCon);
         this->Reset();
         #ifdef __Aver3Filter
         cPitL.Init(0.0), cPitR.Init(0.0), cRolL.Init(0.0), cRolR.Init(0.0), cZL.Init(0.0), cZR.Init(0.0), cMPit.Init(0.0), cMRol.Init(0.0);
@@ -177,9 +183,21 @@ public:
         this->m_nIfInit = 1;
     }
     // set control flag
-    void SetCon(int nPosCon, int nMdZMP, int nFftFB, int nGRFC, int nComp, int nArmSwi) {
+    void SetCon(
+        int nPosCon, 
+        int nMdZMP, 
+        int nFftFB, 
+        int nGRFC, 
+        int nComp, 
+        int nArmSwi, 
+        int nStepCon) {
         this->m_nPosCon = nPosCon;
-        this->m_nMdZMP = nMdZMP, this->m_nFftFB = nFftFB, this->m_nGRFC = nGRFC, this->m_nComp = nComp, this->m_nArmSwi = nArmSwi;
+        this->m_nMdZMP = nMdZMP;
+        this->m_nFftFB = nFftFB;
+        this->m_nGRFC = nGRFC;
+        this->m_nComp = nComp;
+        this->m_nArmSwi = nArmSwi;
+        this->m_nStepCon = nStepCon;
     }
     // reset the control
     void Reset() {
@@ -555,31 +573,35 @@ private:
     bool fnbStepCon(int nIfCon) {
         // static int nKInStep; // test
         // static double dErr; // test
-        double dThresh[2] = { -__Thresh, __Thresh }, dLTemp, dLimit[4] = { -0.1, 0.1, -2.0, 2.0 };
-        auto kp = this->m_stGains->StepCon[0], ts = this->m_stGains->StepCon[1], te = this->m_stGains->StepCon[2], kL = this->m_stGains->StepCon[3];
+        double dThresh[2] = { -this->m_stGains->StepCon[3], this->m_stGains->StepCon[3] }, dLTemp, dLimit[4] = { -0.18, 0.18, -2.0, 2.0 };
+        auto kp = this->m_stGains->StepCon[0], ts = this->m_stGains->StepCon[1], te = this->m_stGains->StepCon[2], kL = 3.5 / te;
         auto &err = this->m_stErr, &ref = this->m_stRef, &cmd = this->m_stCmd;
         auto &io = this->m_stIO;
         if(io->SupSignal == DSup) kp = 0.0; // recover in double support phase
-        for(int i = __x, i <= __y) { // calculate dErr
+        for(int i = __x; i <= __y; i++) { // calculate dErr & deltaL
             #ifdef __Theta
-            dErr[i] = fndThreshold(err.Base[i], dThresh);
+            dErr[i] = 2.0 * fndThreshold(err.Base[i], dThresh);
             #endif
-            #ifdef __Theta3
-            dErr[i] = pow(fndThreshold(err.Base[i], dThresh), 3);
+            #ifdef __Theta2
+            dErr[i] = 3.0 * fndGetSign(err.Base[i]) * pow(fndThreshold(err.Base[i], dThresh), 2);
             #endif
             #ifdef __ThetaInt
-            dErr[i] += fndThreshold(err.Base[i], dThresh) * this->m_stRobConfig->Tc;
+            if(io->SupSignal == DSup) dErr[i] =  0.0;
+            dErr[i] += 3.0 * fndThreshold(err.Base[i], dThresh) * this->m_stRobConfig->Tc;
+            #endif
+            #ifdef __CaptureP
+            dErr[i] = 1.0 * fndThreshold((err.Base[i] + err.dBase[i] / 15.0), dThresh);
             #endif
             ref.DeltaL[i] = kp * dErr[i];
         }
         if(this->m_SupLegLast == DSup && io->SupSignal != DSup) nKInStep = 0;
-        if(nKInStep * this->m_stRobConfig->Tc > 0.0 && nKInStep * this->m_stRobConfig->Tc < ts) kL = 0.0;
-        if(nKInStep * this->m_stRobConfig->Tc > (io->TStepSS - te) && nKInStep * this->m_stRobConfig->Tc < TStepSS) kL = 0.0;  
+        if(nKInStep * this->m_stRobConfig->Tc >= 0.0 && nKInStep * this->m_stRobConfig->Tc < ts) kL = 0.0;
+        if(nKInStep * this->m_stRobConfig->Tc >= (io->TStepSS - te) && nKInStep * this->m_stRobConfig->Tc < io->TStepSS) kL = 0.0;  
         for(int i = __x; i <= __y; i++) {
             dLTemp = kL * (ref.DeltaL[i] - cmd.DeltaL[i]);
-            if(nIfCon) fnvIntergVeloLimit(&cmd.DeltaL[i], dLTemp, dLimit);
+            if(nIfCon) fnvIntergVeloLimit(&cmd.DeltaL[i], dLTemp, dLimit, this->m_stRobConfig->Tc);
         }
-        nKInStep++;
+        if(nKInStep < 1000) nKInStep++;
         return nIfCon;
     }
     // read pg trajectory and reference
@@ -653,6 +675,7 @@ private:
         this->fnbGRFC(this->m_nGRFC);
         this->fnvCompliance(this->m_nComp);
         this->fnbArmSwing(this->m_nArmSwi);
+        this->fnbStepCon(this->m_nStepCon);
         return true;
     }
     // send commands data 
@@ -665,6 +688,7 @@ private:
             io->RAnkCmd_W[i] = cmd.Ank.R.W[i];
         }
         io->ArmQcmd[0] = cmd.ArmQ.L, io->ArmQcmd[1] = cmd.ArmQ.R;
+        for(int i = __x; i <= __y; i++) io->DeltaL_B[i] = cmd.DeltaL[i];
         this->m_SupLegLast = io->SupSignal; // update support signal
         return true;
     }
