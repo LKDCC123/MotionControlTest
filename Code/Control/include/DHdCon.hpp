@@ -573,7 +573,8 @@ private:
     bool fnbStepCon(int nIfCon) {
         // static int nKInStep; // test
         // static double dErr; // test
-        double dThresh[2] = { -this->m_stGains->StepCon[3], this->m_stGains->StepCon[3] }, dLTemp, dLimit[4] = { -0.18, 0.18, -2.0, 2.0 };
+        double dLimit[4] = { -0.18, 0.18, -2.0, 2.0 };
+        double dThresh[2] = { -this->m_stGains->StepCon[3], this->m_stGains->StepCon[3] }, dLTemp;
         auto kp = this->m_stGains->StepCon[0], ts = this->m_stGains->StepCon[1], te = this->m_stGains->StepCon[2], kL = 3.5 / te;
         auto &err = this->m_stErr, &ref = this->m_stRef, &cmd = this->m_stCmd;
         auto &io = this->m_stIO;
