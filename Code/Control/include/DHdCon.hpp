@@ -65,6 +65,7 @@ struct st_Filters{ // init required
 struct st_DHdConIO{ // init required
     // input
     double BasePG[6]; // pattern generated base position and posture [x, y, z, rx, ry, rz]
+    double dBasePG[6]; // pattern generated base position and posture rate [x, y, z, rx, ry, rz]
     double LAnkPG_W[6]; // pattern generated left ankle position and posture in world frame [x, y, z, rx, ry, rz]
     double RAnkPG_W[6]; // pattern generated right ankle position and posture in world frame [x, y, z, rx, ry, rz]
     double LFTPG_B[6]; // left reference foot contact force and torque in base frame [fx, fy, fz, tx, ty, tz]
@@ -613,6 +614,7 @@ private:
         auto &io = this->m_stIO;
         for(int i = __x; i <= _ya; i++) {
             cmd.Base[i]     = pg.Base[i]        = io->BasePG[i];
+                              pg.dBase[i]       = io->dBasePG[i];
             cmd.Ank.L.W[i]  = pg.Ank.L.W[i]     = io->LAnkPG_W[i];
             cmd.Ank.R.W[i]  = pg.Ank.R.W[i]     = io->RAnkPG_W[i];
             pg.Ank.L.B[i]   = pg.Ank.L.W[i] - pg.Base[i];
@@ -621,7 +623,7 @@ private:
             pg.Fft.R.B[i]   = io->RFTPG_B[i];
         }
         for(int i = __x; i <= __z; i++) cmd.Ank.L.B[i] = pg.Ank.L.B[i], cmd.Ank.R.B[i] = pg.Ank.R.B[i];
-        for(int i = _rl; i <= _pt; i++) ref.Base[i] = pg.Base[i];
+        for(int i = _rl; i <= _pt; i++) ref.Base[i] = pg.Base[i], ref.dBase[i] = pg.dBase[i];
         for(int i = 0; i < 6; i++) pg.LegQ.L[i] = io->LegQ[i], pg.LegQ.R[i] = io->LegQ[i + 6];
         if(nIfFirst > 0) {
             for(int i = 0; i < 6; i++) dLegQL_old[i] = pg.LegQ.L[i], dLegQR_old[i] = pg.LegQ.R[i]; // if is first
