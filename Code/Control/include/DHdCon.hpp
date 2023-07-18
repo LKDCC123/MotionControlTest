@@ -12,6 +12,8 @@ _D_USING_BASE
 #define __FzMin 50.0
 #define __VarStiff
 #define __Aver3Filter
+#define __TouchSoft
+// #define __UntouchRe
 // for stepcon ===============================
 // #define __Theta
 // #define __Theta2
@@ -20,7 +22,7 @@ _D_USING_BASE
 // #define __CapturePInt
 // for stepcon ===============================
 
-static double dPr[4]; // test
+static double dPr[10]; // test
 static double dConL[6], dConR[6], dCondL[6], dCondR[6], dConddL[6], dConddR[6]; // test
 static int nKInStep; // test
 static double dErr[2]; // test
@@ -453,38 +455,59 @@ private:
     }
     // obtian the paramaters for ground reaction force control
     bool fnbVarStiff(
-        double dPr[4] // [kfr_L, kfr_R, kpr_L, kpr_R]
+        double dPr[10] // [kfr_L, kfr_R, kpr_L, kpr_R], [kfz_L, kfz_R, kpz_L, kpz_R, kdz_L, kdz_R]
         ) {
-        double dDouAmp = 1.0, dDouStiff = 0.5;
-        double dSupAmp = 1.2, dSupStiff = 0.2;
-        double dSwiAmp = 1.5, dSwiStiff = 0.05;
-        double dDefStiff = 0.8, dRecStiff = 5.0;
-        auto ga = this->m_stGains;
-        auto kfr = ga->GRFC[7], kpr = ga->GRFC[8];
-        auto &kfr_L = dPr[0], &kfr_R = dPr[1], &kpr_L = dPr[2], &kpr_R = dPr[3];
-        kfr_L = kfr_R = kfr, kpr_L = kpr_R = dDefStiff * kpr;
+        double dDouAmp[2] = { 1.0, 1.0 }, dDouStiff[2] = { 0.5, 0.8 };
+        double dSupAmp[2] = { 1.2, 1.3 }, dSupStiff[2] = { 0.2, 1.0 };
+        double dSwiAmp[2] = { 1.5, 1.1 }, dSwiStiff[2] = { 0.05, 0.2 };
+        double dSupAmpKdz = 0.5,          dRecStiff[2] = { 5.0, 2.5 };
+        auto &ga = this->m_stGains;
+        auto &kfz = ga->GRFC[0], &kpz = ga->GRFC[1], &kdz = ga->GRFC[2], &kfr = ga->GRFC[7], &kpr = ga->GRFC[8];
+        auto &kfr_L = dPr[0], &kfr_R = dPr[1], &kpr_L = dPr[2], &kpr_R = dPr[3], &kfz_L = dPr[4], &kfz_R = dPr[5], &kpz_L = dPr[6], &kpz_R = dPr[7], &kdz_L = dPr[8], &kdz_R = dPr[9];
+        kfr_L = kfr_R = kfr, kpr_L = kpr_R = kpr, kfz_L = kfz_R = kfz, kpz_L = kpz_R = kpz, kdz_L = kdz_R = kdz;
         #ifdef __VarStiff
         switch(this->m_stIO->SupSignal) {
-        case DSup: // double support phase
-            kfr_L = kfr_R = kfr, kpr_L = kpr_R = dRecStiff * kpr; // paramaters that not touch down
-            if(this->fndIfLTD()) kfr_L = dDouAmp * kfr, kpr_L = dDouStiff * kpr; // if left leg touch down
-            if(this->fndIfRTD()) kfr_R = dDouAmp * kfr, kpr_R = dDouStiff * kpr; // if right leg touch down
-            break;
-        case LSup: // left leg support phase
-            kfr_L = kfr_R = kfr, kpr_L = dDefStiff * kpr, kpr_R = dRecStiff * kpr; // paramaters that not touch down
-            if(this->fndIfLTD()) kfr_L =   dSupAmp * kfr, kpr_L = dSupStiff * kpr; // if left leg touch down
-            if(this->fndIfRTD()) kfr_R =   dSwiAmp * kfr, kpr_R = dSwiStiff * kpr; // if right leg touch down
-            break;
-        case RSup: // right leg support phase
-            kfr_L = kfr_R = kfr, kpr_R = dDefStiff * kpr, kpr_L = dRecStiff * kpr; // paramaters that not touch down
-            if(this->fndIfRTD()) kfr_R =   dSupAmp * kfr, kpr_R = dSupStiff * kpr; // if right leg touch down
-            if(this->fndIfLTD()) kfr_L =   dSwiAmp * kfr, kpr_L = dSwiStiff * kpr; // if left leg touch down
-            break;
-        default: // fly
-            kfr_L = kfr_R = kfr, kpr_L = kpr_R = dRecStiff * kpr; // paramaters that not touch down
-            if(this->fndIfLTD()) kfr_L =   dSwiAmp * kfr, kpr_L = dSwiStiff * kpr; // if left leg touch down
-            if(this->fndIfRTD()) kfr_R =   dSwiAmp * kfr, kpr_R = dSwiStiff * kpr; // if right leg touch down
-            break;
+        #ifdef __UntouchRe
+            case DSup: // double support phase
+                /*rot*/ kfr_L = kfr_R = dDouAmp[0] * kfr, kpr_L = kpr_R = dDouStiff[0] * kpr, /*z*/ kfz_L = kfz_R = dDouAmp[1] * kfz, kpz_L = kpz_R = dDouStiff[1] * kpz, kdz_L = kdz_R = kdz;
+                if(!this->fndIfLTD()) /*rot*/ kpr_L = dRecStiff[0] * kpr, /*z*/ kpz_L = dRecStiff[1] * kpz; // if left foot untouched -> faster recover
+                if(!this->fndIfRTD()) /*rot*/ kpr_R = dRecStiff[0] * kpr, /*z*/ kpz_R = dRecStiff[1] * kpz; // if right foot untouched -> faster recover
+                break;
+            case LSup: // left leg support phase
+                /*rot*/ kfr_L = dSupAmp[0] * kfr, kpr_L = dSupStiff[0] * kpr, /*z*/ kfz_L = dSupAmp[1] * kfz, kpz_L = dSupStiff[1] * kpz, kdz_L = kdz_R = kdz; // better stabilzity
+                /*rot*/ kfr_R = dSwiAmp[0] * kfr, kpr_R = dSwiStiff[0] * kpr, /*z*/ kfz_R = dSwiAmp[1] * kfz, kpz_R = dSwiStiff[1] * kpz, kdz_R = kdz_R = dSupAmpKdz * kdz; // better adaption
+                if(!this->fndIfRTD()) /*rot*/ kpr_R = dRecStiff[0] * kpr, /*z*/ kpz_R = dRecStiff[1] * kpz; // if right foot untouched -> faster recover 
+                break;
+            case RSup: // right leg support phase
+                /*rot*/ kfr_L = dSwiAmp[0] * kfr, kpr_L = dSwiStiff[0] * kpr, /*z*/ kfz_L = dSwiAmp[1] * kfz, kpz_L = dSwiStiff[1] * kpz, kdz_L = kdz_R = dSupAmpKdz * kdz; // better adaption
+                /*rot*/ kfr_R = dSupAmp[0] * kfr, kpr_R = dSupStiff[0] * kpr, /*z*/ kfz_R = dSupAmp[1] * kfz, kpz_R = dSupStiff[1] * kpz, kdz_R = kdz_R = kdz; // better stabilzity
+                if(!this->fndIfLTD()) /*rot*/ kpr_L = dRecStiff[0] * kpr, /*z*/ kpz_L = dRecStiff[1] * kpz; // if left foot untouched -> faster recover
+                break;
+            default: // fly
+                if(!this->fndIfLTD()) /*rot*/ kpr_L = dRecStiff[0] * kpr, /*z*/ kpz_L = dRecStiff[1] * kpz; // if left foot untouched -> faster recover
+                if(!this->fndIfRTD()) /*rot*/ kpr_R = dRecStiff[0] * kpr, /*z*/ kpz_R = dRecStiff[1] * kpz; // if right foot untouched -> faster recover 
+                break;
+        #endif
+        #ifdef __TouchSoft
+            case DSup: // double support phase
+                /*rot*/ kpr_L = kpr_R = dRecStiff[0] * kpr, /*z*/ kpz_L = kpz_R = dRecStiff[1] * kpz; // faster recover
+                if(this->fndIfLTD()) /*rot*/ kfr_L = dDouAmp[0] * kfr, kpr_L = dDouStiff[0] * kpr, /*z*/ kfz_L = dDouAmp[1] * kfz, kpz_L = dDouStiff[1] * kpz, kdz_L = kdz;
+                if(this->fndIfRTD()) /*rot*/ kfr_R = dDouAmp[0] * kfr, kpr_R = dDouStiff[0] * kpr, /*z*/ kfz_R = dDouAmp[1] * kfz, kpz_R = dDouStiff[1] * kpz, kdz_R = kdz;
+                break;
+            case LSup: // left leg support phase
+                /*rot*/ kpr_R = dRecStiff[0] * kpr, /*z*/ kpz_R = dRecStiff[1] * kpz; // if right foot untouched -> faster recover 
+                if(this->fndIfLTD()) /*rot*/ kfr_L = dSupAmp[0] * kfr, kpr_L = dSupStiff[0] * kpr, /*z*/ kfz_L = dSupAmp[1] * kfz, kpz_L = dSupStiff[1] * kpz, kdz_L = kdz_R = kdz; // better stabilzity
+                if(this->fndIfRTD()) /*rot*/ kfr_R = dSwiAmp[0] * kfr, kpr_R = dSwiStiff[0] * kpr, /*z*/ kfz_R = dSwiAmp[1] * kfz, kpz_R = dSwiStiff[1] * kpz, kdz_R = kdz_R = dSupAmpKdz * kdz; // better adaption
+                break;
+            case RSup: // right leg support phase
+                /*rot*/ kpr_L = dRecStiff[0] * kpr, /*z*/ kpz_L = dRecStiff[1] * kpz; // if right foot untouched -> faster recover
+                if(this->fndIfLTD()) /*rot*/ kfr_L = dSwiAmp[0] * kfr, kpr_L = dSwiStiff[0] * kpr, /*z*/ kfz_L = dSwiAmp[1] * kfz, kpz_L = dSwiStiff[1] * kpz, kdz_L = kdz_R = dSupAmpKdz * kdz; // better adaption
+                if(this->fndIfRTD()) /*rot*/ kfr_R = dSupAmp[0] * kfr, kpr_R = dSupStiff[0] * kpr, /*z*/ kfz_R = dSupAmp[1] * kfz, kpz_R = dSupStiff[1] * kpz, kdz_R = kdz_R = kdz; // better stabilzity
+                break;
+            default: // fly
+                /*rot*/ kpr_L = kpr_R = dRecStiff[0] * kpr, /*z*/ kpz_L = kpz_R = dRecStiff[1] * kpz; // faster recover
+                break;
+        #endif
         }
         #endif
         return true;
@@ -500,11 +523,11 @@ private:
         static double dFzLErr, dFzRErr, dFzLdErr, dFzRdErr;
         this->fnbCalFftErr();
         this->fnbVarStiff(dPr);
-        auto &kfr_L = dPr[0], &kfr_R = dPr[1], &kpr_L = dPr[2], &kpr_R = dPr[3];
+        auto /*rot*/ &kfr_L = dPr[0], &kfr_R = dPr[1], &kpr_L = dPr[2], &kpr_R = dPr[3], /*z*/ &kfz_L = dPr[4], &kfz_R = dPr[5], &kpz_L = dPr[6], &kpz_R = dPr[7], &kdz_L = dPr[8], &kdz_R = dPr[9];
         // calculate compliance z
         dFzLdErr = (err.Fft.L.B[__z] - dFzLErr) / Tc, dFzRdErr = (err.Fft.R.B[__z] - dFzRErr) / Tc;
-        dConddL[__z] = kfz * fndThreshold(err.Fft.L.B[__z], dThresh_z) - kpz * dConL[__z] - kdz * dCondL[__z] + kvcz * dCondR[__z] + kacz * dConddR[__z] + kdfz * dFzLdErr + kdfcz * dFzRdErr;
-        dConddR[__z] = kfz * fndThreshold(err.Fft.R.B[__z], dThresh_z) - kpz * dConR[__z] - kdz * dCondR[__z] + kvcz * dCondL[__z] + kacz * dConddL[__z] + kdfz * dFzRdErr + kdfcz * dFzLdErr;
+        dConddL[__z] = kfz_L * fndThreshold(err.Fft.L.B[__z], dThresh_z) - kpz_L * dConL[__z] - kdz_L * dCondL[__z] + kvcz * dCondR[__z] + kacz * dConddR[__z] + kdfz * dFzLdErr + kdfcz * dFzRdErr;
+        dConddR[__z] = kfz_R * fndThreshold(err.Fft.R.B[__z], dThresh_z) - kpz_R * dConR[__z] - kdz_R * dCondR[__z] + kvcz * dCondL[__z] + kacz * dConddL[__z] + kdfz * dFzRdErr + kdfcz * dFzLdErr;
         dFzLErr = err.Fft.L.B[__z], dFzRErr = err.Fft.R.B[__z];
         fnvIntergAccLimit(&dConL[__z], &dCondL[__z], dConddL[__z], dlimit_z, Tc);
         fnvIntergAccLimit(&dConR[__z], &dCondR[__z], dConddR[__z], dlimit_z, Tc);
