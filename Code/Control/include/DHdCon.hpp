@@ -12,11 +12,20 @@ _D_USING_BASE
 #define __FzMin 50.0
 // #define __VarStiff
 // #define __Aver3Filter
+// for stepcon ===============================
+// #define __Theta
+// #define __Theta2
+// #define __ThetaInt 
+#define __CaptureP
+// #define __CapturePInt
+// for stepcon ===============================
 
 static double dPr[10]; // test
 static double dConL[6], dConR[6], dCondL[6], dCondR[6], dConddL[6], dConddR[6]; // test
 static double dMdZMPBase[6], dMdZMPdBase[6], dMdZMPddBase[6]; // test
 static double dAlpha; // test
+static int nKInStep; // test
+static double dErr[2]; // test
 
 #ifdef __Aver3Filter
 double3 dWeightT = { 0.01, 0.1, 0.999 }, dWeightF = { 0.01, 0.1, 0.999 }, dWeightM = { 0.15, 0.26, 0.999 };
@@ -43,6 +52,7 @@ struct st_DHdConGains{ // init required
     double GRFC[10]; // [kfz, kpz, kdz, kvcz, kacz, kdfz, kdfcz, kfr, kpr, kdfcr]
     double Compliance[2]; 
     double ArmSwi[2]; // [k_L, virtualM]
+    double StepCon[4]; // [k_adj, ts, te, thresh]
 };
 
 struct st_Filters{ // init required
@@ -68,6 +78,7 @@ struct st_DHdConIO{ // init required
     double RFTSen_B[6]; // right sensed foot contact force and torque in base frame
     double LegQ[12]; // leg joints angle [left 1~6, right 1~6] 
     double ArmQ[2]; // arm joints angle [left 1, right 1]
+    double TStepSS; // current step span of single support
     int SupSignal;
     int PressKey;
     // output
@@ -75,6 +86,7 @@ struct st_DHdConIO{ // init required
     double LAnkCmd_W[6]; // commanded left ankle position and posture in world frame [x, y, z, rx, ry, rz]
     double RAnkCmd_W[6]; // commanded right ankle position and posture in world frame [x, y, z, rx, ry, rz]
     double ArmQcmd[2]; // commanded arm joints angle [left 1, right 1]
+    double DeltaL_B[2]; // commanded step location adjustment in base frame [x, y]
 };
 
 struct st_DHdConData{
@@ -135,6 +147,7 @@ struct st_DHdConData{
     }ArmQ;
     double ZMP[2]; // ZMP in base frame [x, y]
     int SupLeg;
+    double DeltaL[2]; // step adjustment value in base frame [x, y]
 };
 
 class c_DHdCon {
@@ -156,8 +169,16 @@ public:
         int nFftFB, 
         int nGRFC, 
         int nComp,
-        int nArmSwi) {
-        this->SetCon(nPosCon, nMdZMP, nFftFB, nGRFC, nComp, nArmSwi);
+        int nArmSwi,
+        int nStepCon) {
+        this->SetCon(
+            nPosCon, 
+            nMdZMP, 
+            nFftFB, 
+            nGRFC, 
+            nComp, 
+            nArmSwi,
+            nStepCon);
         this->Reset();
         #ifdef __Aver3Filter
         cPitL.Init(0.0), cPitR.Init(0.0), cRolL.Init(0.0), cRolR.Init(0.0), cZL.Init(0.0), cZR.Init(0.0), cMPit.Init(0.0), cMRol.Init(0.0);
@@ -166,8 +187,21 @@ public:
         this->m_nIfInit = 1;
     }
     // set control flag
-    void SetCon(int nPosCon, int nMdZMP, int nFftFB, int nGRFC, int nComp, int nArmSwi) {
-        this->m_nPosCon = nPosCon, this->m_nMdZMP = nMdZMP, this->m_nFftFB = nFftFB, this->m_nGRFC = nGRFC, this->m_nComp = nComp, this->m_nArmSwi = nArmSwi;
+    void SetCon(
+        int nPosCon, 
+        int nMdZMP, 
+        int nFftFB, 
+        int nGRFC, 
+        int nComp, 
+        int nArmSwi,
+        int nStepCon) {
+        this->m_nPosCon = nPosCon, 
+        this->m_nMdZMP = nMdZMP, 
+        this->m_nFftFB = nFftFB, 
+        this->m_nGRFC = nGRFC, 
+        this->m_nComp = nComp, 
+        this->m_nArmSwi = nArmSwi;
+        this->m_nStepCon = nStepCon;
     }
     // reset the control
     void Reset() {
@@ -177,6 +211,7 @@ public:
         memset(&this->m_stErr, 0, sizeof(this->m_stErr));
         memset(&this->m_stCoV, 0, sizeof(this->m_stCoV));
         memset(&this->m_stCmd, 0, sizeof(this->m_stCmd));
+        this->m_SupLegLast = DSup;
     }
     // return 1: control applied, 0: control banished, -1: didn't init yet
     int Loop() { 
@@ -219,8 +254,9 @@ private:
     st_Filters * m_stFilters;
     st_DHdConIO * m_stIO;
     st_RobotConfig * m_stRobConfig;
-    int m_nPosCon, m_nMdZMP, m_nFftFB, m_nGRFC, m_nComp, m_nArmSwi; // singal control flag
+    int m_nPosCon, m_nMdZMP, m_nFftFB, m_nGRFC, m_nComp, m_nArmSwi, m_nStepCon; // singal control flag
     int m_nIfInit, m_nIfConOn; // init flag and total control flag
+    int m_SupLegLast; // support leg of the last time circle, not the last step!!
     double m_dSubPoly_B[4]; // [-x, x, -y, y]
     double m_dMStabLimit[4]; // [-tx, tx, -ty, ty]
     double m_dMStab[6], m_dMFeet[6], m_dMMdZMP[6], m_dMPend[6], m_dMWheel[6];
@@ -295,7 +331,7 @@ private:
     // calculate the moment limitation due to the foot region
     bool fnbCalMStabLimitPG() { 
         auto &cfg = this->m_stRobConfig;
-        double dMargin[3] = { 0.015, 0.01, 0.01 }; // [forw, back, side]
+        double dMargin[3] = { 0.015, 0.01, 0.0 }; // [forw, back, side]
         switch(this->m_stIO->SupSignal) {
         case DSup: // double leg support phase
             m_dMStabLimit[0] = -(cfg->FootGeom[3] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
@@ -544,6 +580,42 @@ private:
         }
         return false;
     }
+    //  model-free heuristic method of adjusting step location
+    bool fnbStepCon(int nIfCon) {
+        // static int nKInStep; // test
+        // static double dErr; // test
+        double dLimit[4] = { -0.18, 0.18, -2.0, 2.0 };
+        double dThresh[2] = { -this->m_stGains->StepCon[3], this->m_stGains->StepCon[3] }, dLTemp;
+        auto kp = this->m_stGains->StepCon[0], ts = this->m_stGains->StepCon[1], te = this->m_stGains->StepCon[2], kL = 3.5 / te;
+        auto &err = this->m_stErr, &ref = this->m_stRef, &cmd = this->m_stCmd;
+        auto &io = this->m_stIO;
+        if(io->SupSignal == DSup) kp = 0.0; // recover in double support phase
+        for(int i = __x; i <= __y; i++) { // calculate dErr & deltaL
+            #ifdef __Theta
+            dErr[i] = 2.0 * fndThreshold(err.Base[i], dThresh);
+            #endif
+            #ifdef __Theta2
+            dErr[i] = 3.0 * fndGetSign(err.Base[i]) * pow(fndThreshold(err.Base[i], dThresh), 2);
+            #endif
+            #ifdef __ThetaInt
+            if(io->SupSignal == DSup) dErr[i] =  0.0;
+            dErr[i] += 3.0 * fndThreshold(err.Base[i], dThresh) * this->m_stRobConfig->Tc;
+            #endif
+            #ifdef __CaptureP
+            dErr[i] = 1.0 * fndThreshold((err.Base[i] + err.dBase[i] / 15.0), dThresh);
+            #endif
+            ref.DeltaL[i] = kp * dErr[i];
+        }
+        if(this->m_SupLegLast == DSup && io->SupSignal != DSup) nKInStep = 0;
+        if(nKInStep * this->m_stRobConfig->Tc >= 0.0 && nKInStep * this->m_stRobConfig->Tc < ts) kL = 0.0;
+        if(nKInStep * this->m_stRobConfig->Tc >= (io->TStepSS - te) && nKInStep * this->m_stRobConfig->Tc < io->TStepSS) kL = 0.0;  
+        for(int i = __x; i <= __y; i++) {
+            dLTemp = kL * (ref.DeltaL[i] - cmd.DeltaL[i]);
+            if(nIfCon) fnvIntergVeloLimit(&cmd.DeltaL[i], dLTemp, dLimit, this->m_stRobConfig->Tc);
+        }
+        if(nKInStep < 1000) nKInStep++;
+        return nIfCon;
+    }
     // read pg trajectory and reference
     bool fnbGetTra() {
         static int nIfFirst = 2;
@@ -617,6 +689,7 @@ private:
         this->fnbGRFC(this->m_nGRFC);
         this->fnvCompliance(this->m_nComp);
         this->fnbArmSwing(this->m_nArmSwi);
+        this->fnbStepCon(this->m_nStepCon);
         return true;
     }
     // send commands data 
