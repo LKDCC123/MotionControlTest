@@ -10,22 +10,35 @@ _D_CONTROL_BEGIN
 _D_USING_BASE
 
 #define __FzMin 50.0
-#define __VarStiff
-#define __Aver3Filter
+
+/*  for data filter  *///=========================
+// #define __Aver3Filter
+
+/*    for varstiff   *///=========================
+// #define __VarStiff
 #define __TouchSoft
 // #define __UntouchRe
-// for stepcon ===============================
+
+/*  for mstab limit  *///=========================
+// #define __Direct
+#define __AnkPos
+
+/*for alpha calculate*///=========================
+#define __ZMPSplit
+// #define __FzSplit
+
+/*    for stepcon    *///=========================
 // #define __Theta
 // #define __Theta2
 // #define __ThetaInt 
 #define __CaptureP
 // #define __CapturePInt
-// for stepcon ===============================
 
 static double dPr[10]; // test
 static double dConL[6], dConR[6], dCondL[6], dCondR[6], dConddL[6], dConddR[6]; // test
 static int nKInStep; // test
 static double dErr[2]; // test
+static double dAlphaRe; // test
 
 #ifdef __Aver3Filter
 double3 dWeightT = { 0.05, 0.1, 0.95 }, dWeightF = { 0.05, 0.15, 0.85 }, dWeightM = { 0.15, 0.26, 0.62 };
@@ -239,6 +252,7 @@ public:
     st_DHdConData GetErrData() { return this->m_stErr; }
     st_DHdConData GetCoVData() { return this->m_stCoV; }
     st_DHdConData GetCmdData() { return this->m_stCmd; }
+    double *GetSupPolyData() { return this->m_dSubPoly_B; };
     double *GetMStabLimitData() { return this->m_dMStabLimit; };
     double *GetMStabData() { return this->m_dMStab; };
     double *GetMFeetData() { return this->m_dMFeet; };
@@ -302,25 +316,25 @@ private:
         auto &cfg = this->m_stRobConfig;
         switch(this->m_stIO->SupSignal) {
         case DSup: // double leg support phase
-            m_dSubPoly_B[0] = __MinOf((this->m_stPG.Ank.L.B[__x] - cfg->FootGeom[1]), (this->m_stPG.Ank.R.B[__x] - cfg->FootGeom[1]));
-            m_dSubPoly_B[1] = __MaxOf((this->m_stPG.Ank.L.B[__x] + cfg->FootGeom[0]), (this->m_stPG.Ank.R.B[__x] + cfg->FootGeom[0]));
-            m_dSubPoly_B[2] = m_stPG.Ank.R.B[__y] - cfg->FootGeom[3];
-            m_dSubPoly_B[3] = m_stPG.Ank.L.B[__y] + cfg->FootGeom[3];
+            this->m_dSubPoly_B[0] = __MinOf((this->m_stCmd.Ank.L.B[__x] - cfg->FootGeom[1]), (this->m_stCmd.Ank.R.B[__x] - cfg->FootGeom[1]));
+            this->m_dSubPoly_B[1] = __MaxOf((this->m_stCmd.Ank.L.B[__x] + cfg->FootGeom[0]), (this->m_stCmd.Ank.R.B[__x] + cfg->FootGeom[0]));
+            this->m_dSubPoly_B[2] = this->m_stCmd.Ank.R.B[__y] - cfg->FootGeom[3];
+            this->m_dSubPoly_B[3] = this->m_stCmd.Ank.L.B[__y] + cfg->FootGeom[3];
             break;
         case LSup: // left leg support phase
-            m_dSubPoly_B[0] = this->m_stPG.Ank.L.B[__x] - cfg->FootGeom[1];
-            m_dSubPoly_B[1] = this->m_stPG.Ank.L.B[__x] + cfg->FootGeom[0];
-            m_dSubPoly_B[2] = this->m_stPG.Ank.L.B[__y] - cfg->FootGeom[2];
-            m_dSubPoly_B[3] = this->m_stPG.Ank.L.B[__y] + cfg->FootGeom[3];
+            this->m_dSubPoly_B[0] = this->m_stCmd.Ank.L.B[__x] - cfg->FootGeom[1];
+            this->m_dSubPoly_B[1] = this->m_stCmd.Ank.L.B[__x] + cfg->FootGeom[0];
+            this->m_dSubPoly_B[2] = this->m_stCmd.Ank.L.B[__y] - cfg->FootGeom[2];
+            this->m_dSubPoly_B[3] = this->m_stCmd.Ank.L.B[__y] + cfg->FootGeom[3];
             break;
         case RSup: // right leg support phase
-            m_dSubPoly_B[0] = this->m_stPG.Ank.R.B[__x] - cfg->FootGeom[1];
-            m_dSubPoly_B[1] = this->m_stPG.Ank.R.B[__x] + cfg->FootGeom[0];
-            m_dSubPoly_B[2] = this->m_stPG.Ank.R.B[__y] - cfg->FootGeom[3];
-            m_dSubPoly_B[3] = this->m_stPG.Ank.R.B[__y] + cfg->FootGeom[2];
+            this->m_dSubPoly_B[0] = this->m_stCmd.Ank.R.B[__x] - cfg->FootGeom[1];
+            this->m_dSubPoly_B[1] = this->m_stCmd.Ank.R.B[__x] + cfg->FootGeom[0];
+            this->m_dSubPoly_B[2] = this->m_stCmd.Ank.R.B[__y] - cfg->FootGeom[3];
+            this->m_dSubPoly_B[3] = this->m_stCmd.Ank.R.B[__y] + cfg->FootGeom[2];
             break;
         default: // fly phase or other
-            memset(m_dSubPoly_B, 0, sizeof(m_dSubPoly_B));
+            memset(this->m_dSubPoly_B, 0, sizeof(this->m_dSubPoly_B));
             return false;
         }
         return true;
@@ -329,25 +343,47 @@ private:
     bool fnbCalMStabLimitPG() { 
         auto &cfg = this->m_stRobConfig;
         double dMargin[3] = { 0.015, 0.01, 0.01 }; // [forw, back, side]
-        switch(this->m_stIO->SupSignal) {
-        case DSup: // double leg support phase
-            m_dMStabLimit[0] = -(cfg->FootGeom[3] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
-            m_dMStabLimit[1] =  (cfg->FootGeom[3] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
-            break;
-        case LSup: // left leg support phase
-            m_dMStabLimit[0] = -(cfg->FootGeom[2] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
-            m_dMStabLimit[1] =  (cfg->FootGeom[3] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
-            break;
-        case RSup: // right leg support phase
-            m_dMStabLimit[0] = -(cfg->FootGeom[3] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
-            m_dMStabLimit[1] =  (cfg->FootGeom[2] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
-            break;
-        default: // fly phase or other
-            memset(m_dMStabLimit, 0, sizeof(m_dMStabLimit));
-            return false;
-        }
-        m_dMStabLimit[2] = -(cfg->FootGeom[0] - (double)this->m_nPosCon * dMargin[0]) * cfg->Mass * __Gravity;
-        m_dMStabLimit[3] =  (cfg->FootGeom[1] - (double)this->m_nPosCon * dMargin[1]) * cfg->Mass * __Gravity;
+        #ifdef __Direct
+            switch(this->m_stIO->SupSignal) {
+            case DSup: // double leg support phase
+                this->m_dMStabLimit[0] = -(cfg->FootGeom[3] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
+                this->m_dMStabLimit[1] =  (cfg->FootGeom[3] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
+                break;
+            case LSup: // left leg support phase
+                this->m_dMStabLimit[0] = -(cfg->FootGeom[2] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
+                this->m_dMStabLimit[1] =  (cfg->FootGeom[3] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
+                break;
+            case RSup: // right leg support phase
+                this->m_dMStabLimit[0] = -(cfg->FootGeom[3] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
+                this->m_dMStabLimit[1] =  (cfg->FootGeom[2] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
+                break;
+            default: // fly phase or other
+                memset(this->m_dMStabLimit, 0, sizeof(this->m_dMStabLimit));
+                return false;
+            }
+        #endif
+        #ifdef __AnkPos
+            double dSupAnkPosLat[2] = { 0.0 }; // left, right
+            this->fnbCalSupPolyPG(); // calculate support polygon
+            switch(this->m_stIO->SupSignal) {
+            case DSup: // double leg support phase
+                dSupAnkPosLat[0] = this->m_stCmd.Ank.L.B[__y], dSupAnkPosLat[1] = this->m_stCmd.Ank.R.B[__y];
+                break;
+            case LSup: // left leg support phase
+                dSupAnkPosLat[0] = dSupAnkPosLat[1] = this->m_stCmd.Ank.L.B[__y];
+                break;
+            case RSup: // right leg support phase
+                dSupAnkPosLat[0] = dSupAnkPosLat[1] = this->m_stCmd.Ank.R.B[__y];
+                break;
+            default: // fly phase or other
+                dSupAnkPosLat[0] = this->m_dSubPoly_B[3], dSupAnkPosLat[1] = this->m_dSubPoly_B[2];
+                break;
+            }
+            this->m_dMStabLimit[0] = (this->m_dSubPoly_B[2] - dSupAnkPosLat[1] + (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
+            this->m_dMStabLimit[1] = (this->m_dSubPoly_B[3] - dSupAnkPosLat[0] - (double)this->m_nPosCon * dMargin[2]) * cfg->Mass * __Gravity;
+        #endif
+        this->m_dMStabLimit[2] = -(cfg->FootGeom[0] - (double)this->m_nPosCon * dMargin[0]) * cfg->Mass * __Gravity;
+        this->m_dMStabLimit[3] =  (cfg->FootGeom[1] - (double)this->m_nPosCon * dMargin[1]) * cfg->Mass * __Gravity;
         return true;
     }
     // calculate the CoM error using simple direct reading state estimate method
@@ -371,7 +407,7 @@ private:
     // calculate the feedback moment to stablize the CoM and CoM rate error
     bool fnbCalMStabFB() { 
         double dLagTSplit = 0.1, dLagTFz = 0.002;
-        double dFBMAmp[2] = { 1.2, 1.0 }, dFBkd[2] = { 1.5, 1.0 }; // [rl, pt]
+        double dFBMAmp[2] = { 1.0, 1.0 }, dFBkd[2] = { 1.5, 1.0 }; // [rl, pt]
         auto &err = this->m_stErr;
         auto &kp = this->m_stGains->CalMStab[0], &kd = this->m_stGains->CalMStab[1];
         auto &Lx = this->m_stCmd.Ank.L.B[__x], &Ly = this->m_stCmd.Ank.L.B[__y], &Rx = this->m_stCmd.Ank.R.B[__x], &Ry = this->m_stCmd.Ank.R.B[__y];
@@ -385,9 +421,11 @@ private:
         #endif
         this->m_dMFeet[_rl] = fndAddLimit(this->m_dMStab[_rl], 0.0, &this->m_dMMdZMP[_rl], this->m_dMStabLimit);
         this->m_dMFeet[_pt] = fndAddLimit(this->m_dMStab[_pt], 0.0, &this->m_dMMdZMP[_pt], this->m_dMStabLimit + 2);
-        if(this->m_stIO->SupSignal == DSup) this->m_dMFeet[__z] = fndFilterTimeLag(this->m_dMFeet[__z], (this->m_dMFeet[_rl]/pow(((Lx - Rx)*(Lx - Rx))/((Ly - Ry)*(Ly - Ry)) + 1, 0.5) - (this->m_dMFeet[_pt]*(Lx - Rx)/(pow(((Lx - Rx)*(Lx - Rx))/((Ly - Ry)*(Ly - Ry)) + 1, 0.5)*(Ly - Ry)))) / sqrt((Lx - Rx)*(Lx - Rx) + (Ly - Ry)*(Ly - Ry)), this->m_stRobConfig->Tc, dLagTFz);
-        // if(this->m_stIO->SupSignal == DSup) this->m_dMFeet[__z] = fndFilterTimeLag(this->m_dMFeet[__z], this->m_dMFeet[_rl] / this->m_stRobConfig->AnkWidth, this->m_stRobConfig->Tc, dLagTFz);
-        else this->m_dMFeet[__z] = fndFilterTimeLag(this->m_dMFeet[__z], 0.0, this->m_stRobConfig->Tc, dLagTFz); // left foot positive, Todo[more accurate split]
+        if(this->fndIfTD()) {
+            // if(this->m_stIO->SupSignal == DSup) this->m_dMFeet[__z] = fndFilterTimeLag(this->m_dMFeet[__z], (this->m_dMFeet[_rl]/pow(((Lx - Rx)*(Lx - Rx))/((Ly - Ry)*(Ly - Ry)) + 1, 0.5) - (this->m_dMFeet[_pt]*(Lx - Rx)/(pow(((Lx - Rx)*(Lx - Rx))/((Ly - Ry)*(Ly - Ry)) + 1, 0.5)*(Ly - Ry)))) / sqrt((Lx - Rx)*(Lx - Rx) + (Ly - Ry)*(Ly - Ry)), this->m_stRobConfig->Tc, dLagTFz);
+            if(this->m_stIO->SupSignal == DSup) this->m_dMFeet[__z] = fndFilterTimeLag(this->m_dMFeet[__z], this->m_dMFeet[_rl] / this->m_stRobConfig->AnkWidth, this->m_stRobConfig->Tc, dLagTFz);
+            else this->m_dMFeet[__z] = fndFilterTimeLag(this->m_dMFeet[__z], 0.0, this->m_stRobConfig->Tc, dLagTFz); // left foot positive, Todo[more accurate split]
+        }
         // calculate Mpend and Mwheel by spliting Mmdzmp
         for(int i = _rl; i <= _pt; i++) {
             this->m_dMPend[i] = fndFilterTimeLag(this->m_dMPend[i], this->m_dMMdZMP[i], this->m_stRobConfig->Tc, dLagTSplit);
@@ -423,22 +461,25 @@ private:
         auto &pg = this->m_stPG, &ref = this->m_stRef;
         auto &Lx = this->m_stCmd.Ank.L.B[__x], &Ly = this->m_stCmd.Ank.L.B[__y], &Rx = this->m_stCmd.Ank.R.B[__x], &Ry = this->m_stCmd.Ank.R.B[__y];
         auto &Zx = this->m_stSen.ZMP[__x], &Zy = this->m_stSen.ZMP[__y];
-        double dMidPoint_y = (Lx*Lx*Ry - Lx*Ly*Rx + Zx*Lx*Ly - Lx*Rx*Ry - Zx*Lx*Ry + Zy*Ly*Ly + Ly*Rx*Rx - Zx*Ly*Rx - 2*Zy*Ly*Ry + Zx*Rx*Ry + Zy*Ry*Ry)/(Lx*Lx - 2*Lx*Rx + Ly*Ly - 2*Ly*Ry + Rx*Rx + Ry*Ry);
         double dLimitAlpha[2] = { 0.0, 1.0 }, dAlphaL, dAlphaR;
-        // if(this->fnnIfTD()) dAlphaL = fndLimit((dMidPoint_y - Ry) / (Ly - Ry), dLimitAlpha);
-        if(this->fnnIfTD()) dAlphaL = this->m_stSen.Fft.L.B[__z] / (this->m_stSen.Fft.L.B[__z] + this->m_stSen.Fft.R.B[__z]); // calculate the split rate for the feedback force
-        else dAlphaL = 0.5; // if fly
-        dAlphaR = 1.0 - dAlphaL;
+        #ifdef __ZMPSplit
+            double dMidPoint_y = (Lx*Lx*Ry - Lx*Ly*Rx + Zx*Lx*Ly - Lx*Rx*Ry - Zx*Lx*Ry + Zy*Ly*Ly + Ly*Rx*Rx - Zx*Ly*Rx - 2*Zy*Ly*Ry + Zx*Rx*Ry + Zy*Ry*Ry)/(Lx*Lx - 2*Lx*Rx + Ly*Ly - 2*Ly*Ry + Rx*Rx + Ry*Ry);
+            dAlphaL = fndLimit((dMidPoint_y - Ry) / (Ly - Ry), dLimitAlpha);
+        #endif
+        #ifdef __FzSplit
+            dAlphaL = this->m_stSen.Fft.L.B[__z] / (this->m_stSen.Fft.L.B[__z] + this->m_stSen.Fft.R.B[__z]); // calculate the split rate for the feedback force
+        #endif
+        dAlphaRe = dAlphaR = 1.0 - dAlphaL;
         dAlphaL *= dIfCon, dAlphaR *= dIfCon, dFzAmp *= dIfCon; // check if feedback control is triggered Todo[these 3 val add filter]
         memset(ref.Fft.L.B, 0, sizeof(ref.Fft.L.B)), memset(ref.Fft.R.B, 0, sizeof(ref.Fft.R.B)); // init referenced footft every control circle
         ref.Fft.L.B[__z] = this->m_stGains->Vip * pg.Fft.L.B[__z], ref.Fft.R.B[__z] = this->m_stGains->Vip * pg.Fft.R.B[__z]; // init referenced footft z
         if(this->fnnIfTD()) { // add feedback force when the robot touch down
+            ref.Fft.L.B[__z] += dFzAmp * this->m_dMFeet[__z];
+            ref.Fft.R.B[__z] -= dFzAmp * this->m_dMFeet[__z];
             switch(this->m_stIO->SupSignal) {
             case DSup: // double leg support phase
                 if(this->fnnIfLTD()) for(int i = _rl; i <= _pt; i++) ref.Fft.L.B[i] = pg.Fft.L.B[i] + dAlphaL * this->m_dMFeet[i];
                 if(this->fnnIfRTD()) for(int i = _rl; i <= _pt; i++) ref.Fft.R.B[i] = pg.Fft.R.B[i] + dAlphaR * this->m_dMFeet[i];
-                ref.Fft.L.B[__z] += dFzAmp * this->m_dMFeet[__z];
-                ref.Fft.R.B[__z] -= dFzAmp * this->m_dMFeet[__z];
                 break;
             case LSup: // left leg support phase
                 if(this->fnnIfLTD()) for(int i = _rl; i <= _pt; i++) ref.Fft.L.B[i] = pg.Fft.L.B[i] + dAlphaL * this->m_dMFeet[i];
@@ -566,7 +607,7 @@ private:
             fnvIntergVeloLimit(&AnkR[i], dAnkR[i], dLimit, this->m_stRobConfig->Tc);
         }
         if(nIfCon) {
-            for(int i = _rl; i <= _pt; i++) cmd.Ank.L.B[i] += AnkL[i], cmd.Ank.R.B[i] += AnkR[i]; 
+            for(int i = _rl; i <= _ya; i++) cmd.Ank.L.B[i] += AnkL[i], cmd.Ank.R.B[i] += AnkR[i]; 
             return true;
         }
         return false;
@@ -640,8 +681,8 @@ private:
                               pg.dBase[i]       = io->dBasePG[i];
             cmd.Ank.L.W[i]  = pg.Ank.L.W[i]     = io->LAnkPG_W[i];
             cmd.Ank.R.W[i]  = pg.Ank.R.W[i]     = io->RAnkPG_W[i];
-            pg.Ank.L.B[i]   = pg.Ank.L.W[i] - pg.Base[i];
-            pg.Ank.R.B[i]   = pg.Ank.R.W[i] - pg.Base[i];
+            pg.Ank.L.B[i]   = io->LAnkPG_W[i] - io->BasePG[i];
+            pg.Ank.R.B[i]   = io->RAnkPG_W[i] - io->BasePG[i];
             pg.Fft.L.B[i]   = io->LFTPG_B[i];
             pg.Fft.R.B[i]   = io->RFTPG_B[i];
         }
